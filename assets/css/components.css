@@ -801,7 +801,7 @@ button.cell:active,
     }
 
     .detail-backdrop .contact-detail {
-        width: min(620px, calc(100vw - var(--sidebar-width) - min(680px, 42vw)));
+        width: min(440px, calc(100vw - var(--sidebar-width) - min(680px, 42vw)));
         max-width: none;
         max-height: none;
         min-height: 100dvh;
@@ -1221,7 +1221,7 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
         box-sizing: border-box;
     }
     .sheet {
-        width: min(560px, calc(100vw - var(--sidebar-width) - 48px));
+        width: min(440px, calc(100vw - var(--sidebar-width) - 48px));
         max-height: calc(100dvh - var(--topbar-height) - 48px);
         border-radius: var(--radio-sheet);
     }
