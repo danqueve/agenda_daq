@@ -1,5 +1,5 @@
 :root {
-    color-scheme: light dark;
+    color-scheme: light;
 
     /* Color — modo claro (paleta tomada del tema de referencia Hando).
        tint, red, orange, gray y avatares 1/6/8 están oscurecidos para cumplir
@@ -107,30 +107,11 @@
     --duracion-push: 300ms;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        --bg-grouped: #2A2B34;
-        --bg-card: #1F2028;
-        --bg-card-2: #343A40;
-        --label: #ECEEF1;
-        --label-2: #CED4DA;
-        --label-3: #8C98A4;
-        --separator: #343A40;
-        --tint-contraste: #FFFFFF;
-        --tint: #108DFF;
-        --tint-hover: #0E7FE6;
-        --red: #E7366B;
-        --red-hover: #D03160;
-        --orange: #E77636;
-        --orange-hover: #D06A31;
-        --gray: #8C98A4;
-
-        --sombra-sm: 0 2px 8px rgba(0, 0, 0, .28);
-        --sombra-md: 0 8px 16px rgba(0, 0, 0, .36);
-        --sombra-lg: 0 16px 48px rgba(0, 0, 0, .45);
-    }
-}
-
+/* El modo oscuro automático (prefers-color-scheme) queda desactivado a
+   pedido: la app es siempre clara sin importar el tema del sistema/
+   navegador. El bloque [data-theme="dark"] queda abajo solo para poder
+   previsualizar el tema oscuro a mano desde ui.php si hace falta más
+   adelante; no se activa solo. */
 :root[data-theme="dark"] {
     --bg-grouped: #2A2B34;
     --bg-card: #1F2028;
