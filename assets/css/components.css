@@ -778,12 +778,13 @@ button.cell:active,
 .agenda-today { float: right; margin: -5px 0 10px; }
 .agenda-empty { clear: both; }
 
-/* La vista dividida (lista + ficha fija a la derecha) necesita bastante
-   ancho real para no quedar apretada: sidebar (260px) + lista (hasta 680px)
-   + ficha. Por debajo de 1200px no entra cómoda, así que la ficha se abre
-   como sheet centrada normal (ver reglas de .sheet-backdrop más abajo),
-   igual que en tablet/celular. Este fue el origen del bug de paneles
-   "fuera de encuadre" en pantallas de 900-1199px. */
+/* La lista de contactos usa un poco más de ancho en pantallas grandes, pero
+   la ficha de contacto SIEMPRE se abre como sheet centrada y compacta (ver
+   .sheet-backdrop/.sheet más abajo) — nunca como panel fijo de altura
+   completa. Un panel docked a la derecha causaba dos problemas reales: su
+   header ("Cerrar"/"Editar") quedaba tapado detrás de la barra superior
+   fija, y resultaba un cuadro demasiado largo con mucho espacio vacío para
+   lo poco que muestra una ficha. */
 @media (min-width: 1200px) {
     .screen:has(.contact-list) { max-width: none; }
 
@@ -791,23 +792,6 @@ button.cell:active,
         width: min(680px, 42vw);
         border-right: 1px solid var(--separator);
         min-height: calc(100dvh - var(--topbar-height));
-    }
-
-    .detail-backdrop {
-        align-items: stretch;
-        justify-content: flex-end;
-        background: transparent;
-        pointer-events: none;
-    }
-
-    .detail-backdrop .contact-detail {
-        width: min(440px, calc(100vw - var(--sidebar-width) - min(680px, 42vw)));
-        max-width: none;
-        max-height: none;
-        min-height: 100dvh;
-        border-radius: 0;
-        box-shadow: var(--sombra-lg);
-        pointer-events: auto;
     }
 }
 
