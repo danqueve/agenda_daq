@@ -86,6 +86,29 @@ function panelModule() {
             return Object.entries(this.panel.proximos || {}).sort(([a], [b]) => a.localeCompare(b));
         },
 
+        // Junta vencidos/hoy/próximos/sin fecha en una sola lista para la
+        // grilla de tarjetas pastel, marcando el estado visual de cada una.
+        // Puramente de presentación: no cambia qué datos trae el panel.
+        tarjetasHoy() {
+            const marcar = (lista, estado) => (lista || []).map((c) => ({ contacto: c, estado }));
+            const proximos = Object.values(this.panel.proximos || {}).flat();
+            return [
+                ...marcar(this.panel.vencidos, 'vencido'),
+                ...marcar(this.panel.hoy, 'hoy'),
+                ...marcar(proximos, 'proximo'),
+                ...marcar(this.panel.sin_fecha, 'sinfecha'),
+            ];
+        },
+
+        mensajeAnillo() {
+            const total = Number(this.panel.anillo?.agendados_hoy || 0);
+            const hechos = Number(this.panel.anillo?.hechos_hoy || 0);
+            const restan = Math.max(total - hechos, 0);
+            if (!total) return 'Sin recontactos agendados para hoy';
+            if (!restan) return '¡Completaste el día!';
+            return restan === 1 ? 'Te queda 1 recontacto' : `Te quedan ${restan} recontactos`;
+        },
+
         tituloDia(day) {
             return new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(this.desdeIso(day));
         },

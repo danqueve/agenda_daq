@@ -83,6 +83,130 @@ requireLogin();
             </section>
 
             <section class="ui-seccion">
+                <h2 class="footnote ui-seccion__titulo">Anillo del día (pastel)</h2>
+                <div class="anillo-dia anillo-dia--pastel">
+                    <div class="anillo-dia__grafico">
+                        <svg viewBox="0 0 110 110">
+                            <circle class="anillo-dia__pista" cx="55" cy="55" r="48" fill="none" stroke-width="10"/>
+                            <circle class="anillo-dia__progreso" cx="55" cy="55" r="48" fill="none" stroke-width="10"
+                                stroke-dasharray="301.6" stroke-dashoffset="90.5"/>
+                        </svg>
+                        <div class="anillo-dia__numero">
+                            <strong class="tabular">3/5</strong>
+                        </div>
+                    </div>
+                    <div class="anillo-dia__filas">
+                        <p class="anillo-dia__etiqueta">Anillo del día</p>
+                        <p class="anillo-dia__mensaje">Te quedan 2 recontactos</p>
+                        <p class="anillo-dia__ayuda">Registrá un recontacto y el anillo avanza.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ui-seccion">
+                <h2 class="footnote ui-seccion__titulo">Tarjetas de métrica (stat-card)</h2>
+                <div class="stat-card-grid">
+                    <div class="stat-card stat-card--vencido">
+                        <div class="stat-card__cabecera"><span class="stat-card__etiqueta">Vencidos</span><span class="stat-card__icono"><i data-lucide="alert-circle"></i></span></div>
+                        <strong class="stat-card__numero tabular">3</strong>
+                        <p class="stat-card__ayuda">Necesitan atención</p>
+                    </div>
+                    <div class="stat-card stat-card--hoy">
+                        <div class="stat-card__cabecera"><span class="stat-card__etiqueta">Para hoy</span><span class="stat-card__icono"><i data-lucide="clock"></i></span></div>
+                        <strong class="stat-card__numero tabular">9</strong>
+                        <p class="stat-card__ayuda">Agendados para hoy</p>
+                    </div>
+                    <div class="stat-card stat-card--proximo">
+                        <div class="stat-card__cabecera"><span class="stat-card__etiqueta">Próximos días</span><span class="stat-card__icono"><i data-lucide="calendar-days"></i></span></div>
+                        <strong class="stat-card__numero tabular">14</strong>
+                        <p class="stat-card__ayuda">Esta semana</p>
+                    </div>
+                    <div class="stat-card stat-card--concreto">
+                        <div class="stat-card__cabecera"><span class="stat-card__etiqueta">Concretaron</span><span class="stat-card__icono"><i data-lucide="check-circle"></i></span></div>
+                        <strong class="stat-card__numero tabular">6</strong>
+                        <p class="stat-card__ayuda">Este mes</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ui-seccion">
+                <h2 class="footnote ui-seccion__titulo">Grilla de recontactos (card-pastel)</h2>
+                <div class="card-pastel-grid">
+                    <article class="card-pastel card-pastel--vencido">
+                        <div class="card-pastel__head">
+                            <span class="card-pastel__persona">
+                                <span class="avatar" style="background:var(--avatar-3)">MG</span>
+                                <span class="card-pastel__cuerpo">
+                                    <span class="card-pastel__nombre">Mariana Gómez</span>
+                                    <span class="card-pastel__detalle">Crédito personal · necesita refinanciar</span>
+                                </span>
+                            </span>
+                            <span class="chip-estado">Vencido</span>
+                        </div>
+                        <p class="card-pastel__fecha tabular"><i data-lucide="clock"></i>Ayer 18:00</p>
+                        <div class="card-pastel__acciones">
+                            <span class="quick-action-card quick-action-card--llamar"><i data-lucide="phone"></i>Llamar</span>
+                            <span class="quick-action-card quick-action-card--whatsapp"><i data-lucide="message-circle"></i>WhatsApp</span>
+                            <span class="quick-action-card quick-action-card--posponer"><i data-lucide="clock-3"></i>Posponer</span>
+                        </div>
+                    </article>
+                    <article class="card-pastel card-pastel--hoy">
+                        <div class="card-pastel__head">
+                            <span class="card-pastel__persona">
+                                <span class="avatar" style="background:var(--avatar-7)">CI</span>
+                                <span class="card-pastel__cuerpo">
+                                    <span class="card-pastel__nombre">Carla Ibáñez</span>
+                                    <span class="card-pastel__detalle">Plan de 12 cuotas · compara precios</span>
+                                </span>
+                            </span>
+                            <span class="chip-estado">Para hoy</span>
+                        </div>
+                        <p class="card-pastel__fecha tabular"><i data-lucide="clock"></i>Hoy 16:00</p>
+                        <div class="card-pastel__acciones">
+                            <span class="quick-action-card quick-action-card--llamar"><i data-lucide="phone"></i>Llamar</span>
+                            <span class="quick-action-card quick-action-card--whatsapp"><i data-lucide="message-circle"></i>WhatsApp</span>
+                            <span class="quick-action-card quick-action-card--posponer"><i data-lucide="clock-3"></i>Posponer</span>
+                        </div>
+                    </article>
+                    <article class="card-pastel card-pastel--proximo">
+                        <div class="card-pastel__head">
+                            <span class="card-pastel__persona">
+                                <span class="avatar" style="background:var(--avatar-2)">LH</span>
+                                <span class="card-pastel__cuerpo">
+                                    <span class="card-pastel__nombre">Lucía Herrera</span>
+                                    <span class="card-pastel__detalle">Celular · cobra el viernes</span>
+                                </span>
+                            </span>
+                            <span class="chip-estado">Próximo</span>
+                        </div>
+                        <p class="card-pastel__fecha tabular"><i data-lucide="clock"></i>Viernes 9:00</p>
+                        <div class="card-pastel__acciones">
+                            <span class="quick-action-card quick-action-card--llamar"><i data-lucide="phone"></i>Llamar</span>
+                            <span class="quick-action-card quick-action-card--whatsapp"><i data-lucide="message-circle"></i>WhatsApp</span>
+                            <span class="quick-action-card quick-action-card--posponer"><i data-lucide="clock-3"></i>Posponer</span>
+                        </div>
+                    </article>
+                    <article class="card-pastel">
+                        <div class="card-pastel__head">
+                            <span class="card-pastel__persona">
+                                <span class="avatar" style="background:var(--avatar-7)">NR</span>
+                                <span class="card-pastel__cuerpo">
+                                    <span class="card-pastel__nombre">Nicolás Ruiz</span>
+                                    <span class="card-pastel__detalle">Colchón 2 plazas · sin fecha agendada</span>
+                                </span>
+                            </span>
+                            <span class="chip-estado">Sin fecha</span>
+                        </div>
+                        <div class="card-pastel__acciones">
+                            <span class="quick-action-card quick-action-card--llamar"><i data-lucide="phone"></i>Llamar</span>
+                            <span class="quick-action-card quick-action-card--whatsapp"><i data-lucide="message-circle"></i>WhatsApp</span>
+                            <span class="quick-action-card quick-action-card--nota"><i data-lucide="sticky-note"></i>Nota</span>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="ui-seccion">
                 <h2 class="footnote ui-seccion__titulo">Lista inset grouped</h2>
                 <div class="group">
                     <a class="cell cell--avatar-offset" href="#">
