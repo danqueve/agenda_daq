@@ -40,107 +40,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#101214" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#06070B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Agenda">
     <title>Agenda DAQ — Ingresar</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <style>
-        .login-pantalla {
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px var(--margen-lateral);
-        }
-        .login-icono {
-            width: 72px;
-            height: 72px;
-            border-radius: 18px;
-            background: var(--tint);
-            color: var(--tint-contraste);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-        }
-        .login-icono svg { width: 36px; height: 36px; }
-        .login-titulo { margin-bottom: 28px; }
-        .login-form { width: 100%; max-width: 360px; }
-        .login-error {
-            color: var(--red);
-            font-size: var(--fs-subhead);
-            text-align: center;
-            margin-bottom: 12px;
-        }
-        .cell input[type="text"],
-        .cell input[type="password"] {
-            flex: 1;
-            text-align: right;
-            border: none;
-            background: none;
-            font-size: var(--fs-body);
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/login.css">
 </head>
 <body>
-    <div class="login-pantalla">
-        <div class="login-icono"><i data-lucide="calendar-clock"></i></div>
-        <h1 class="large-title login-titulo">Agenda DAQ</h1>
+    <main class="login-dark" aria-labelledby="login-titulo">
+        <div class="login-dark__glow" aria-hidden="true"></div>
 
-        <form class="login-form" method="post" x-data="{ recordar: true }">
-            <?= csrf_field() ?>
+        <span class="login-dark__brand">
+            <span class="login-dark__brand-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#0b0d14" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <path d="M8 2v4M16 2v4M3 10h18"/>
+                    <path d="m9 16 2 2 4-4"/>
+                </svg>
+            </span>
+            <span>Agenda DAQ</span>
+        </span>
 
-            <?php if ($error): ?>
-                <p class="login-error"><?= e($error) ?></p>
-            <?php endif; ?>
+        <div class="login-dark__frame">
+            <div class="login-dark__card">
+                <h1 class="login-dark__title" id="login-titulo">Iniciar sesión</h1>
+                <p class="login-dark__sub">Tu agenda de consultas y recontactos.</p>
 
-            <div class="group">
-                <label class="cell">
-                    <span class="cell__label">Usuario</span>
-                    <input type="text" name="usuario" autocomplete="username" required autofocus>
-                </label>
-                <label class="cell">
-                    <span class="cell__label">Contraseña</span>
-                    <input type="password" name="password" autocomplete="current-password" required>
-                </label>
+                <?php if ($error): ?>
+                    <p class="login-dark__error"><?= e($error) ?></p>
+                <?php endif; ?>
+
+                <form method="post" novalidate>
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="recordar" value="1">
+
+                    <div class="login-dark__field">
+                        <label class="login-dark__label" for="login-usuario">Usuario</label>
+                        <input class="login-dark__input" id="login-usuario" name="usuario" type="text" autocomplete="username" required autofocus>
+                    </div>
+
+                    <div class="login-dark__field">
+                        <label class="login-dark__label" for="login-pw">Contraseña</label>
+                        <div class="login-dark__pw">
+                            <input class="login-dark__input" id="login-pw" name="password" type="password" autocomplete="current-password" required>
+                            <button class="login-dark__eye" type="button" aria-label="Mostrar contraseña" aria-pressed="false" aria-controls="login-pw" data-pw-toggle>
+                                <svg class="login-dark__eye-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="login-dark__eye-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7a9.8 9.8 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="login-dark__submit" type="submit">Ingresar</button>
+                </form>
             </div>
+        </div>
+    </main>
 
-            <div class="group">
-                <label class="cell">
-                    <span class="cell__content"><span class="cell__title">Mantener sesión iniciada</span></span>
-                    <input type="hidden" name="recordar" :value="recordar ? '1' : ''">
-                    <button
-                        type="button"
-                        class="toggle"
-                        role="switch"
-                        :aria-checked="recordar ? 'true' : 'false'"
-                        @click="recordar = !recordar"
-                    >
-                        <span class="toggle__perilla"></span>
-                    </button>
-                </label>
-            </div>
-
-            <button type="submit" class="btn-principal">Ingresar</button>
-        </form>
-    </div>
-
-    <script src="assets/vendor/alpine.min.js" defer></script>
-    <script src="assets/vendor/lucide/lucide.min.js"></script>
     <script src="assets/js/pwa.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.lucide) {
-                window.lucide.createIcons();
-            }
+        document.querySelectorAll('[data-pw-toggle]').forEach((btn) => {
+            const input = document.getElementById(btn.getAttribute('aria-controls'));
+            btn.addEventListener('click', () => {
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                btn.setAttribute('aria-pressed', String(show));
+            });
         });
     </script>
 </body>
