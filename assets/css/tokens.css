@@ -26,7 +26,9 @@
     --indigo: #522C8F;
     --indigo-hover: #45256F;
 
-    /* Pastel (tarjetas de estado en la pantalla Hoy) */
+    /* Pastel (tarjetas de estado en la pantalla Hoy). A propósito NO se
+       redefinen en los bloques de tema oscuro: son colores claros fijos
+       (quedan como chips pastel sobre fondo oscuro), no adaptados al tema. */
     --pastel-tint: #E4F1FF;
     --pastel-tint-borde: #C9E3FF;
     --tint-texto: #0B63B8;
@@ -42,6 +44,8 @@
     --pastel-green: #E2F1EE;
     --pastel-green-borde: #C4E2DC;
     --green-texto: #1F6B5F;
+    --pastel-label: #2F384F;
+    --pastel-label-2: #4A5A6B;
 
     /* Paleta de avatares (8 tonos, tomados de la paleta de acento de Hando) */
     --avatar-1: #0A6CCC;
@@ -121,22 +125,6 @@
         --orange-hover: #D06A31;
         --gray: #8C98A4;
 
-        --pastel-tint: color-mix(in srgb, var(--tint) 20%, var(--bg-card));
-        --pastel-tint-borde: color-mix(in srgb, var(--tint) 40%, var(--bg-card));
-        --tint-texto: var(--tint);
-        --pastel-red: color-mix(in srgb, var(--red) 20%, var(--bg-card));
-        --pastel-red-borde: color-mix(in srgb, var(--red) 40%, var(--bg-card));
-        --red-texto: var(--red);
-        --pastel-orange: color-mix(in srgb, var(--orange) 20%, var(--bg-card));
-        --pastel-orange-borde: color-mix(in srgb, var(--orange) 40%, var(--bg-card));
-        --orange-texto: var(--orange);
-        --pastel-indigo: color-mix(in srgb, var(--indigo) 20%, var(--bg-card));
-        --pastel-indigo-borde: color-mix(in srgb, var(--indigo) 40%, var(--bg-card));
-        --indigo-texto: var(--indigo);
-        --pastel-green: color-mix(in srgb, var(--green) 20%, var(--bg-card));
-        --pastel-green-borde: color-mix(in srgb, var(--green) 40%, var(--bg-card));
-        --green-texto: var(--green);
-
         --sombra-sm: 0 2px 8px rgba(0, 0, 0, .28);
         --sombra-md: 0 8px 16px rgba(0, 0, 0, .36);
         --sombra-lg: 0 16px 48px rgba(0, 0, 0, .45);
@@ -159,22 +147,6 @@
     --orange: #E77636;
     --orange-hover: #D06A31;
     --gray: #8C98A4;
-
-    --pastel-tint: color-mix(in srgb, var(--tint) 20%, var(--bg-card));
-    --pastel-tint-borde: color-mix(in srgb, var(--tint) 40%, var(--bg-card));
-    --tint-texto: var(--tint);
-    --pastel-red: color-mix(in srgb, var(--red) 20%, var(--bg-card));
-    --pastel-red-borde: color-mix(in srgb, var(--red) 40%, var(--bg-card));
-    --red-texto: var(--red);
-    --pastel-orange: color-mix(in srgb, var(--orange) 20%, var(--bg-card));
-    --pastel-orange-borde: color-mix(in srgb, var(--orange) 40%, var(--bg-card));
-    --orange-texto: var(--orange);
-    --pastel-indigo: color-mix(in srgb, var(--indigo) 20%, var(--bg-card));
-    --pastel-indigo-borde: color-mix(in srgb, var(--indigo) 40%, var(--bg-card));
-    --indigo-texto: var(--indigo);
-    --pastel-green: color-mix(in srgb, var(--green) 20%, var(--bg-card));
-    --pastel-green-borde: color-mix(in srgb, var(--green) 40%, var(--bg-card));
-    --green-texto: var(--green);
 
     --sombra-sm: 0 2px 8px rgba(0, 0, 0, .28);
     --sombra-md: 0 8px 16px rgba(0, 0, 0, .36);

@@ -1262,14 +1262,18 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 
 /* ===== Tarjetas pastel (pantalla Hoy) ===== */
 
+/* Las tarjetas pastel quedan con el mismo aspecto claro en los dos temas
+   (fondo blanco/pastel fijo, texto oscuro fijo): son chips de color sobre
+   la página, no tarjetas que se adaptan al tema. */
 .card-pastel {
     display: flex;
     flex-direction: column;
     gap: 14px;
     padding: 18px;
     border-radius: var(--radio-grupo);
-    border: 1px solid var(--separator);
-    background: var(--bg-card);
+    border: 1px solid #DEE2E6;
+    background: #FFFFFF;
+    color: var(--pastel-label);
     box-shadow: var(--sombra-sm);
 }
 
@@ -1312,7 +1316,7 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     margin: 2px 0 0;
     font-size: var(--fs-subhead);
     line-height: var(--lh-subhead);
-    color: var(--label-2);
+    color: var(--pastel-label-2);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1322,7 +1326,7 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     display: flex;
     align-items: center;
     gap: 6px;
-    color: var(--label-2);
+    color: var(--pastel-label-2);
     font-size: var(--fs-subhead);
 }
 
@@ -1351,12 +1355,12 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     flex-shrink: 0;
     padding: 4px 8px;
     border-radius: var(--radio-chico);
-    background: var(--bg-card);
+    background: #FFFFFF;
     font-size: var(--fs-footnote);
     font-weight: var(--fw-footnote);
     letter-spacing: .04em;
     text-transform: uppercase;
-    color: var(--label-2);
+    color: var(--pastel-label-2);
 }
 
 .card-pastel--vencido .chip-estado { color: var(--red-texto); }
@@ -1372,8 +1376,8 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     gap: 6px;
     min-height: 44px;
     border-radius: var(--radio-grupo);
-    background: var(--bg-card);
-    color: var(--label);
+    background: #FFFFFF;
+    color: var(--pastel-label);
     font-size: var(--fs-subhead);
     font-weight: 600;
     text-decoration: none;
@@ -1432,7 +1436,7 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: var(--bg-card);
+    background: #FFFFFF;
 }
 
 .stat-card__icono svg { width: 17px; height: 17px; }
@@ -1446,19 +1450,30 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     line-height: 36px;
     font-weight: 700;
     letter-spacing: -0.04em;
+    color: var(--pastel-label);
 }
 
 .stat-card__ayuda {
     font-size: var(--fs-subhead);
     line-height: var(--lh-subhead);
-    color: var(--label-2);
+    color: var(--pastel-label-2);
 }
 
-/* Anillo del día envuelto en tarjeta pastel tint */
+/* Anillo del día envuelto en tarjeta pastel tint. Igual que las demás
+   tarjetas pastel, fondo/texto/ring quedan fijos en los dos temas. */
 .anillo-dia--pastel {
     background: var(--pastel-tint);
     border: 1px solid var(--pastel-tint-borde);
+    color: var(--pastel-label);
     box-shadow: var(--sombra-sm);
+}
+
+.anillo-dia--pastel .anillo-dia__pista {
+    stroke: #FFFFFF;
+}
+
+.anillo-dia--pastel .anillo-dia__numero .caption {
+    color: var(--pastel-label-2);
 }
 
 .anillo-dia__etiqueta {
@@ -1478,5 +1493,5 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 .anillo-dia__ayuda {
     margin: 0;
     font-size: var(--fs-subhead);
-    color: var(--label-2);
+    color: var(--pastel-label-2);
 }
