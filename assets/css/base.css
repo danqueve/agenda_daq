@@ -88,3 +88,7 @@ img, svg {
 [hidden] {
     display: none !important;
 }
+
+[x-cloak] {
+    display: none !important;
+}

@@ -1,7 +1,7 @@
 # Agenda DAQ — contexto del proyecto
 
 Repo: https://github.com/danqueve/agenda_daq.git (rama main)
-Base de datos: c2881399_agenda_daq
+Base de datos: c2881399_agenda
 
 ## Qué es
 Agenda personal de un único usuario (Alejandro) para anotar consultas de clientes

@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS seguimientos (
     resultado ENUM('atendio','no_atendio','mensaje_enviado','sin_dato') DEFAULT NULL,
     nota TEXT,
     fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    proximo_anterior DATETIME DEFAULT NULL,
     proximo_asignado DATETIME DEFAULT NULL,
     PRIMARY KEY (id),
     KEY idx_seguimientos_contacto_fecha (contacto_id, fecha),

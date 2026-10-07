@@ -3,7 +3,7 @@
 Proyecto: agenda personal de consultas y recontactos, con diseño de app iOS
 Repo: `https://github.com/danqueve/agenda_daq.git`
 Dominio: `agenda.imperiocomercial.com.ar`
-Base de datos: `c2881399_agenda_daq` (mismo nombre en WAMP y producción)
+Base de datos: `c2881399_agenda` (mismo nombre en WAMP y producción)
 Stack: PHP 8.3 + MySQL 8 (PDO) + Alpine.js + PWA · Composer solo para `minishlink/web-push` y `vlucas/phpdotenv`
 Avisos: panel "Hoy / Vencidos" + notificaciones push (sin email)
 Desarrollo: WAMP64 local → GitHub → VPS producción (`git pull origin main`)
@@ -31,7 +31,7 @@ Desarrollo: WAMP64 local → GitHub → VPS producción (`git pull origin main`)
 # Agenda DAQ — contexto del proyecto
 
 Repo: https://github.com/danqueve/agenda_daq.git (rama main)
-Base de datos: c2881399_agenda_daq
+Base de datos: c2881399_agenda
 
 ## Qué es
 Agenda personal de un único usuario (Alejandro) para anotar consultas de clientes
@@ -214,7 +214,7 @@ OBJETIVO: esqueleto del proyecto, esquema completo de base de datos, autenticaci
 y la base del sistema de diseño iOS.
 
 1. Estructura de carpetas según CLAUDE.md, composer.json con vlucas/phpdotenv,
-   .env.example (DB_HOST, DB_NAME=c2881399_agenda_daq, DB_USER, DB_PASS,
+   .env.example (DB_HOST, DB_NAME=c2881399_agenda, DB_USER, DB_PASS,
    APP_URL=http://localhost/agenda_daq, APP_TZ, VAPID_PUBLIC, VAPID_PRIVATE, VAPID_SUBJECT),
    .gitignore (vendor, .env, storage/logs/*).
 
@@ -473,7 +473,7 @@ generá los archivos y una guía paso a paso en docs/DEPLOY.md.
 
 2. docs/DEPLOY.md con:
    - Alta del subdominio en el panel y certificado SSL (obligatorio para PWA y push).
-   - Crear base c2881399_agenda_daq y usuario MySQL con permisos solo sobre esa base.
+   - Crear base c2881399_agenda y usuario MySQL con permisos solo sobre esa base.
    - git clone https://github.com/danqueve/agenda_daq.git dentro de public_html (queda public_html/agenda_daq),
      configurando acceso al repo (deploy key SSH si el repo es privado), composer install --no-dev
      usando el binario de PHP 8.x (no el php 5.6 por defecto); cómo encontrar la ruta del binario.

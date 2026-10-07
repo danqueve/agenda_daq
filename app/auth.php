@@ -56,7 +56,7 @@ function requireLogin(): void
         return;
     }
 
-    if (str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/api/')) {
+    if (preg_match('#(?:^|/)api/#', parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '')) {
         json_response(['ok' => false, 'error' => 'No autenticado'], 401);
     }
 
@@ -185,6 +185,12 @@ function borrar_cookie_recordar(): void
 {
     setcookie(RECORDAR_COOKIE, '', ['expires' => time() - 3600, 'path' => '/']);
     unset($_COOKIE[RECORDAR_COOKIE]);
+}
+
+function revocar_tokens_recordar(int $usuarioId): void
+{
+    $stmt = Db::get()->prepare('DELETE FROM tokens_recordar WHERE usuario_id = :usuario_id');
+    $stmt->execute(['usuario_id' => $usuarioId]);
 }
 
 function logout(): void
