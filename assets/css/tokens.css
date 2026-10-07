@@ -1,7 +1,10 @@
 :root {
     color-scheme: light dark;
 
-    /* Color — modo claro (paleta tomada del tema de referencia Hando) */
+    /* Color — modo claro (paleta tomada del tema de referencia Hando).
+       tint, red, orange, gray y avatares 1/6/8 están oscurecidos para cumplir
+       contraste AA con texto blanco (>=4.5:1; íconos >=3:1). En modo oscuro
+       se restauran los tonos originales, que ya contrastan sobre fondo oscuro. */
     --bg-grouped: #F6F8FB;
     --bg-card: #FFFFFF;
     --bg-card-2: #F0F4F7;
@@ -9,29 +12,29 @@
     --label-2: #4A5A6B;
     --label-3: #8C98A4;
     --separator: #DEE2E6;
-    --tint: #108DFF;
-    --tint-hover: #0E7FE6;
+    --tint: #0A6CCC;
+    --tint-hover: #0960B5;
     --tint-contraste: #FFFFFF;
 
-    --red: #E7366B;
-    --red-hover: #D03160;
-    --orange: #E77636;
-    --orange-hover: #D06A31;
+    --red: #D12A5E;
+    --red-hover: #BA2453;
+    --orange: #C85F25;
+    --orange-hover: #B25421;
     --green: #287F71;
     --green-hover: #247266;
-    --gray: #8C98A4;
+    --gray: #6B7785;
     --indigo: #522C8F;
     --indigo-hover: #45256F;
 
     /* Paleta de avatares (8 tonos, tomados de la paleta de acento de Hando) */
-    --avatar-1: #108DFF;
+    --avatar-1: #0A6CCC;
     --avatar-2: #522C8F;
     --avatar-3: #963B68;
     --avatar-4: #DB398A;
     --avatar-5: #E7366B;
-    --avatar-6: #E77636;
+    --avatar-6: #C85F25;
     --avatar-7: #287F71;
-    --avatar-8: #27EBB0;
+    --avatar-8: #12806A;
 
     /* Tipografía */
     --font-sistema: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -93,6 +96,13 @@
         --label-3: #8C98A4;
         --separator: #343A40;
         --tint-contraste: #FFFFFF;
+        --tint: #108DFF;
+        --tint-hover: #0E7FE6;
+        --red: #E7366B;
+        --red-hover: #D03160;
+        --orange: #E77636;
+        --orange-hover: #D06A31;
+        --gray: #8C98A4;
 
         --sombra-sm: 0 2px 8px rgba(0, 0, 0, .28);
         --sombra-md: 0 8px 16px rgba(0, 0, 0, .36);
@@ -109,6 +119,13 @@
     --label-3: #8C98A4;
     --separator: #343A40;
     --tint-contraste: #FFFFFF;
+    --tint: #108DFF;
+    --tint-hover: #0E7FE6;
+    --red: #E7366B;
+    --red-hover: #D03160;
+    --orange: #E77636;
+    --orange-hover: #D06A31;
+    --gray: #8C98A4;
 
     --sombra-sm: 0 2px 8px rgba(0, 0, 0, .28);
     --sombra-md: 0 8px 16px rgba(0, 0, 0, .36);

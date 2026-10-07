@@ -8,40 +8,47 @@ El protagonista del inicio es el "Anillo del día": un anillo de progreso que mu
 cuántos recontactos de hoy ya hiciste sobre el total agendado. Ese es el único elemento
 llamativo; todo lo demás es sobrio y ordenado como iOS.
 
-## Color (variables CSS en assets/css/tokens.css)
-Modo claro / modo oscuro (automático con prefers-color-scheme):
-- --bg-grouped:      #F2F2F7 / #000000   fondo de pantalla
-- --bg-card:         #FFFFFF / #1C1C1E   celdas y grupos
-- --bg-card-2:       #F2F2F7 / #2C2C2E   campos, chips, celdas anidadas
-- --label:           #000000 / #FFFFFF
-- --label-2:         rgba(60,60,67,.60) / rgba(235,235,245,.60)
-- --label-3:         rgba(60,60,67,.30) / rgba(235,235,245,.30)
-- --separator:       rgba(60,60,67,.29) / rgba(84,84,88,.65)
-- --tint:            #0B7A75 / #2BB3AA   verde petróleo: color de la app (botones, links, anillo)
-Semánticos (iguales a los de iOS):
-- --red    #FF3B30 / #FF453A   vencidos, eliminar
-- --orange #FF9500 / #FF9F0A   hoy
-- --green  #34C759 / #30D158   concretó
-- --gray   #8E8E93 / #98989D   cerrados, sin respuesta
-- --indigo #5856D6 / #5E5CE6   próximos días
-Avatares: color de fondo derivado del hash del nombre, de una paleta de 8 tonos iOS.
+## Color (variables CSS en assets/css/tokens.css — fuente de verdad)
+Paleta de trabajo blanca y azul (tema de referencia Hando). Modo claro / modo oscuro
+(automático con prefers-color-scheme, o forzado con data-theme):
+- --bg-grouped:      #F6F8FB / #2A2B34   fondo de pantalla y de los sheets
+- --bg-card:         #FFFFFF / #1F2028   grupos, celdas, cabecera, barra lateral
+- --bg-card-2:       #F0F4F7 / #343A40   campos, chips, pills, celda presionada
+- --label:           #2F384F / #ECEEF1   texto principal
+- --label-2:         #4A5A6B / #CED4DA   texto secundario, encabezados de grupo
+- --label-3:         #8C98A4 / #8C98A4   chevrons, grabber (no usar para texto en claro)
+- --separator:       #DEE2E6 / #343A40
+- --tint:            #0A6CCC / #108DFF   azul de la app (botones, links, anillo, pestaña activa, foco)
+- --tint-contraste:  #FFFFFF             texto sobre --tint
+Semánticos (claro / oscuro):
+- --red    #D12A5E / #E7366B   vencidos, eliminar
+- --orange #C85F25 / #E77636   hoy, posponer
+- --green  #287F71             concretó, guardado
+- --gray   #6B7785 / #8C98A4   cerrados, sin respuesta, pestañas inactivas
+- --indigo #522C8F             próximos días
+Cada color tiene su --*-hover. En modo claro los tonos están oscurecidos para que el texto
+blanco encima cumpla AA (≥4.5:1); en oscuro se usan los tonos vivos originales.
+Avatares: color de fondo derivado del hash del nombre, de la paleta --avatar-1 … --avatar-8.
+El estado nunca se comunica solo con color: siempre va con palabra o ícono.
 
 ## Tipografía
-Fuente del sistema: `-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif`
-(en iPhone/Mac sale SF Pro; en Android Roboto; en Windows Segoe UI).
-Escala iOS (tamaño/interlineado, peso):
-- Large Title 34/41 bold — título de cada pestaña
-- Title 2      22/28 bold — encabezado de ficha
-- Headline     17/22 semibold — nombre en celdas
-- Body         17/22 regular — texto general e inputs (nunca menos de 16px en inputs: evita el zoom de iOS)
-- Subhead      15/20 regular — subtítulos de celdas
-- Footnote     13/18 regular — encabezados y pies de grupo, metadatos
-- Caption      12/16 regular — badges y horas
-Números y horas con `font-variant-numeric: tabular-nums`.
-Encabezados de grupo en Footnote, color --label-2, en minúscula normal (como iOS 15+), no en mayúsculas.
+Public Sans (400, 500, 600, 700) en --font-sistema, con fallback a la fuente del sistema.
+Archivos .woff2 locales en assets/vendor/fonts/ (no CDN, para que funcione offline).
+Escala (tamaño/interlineado, peso) — variables --fs-*, --lh-*, --fw-*:
+- Large Title 28/34 700 — título de cada pantalla (tracking −0.04em)
+- Title 2     20/26 600 — encabezado de ficha, títulos de alertas
+- Headline    15/20 600 — nombre en celdas, título de sheet
+- Body        14/20 400 — texto general (los inputs van a 16px: evita el zoom de iOS)
+- Subhead     13/18 400 — subtítulos de celdas, pills, segmented
+- Footnote    12/16 600 — encabezados de grupo (MAYÚSCULAS, +0.04em), chips, metadatos
+- Caption     11/14 400 — badges, horas, etiquetas de la tab bar
+Números y horas con `font-variant-numeric: tabular-nums` (clase .tabular).
 
 ## Layout y componentes
-- Margen lateral 16px; grupos con radio 10px; celdas de 44px mínimo de alto (área táctil).
+- Margen lateral --margen-lateral (24px; 16px en móvil). Radios: --radio-chico 4px (controles),
+  --radio-grupo 8px (tarjetas), --radio-sheet 8px. Celdas de 44px mínimo de alto (área táctil).
+- Cabecera de workspace fija (--topbar-height 70px) con marca, secciones y "Nueva consulta".
+  Tarjetas con borde 1px --separator + --sombra-sm; sheets con --sombra-lg.
 - Respetar safe areas: `viewport-fit=cover` y `env(safe-area-inset-*)`.
 - Nav bar: título grande que al scrollear pasa a título chico centrado sobre barra translúcida
   (`backdrop-filter: saturate(180%) blur(20px)`). Botón "+" arriba a la derecha.

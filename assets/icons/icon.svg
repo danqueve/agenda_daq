@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
   <title id="title">Agenda DAQ</title>
-  <rect width="512" height="512" rx="112" fill="#0B7A75"/>
+  <rect width="512" height="512" rx="112" fill="#0A6CCC"/>
   <rect x="108" y="126" width="296" height="282" rx="42" fill="#fff"/>
-  <rect x="108" y="126" width="296" height="88" rx="42" fill="#D8F2EF"/>
+  <rect x="108" y="126" width="296" height="88" rx="42" fill="#DCEBFA"/>
   <path d="M184 94v72M328 94v72" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="28"/>
-  <path d="M184 270h144M184 326h94" fill="none" stroke="#0B7A75" stroke-linecap="round" stroke-width="25"/>
-  <circle cx="346" cy="330" r="42" fill="#0B7A75"/>
+  <path d="M184 270h144M184 326h94" fill="none" stroke="#0A6CCC" stroke-linecap="round" stroke-width="25"/>
+  <circle cx="346" cy="330" r="42" fill="#0A6CCC"/>
   <path d="m326 330 14 14 28-31" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="14"/>
 </svg>

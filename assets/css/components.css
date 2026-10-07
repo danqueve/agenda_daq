@@ -1254,3 +1254,8 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 .filter-chip { color: var(--label-2); background: var(--bg-card); border: 1px solid var(--separator); border-radius: var(--radio-chico); }
 .filter-chip--clear { color: var(--tint); }
 .screen__body > .group__header, .panel-group > .group__header { padding-right: 0; padding-left: 0; background: transparent; }
+
+/* Título y subtítulo de celda en líneas separadas: son <span>, y sin
+   display:block quedaban en la misma línea y el ellipsis no actuaba. */
+.cell__title,
+.cell__subtitle { display: block; }
