@@ -1,3 +1,35 @@
+@font-face {
+    font-family: "Public Sans";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../vendor/fonts/publicsans-400.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Public Sans";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("../vendor/fonts/publicsans-500.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Public Sans";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("../vendor/fonts/publicsans-600.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Public Sans";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../vendor/fonts/publicsans-700.woff2") format("woff2");
+}
+
 *,
 *::before,
 *::after {
@@ -36,6 +68,12 @@ ul, ol {
 button, input, textarea, select {
     font-family: inherit;
     color: inherit;
+}
+
+/* 16px evita que iOS haga zoom automático al enfocar un input, aunque el
+   resto de la interfaz use 14px (--fs-body) para una densidad de dashboard. */
+input, textarea, select {
+    font-size: 16px;
 }
 
 button {
