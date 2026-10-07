@@ -28,7 +28,7 @@ $usuarioId = usuario_actual_id();
     <link rel="stylesheet" href="assets/css/components.css">
 </head>
 <body>
-    <div class="app-shell" x-data="appShell()" x-init="init()">
+    <div class="app-shell" x-data="appShell()" x-init="init()" :class="{'modo-contactos': activo === 'contactos'}">
         <div class="banner" x-show="sinConexion" x-cloak>Sin conexión. Mostrando los últimos datos guardados.</div>
         <header class="workspace-header">
             <button class="workspace-brand" type="button" @click="activo = 'hoy'" aria-label="Ir al inicio de Agenda DAQ"><span class="workspace-brand__mark"><i data-lucide="calendar-check-2"></i></span><span>Agenda DAQ</span></button>
