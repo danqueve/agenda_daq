@@ -1,0 +1,17 @@
+RewriteEngine On
+
+# Bloquear acceso web directo a carpetas privadas
+RewriteRule ^(app|cron|sql|vendor|storage|docs|tests)(/.*)?$ - [F,L]
+
+# Bloquear archivos sensibles y de configuración
+RewriteRule (^|/)\.(?!well-known) - [F,L]
+RewriteRule ^composer\.(json|lock)$ - [F,L]
+RewriteRule \.md$ - [F,L]
+
+Options -Indexes
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set Referrer-Policy "same-origin"
+</IfModule>

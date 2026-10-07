@@ -1,0 +1,90 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100%;
+    min-height: 100dvh;
+    background: var(--bg-grouped);
+    color: var(--label);
+    font-family: var(--font-sistema);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    -webkit-font-smoothing: antialiased;
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+h1, h2, h3, p, ul, ol, figure {
+    margin: 0;
+}
+
+ul, ol {
+    padding: 0;
+    list-style: none;
+}
+
+button, input, textarea, select {
+    font-family: inherit;
+    color: inherit;
+}
+
+button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+a {
+    color: var(--tint);
+    text-decoration: none;
+}
+
+img, svg {
+    display: block;
+    max-width: 100%;
+}
+
+.tabular {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Tipografía utilitaria */
+.large-title { font-size: var(--fs-large-title); line-height: var(--lh-large-title); font-weight: var(--fw-large-title); }
+.title2      { font-size: var(--fs-title2);      line-height: var(--lh-title2);      font-weight: var(--fw-title2); }
+.headline    { font-size: var(--fs-headline);    line-height: var(--lh-headline);    font-weight: var(--fw-headline); }
+.body-text   { font-size: var(--fs-body);        line-height: var(--lh-body);        font-weight: var(--fw-body); }
+.subhead     { font-size: var(--fs-subhead);      line-height: var(--lh-subhead);      font-weight: var(--fw-subhead); color: var(--label-2); }
+.footnote    { font-size: var(--fs-footnote);     line-height: var(--lh-footnote);     font-weight: var(--fw-footnote); color: var(--label-2); }
+.caption     { font-size: var(--fs-caption);      line-height: var(--lh-caption);      font-weight: var(--fw-caption); }
+
+/* Foco visible para navegación con teclado (no afecta el foco por mouse/touch) */
+:focus-visible {
+    outline: 2px solid var(--tint);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+[hidden] {
+    display: none !important;
+}
