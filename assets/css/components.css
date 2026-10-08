@@ -30,7 +30,7 @@
 
 .navbar {
     position: sticky;
-    top: 0;
+    top: env(safe-area-inset-top, 0px);
     z-index: 20;
     padding: 8px var(--margen-lateral) 0;
     background: color-mix(in srgb, var(--bg-grouped) 80%, transparent);
@@ -473,7 +473,7 @@ button.cell:active,
 
 .filter-chip {
     flex: 0 0 auto;
-    min-height: 32px;
+    min-height: 44px;
     padding: 0 10px;
     border: 0;
     border-radius: 16px;
@@ -1076,7 +1076,6 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 .workspace-create { color: var(--tint-contraste); background: var(--tint); border: 1px solid var(--tint); box-shadow: none; }
 .workspace-create:hover { background: var(--tint-hover); border-color: var(--tint-hover); }
 .workspace-create svg { width: 16px; height: 16px; stroke-width: 2.5; }
-.app-shell__content { padding-top: env(safe-area-inset-top); }
 .app-shell > .banner { top: env(safe-area-inset-top); border-radius: 0; }
 
 /* Buscar/Nueva consulta van pegados al título de cada pantalla (ver
@@ -1162,7 +1161,7 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     .workspace-create { min-width: 34px; padding: 0 9px; }
     .navbar { min-height: 70px; padding: 14px 16px 10px; }
     .navbar__title { font-size: 25px; }
-    .screen { padding: 0 0 98px; }
+    .screen { padding: 0; }
     .screen__body { padding: 0 16px 98px; }
     .screen--with-tabbar { padding-bottom: 98px; }
     .tabbar { background: color-mix(in srgb, var(--bg-card) 96%, transparent); border-top: 1px solid var(--separator); box-shadow: var(--sombra-sm); }

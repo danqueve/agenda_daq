@@ -107,7 +107,7 @@
     .tabbar__badge { position: absolute; top: 2px; right: calc(50% - 18px); margin-left: 0; }
 
     .app-shell__content { min-height: 100dvh; margin-left: 0; padding-bottom: calc(98px + env(safe-area-inset-bottom)); }
-    .screen { max-width: 680px; padding-bottom: 98px; }
+    .screen { max-width: 680px; }
     .screen__body { padding-right: 16px; padding-bottom: 98px; padding-left: 16px; }
 
     .sheet-backdrop { padding: 0; }
@@ -231,7 +231,7 @@
 .semana-dia--hoy .semana-dia__punto { background: #fff; }
 
 /* Tarjetas de resumen (Vencidos / Para hoy / Próximos / Concretaron) */
-.stat-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+.stat-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
 .stat-card {
     display: flex; flex-direction: column; gap: 12px;
     padding: 20px;
@@ -362,7 +362,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .filtro-pills { display: flex; flex-wrap: wrap; gap: 8px; }
 .filtro-pill {
     display: inline-flex; align-items: center; gap: 6px;
-    min-height: 36px; padding: 0 14px;
+    min-height: 44px; padding: 0 14px;
     border: 1px solid var(--separator); border-radius: var(--radio-chico);
     background: var(--bg-card); color: var(--label);
     font-size: var(--fs-subhead); cursor: pointer;
