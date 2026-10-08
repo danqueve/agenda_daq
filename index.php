@@ -143,7 +143,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <a class="quick-action-card quick-action-card--llamar" :href="`tel:+${item.contacto.celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
                                     <a class="quick-action-card quick-action-card--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${item.contacto.celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
                                     <button type="button" class="quick-action-card quick-action-card--posponer" x-show="item.estado !== 'sinfecha'" @click="posponerContacto(item.contacto, item.estado === 'hoy' ? 'hora' : 'manana')"><i data-lucide="clock-3"></i>Posponer</button>
-                                    <button type="button" class="quick-action-card quick-action-card--nota" x-show="item.estado === 'sinfecha'" @click="abrirNota(item.contacto)"><i data-lucide="sticky-note"></i>Nota</button>
+                                    <button type="button" class="quick-action-card quick-action-card--nota" x-show="item.estado === 'sinfecha'" @click="abrirNotaSeguimiento(item.contacto)"><i data-lucide="sticky-note"></i>Nota</button>
                                 </div>
                             </article>
                         </template>
@@ -410,7 +410,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                         <p class="group__header footnote">fijadas</p>
                         <div class="notas-fijadas">
                             <template x-for="nota in notasFijadas()" :key="nota.id">
-                                <button type="button" class="nota-card" :class="`nota--${nota.color}`" @click="abrirNota(nota)">
+                                <button type="button" class="nota-card" :class="`nota--${nota.color}`" @click="abrirNotaEditor(nota)">
                                     <div class="nota-card__cabecera">
                                         <h3 class="nota-card__titulo" x-text="nota.titulo || 'Sin título'"></h3>
                                         <i class="nota-card__pin" data-lucide="pin"></i>
@@ -429,7 +429,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                         <p class="group__header footnote">recientes</p>
                         <div class="notas-recientes">
                             <template x-for="nota in notasRecientes()" :key="nota.id">
-                                <button type="button" class="nota-card" :class="`nota--${nota.color}`" @click="abrirNota(nota)">
+                                <button type="button" class="nota-card" :class="`nota--${nota.color}`" @click="abrirNotaEditor(nota)">
                                     <h3 class="nota-card__titulo" x-text="nota.titulo || 'Sin título'"></h3>
                                     <p class="nota-card__texto" x-text="nota.texto"></p>
                                     <div class="nota-card__pie">
@@ -470,7 +470,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                             <div class="nota-editor__contacto-fila">
                                 <span class="avatar" :style="`background:${colorAvatar(notaActual?.contacto_nombre)}`" x-text="iniciales(notaActual?.contacto_nombre)"></span>
                                 <span class="nota-editor__contacto-nombre" x-text="notaActual?.contacto_nombre"></span>
-                                <button type="button" class="btn-texto" @click="sheetNota = false; abrirFicha(notaActual.contacto_id)">Abrir ficha</button>
+                                <button type="button" class="btn-texto" @click="abrirFichaDesdeNota()">Abrir ficha</button>
                             </div>
                         </div>
 
@@ -657,7 +657,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                             <a class="action-button action-button--llamar" :href="`tel:+${contactoActual?.celular_norm}`"><span class="action-button__icon"><i data-lucide="phone"></i></span><span class="action-button__label">Llamar</span></a>
                             <a class="action-button action-button--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${contactoActual?.celular_norm}`"><span class="action-button__icon"><i data-lucide="message-circle"></i></span><span class="action-button__label">WhatsApp</span></a>
                             <button class="action-button action-button--recontacto" type="button" @click="abrirSeguimiento(contactoActual)"><span class="action-button__icon"><i data-lucide="phone-forwarded"></i></span><span class="action-button__label">Recontacto</span></button>
-                            <button class="action-button action-button--nota" type="button" @click="abrirNota(contactoActual)"><span class="action-button__icon"><i data-lucide="sticky-note"></i></span><span class="action-button__label">Nota</span></button>
+                            <button class="action-button action-button--nota" type="button" @click="abrirNotaSeguimiento(contactoActual)"><span class="action-button__icon"><i data-lucide="sticky-note"></i></span><span class="action-button__label">Nota</span></button>
                         </div>
                     </div>
 

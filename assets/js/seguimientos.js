@@ -85,7 +85,7 @@ function seguimientosModule() {
             this.refrescarIconos();
         },
 
-        abrirNota(contacto) {
+        abrirNotaSeguimiento(contacto) {
             if (!contacto) return;
             this.seguimientoContacto = contacto;
             this.seguimientoModo = 'nota';

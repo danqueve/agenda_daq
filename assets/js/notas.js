@@ -111,7 +111,15 @@ function notasModule() {
             this.resultadosContacto = [];
         },
 
-        async abrirNota(nota) {
+        // El editor de una nota existente es distinto de "Nota" en una ficha
+        // de contacto (que registra una nota de seguimiento). Conservan
+        // nombres diferentes para que un módulo no reemplace al otro.
+        abrirNotaEditor(nota) {
+            if (!nota) return;
+            // La ficha puede ser el origen del editor en enlaces internos.
+            // Nunca dejamos dos hojas activas en un teléfono.
+            this.sheetFicha = false;
+            this.sheetSeguimiento = false;
             this.notaActual = { ...nota };
             this.sheetNota = true;
             this.refrescarIconos();
@@ -121,6 +129,8 @@ function notasModule() {
             try {
                 const result = await this.api(`api/notas.php?id=${id}`);
                 this.activo = 'notas';
+                this.sheetFicha = false;
+                this.sheetSeguimiento = false;
                 this.notaActual = result.data;
                 this.sheetNota = true;
                 this.refrescarIconos();
@@ -134,6 +144,16 @@ function notasModule() {
             this.sheetNota = false;
             this.notaActual = null;
             this.cargarNotas();
+        },
+
+        abrirFichaDesdeNota() {
+            const contactoId = Number(this.notaActual?.contacto_id);
+            if (!contactoId) return;
+
+            this.cerrarNota();
+            // Espera la salida de la hoja para que, incluso con la animación
+            // activa, no haya dos paneles visibles a la vez.
+            window.setTimeout(() => this.abrirFicha(contactoId), 170);
         },
 
         // Autoguardado con debounce de 800ms: cualquier cambio en el título,

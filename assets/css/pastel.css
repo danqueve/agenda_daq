@@ -362,7 +362,12 @@ button.card-pastel { cursor: pointer; font: inherit; }
 /* =====================================================================
    6. HOJAS (sheets) Y FORMULARIOS  ·  referencias 01b, 03b
    ===================================================================== */
-.sheet-backdrop { background: rgba(47, 56, 79, .35); }
+.sheet-backdrop {
+    /* Debe quedar por encima de la barra de navegación móvil (incluidos los
+       Android que entregan un viewport ancho) y de los encabezados sticky. */
+    z-index: 70;
+    background: rgba(47, 56, 79, .35);
+}
 /* El velo puede atenuar la página, pero cada hoja debe ser una superficie
    completamente sólida: nunca debe transparentarse el contenido de atrás. */
 .sheet { background-color: var(--bg-grouped); background-image: none; box-shadow: var(--sombra-lg); }
