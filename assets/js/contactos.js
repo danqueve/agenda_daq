@@ -9,10 +9,11 @@ function contactosModule() {
         paginaContactos: 1,
         errorContactos: '',
         busqueda: '',
-        filtroEstado: 'abiertos',
+        filtroEstado: '',
         filtroOrigen: '',
         filtroProvincia: '',
         filtroEtiqueta: '',
+        resumenContactos: { total: 0, en_seguimiento: 0 },
         sheetContacto: false,
         sheetFicha: false,
         sheetDuplicado: false,
@@ -67,6 +68,7 @@ function contactosModule() {
                 const data = result.data;
                 this.contactos = this.paginaContactos === 1 ? data.items : [...this.contactos, ...data.items];
                 this.hayMasContactos = data.hay_mas;
+                this.resumenContactos = data.resumen || this.resumenContactos;
                 this.paginaContactos += 1;
                 this.refrescarIconos();
             } catch (error) {
@@ -91,11 +93,38 @@ function contactosModule() {
 
         limpiarFiltros() {
             this.busqueda = '';
-            this.filtroEstado = 'abiertos';
+            this.filtroEstado = '';
             this.filtroOrigen = '';
             this.filtroProvincia = '';
             this.filtroEtiqueta = '';
             this.cargarContactos(true);
+        },
+
+        // Estado visual de la tarjeta/ficha: deriva de estado + motivo_cierre
+        // (la base no guarda un "estado visual" aparte, se calcula acá).
+        estadoVisual(contacto) {
+            if (!contacto) return 'nuevo';
+            if (contacto.estado === 'cerrada') {
+                return contacto.motivo_cierre === 'concreto' ? 'concreto' : 'cerrado';
+            }
+            return contacto.estado === 'pendiente' ? 'nuevo' : 'seguimiento';
+        },
+
+        etiquetaEstado(contacto) {
+            if (!contacto) return '';
+            if (contacto.estado === 'cerrada') {
+                return { concreto: 'Concretó', no_interesa: 'No le interesó', sin_respuesta: 'Sin respuesta' }[contacto.motivo_cierre] || 'Cerrado';
+            }
+            return contacto.estado === 'pendiente' ? 'Nuevo' : 'En seguimiento';
+        },
+
+        fechaRelativa(value) {
+            if (!value) return '';
+            const fecha = new Date(value.replace(' ', 'T'));
+            const dias = Math.floor((new Date().setHours(0, 0, 0, 0) - fecha.setHours(0, 0, 0, 0)) / 86400000);
+            if (dias <= 0) return 'hoy';
+            if (dias === 1) return 'hace 1 día';
+            return `hace ${dias} días`;
         },
 
         abrirNuevoContacto() {

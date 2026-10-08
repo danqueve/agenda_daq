@@ -117,57 +117,60 @@ $usuarioNombre = $stmtUsuario->fetchColumn() ?: 'Usuario';
 
             <section class="screen" x-show="activo === 'contactos'">
                 <header class="navbar">
+                    <p class="subhead" x-text="`${resumenContactos.total} contactos · ${resumenContactos.en_seguimiento} en seguimiento`"></p>
                     <div class="navbar__large-row">
                         <h1 class="navbar__large-title">Contactos</h1>
-                        <button class="navbar__button navbar__button--large" type="button" aria-label="Nuevo contacto" @click="abrirNuevoContacto()">
-                            <i data-lucide="plus"></i>
-                        </button>
+                        <div class="navbar__acciones">
+                            <label class="search-field search-field--header">
+                                <i data-lucide="search"></i>
+                                <input type="search" x-model="busqueda" @input.debounce.300ms="aplicarFiltros()" placeholder="Nombre o celular" aria-label="Buscar contactos">
+                            </label>
+                            <button class="workspace-create" type="button" @click="abrirNuevoContacto()"><i data-lucide="plus"></i><span>Nueva consulta</span></button>
+                        </div>
                     </div>
                 </header>
                 <div class="screen__body">
-                    <label class="search-field">
-                        <i data-lucide="search"></i>
-                        <input type="search" x-model="busqueda" @input.debounce.300ms="aplicarFiltros()" placeholder="Buscar contactos" aria-label="Buscar contactos">
-                    </label>
-
-                    <div class="segmented" role="tablist" aria-label="Estado de contactos">
-                        <template x-for="estado in [{id: 'abiertos', texto: 'Abiertos'}, {id: 'seguimiento', texto: 'En seguimiento'}, {id: 'cerrada', texto: 'Cerrados'}]" :key="estado.id">
-                            <button class="segmented__option" type="button" role="tab" :aria-selected="filtroEstado === estado.id" @click="filtroEstado = estado.id; aplicarFiltros()" x-text="estado.texto"></button>
-                        </template>
-                    </div>
-
-                    <div class="filter-row" aria-label="Filtros adicionales">
-                        <select class="filter-chip" x-model="filtroOrigen" @change="aplicarFiltros()" aria-label="Filtrar por origen">
-                            <option value="">Origen</option><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="llamada">Llamada</option><option value="local">Local</option><option value="referido">Referido</option><option value="otro">Otro</option>
-                        </select>
-                        <select class="filter-chip" x-model="filtroProvincia" @change="aplicarFiltros()" aria-label="Filtrar por provincia">
-                            <option value="">Provincia</option><option>Tucumán</option><option>Santiago del Estero</option><option>Catamarca</option><option>Otra</option>
-                        </select>
-                        <select class="filter-chip" x-model="filtroEtiqueta" @change="aplicarFiltros()" aria-label="Filtrar por etiqueta">
-                            <option value="">Etiqueta</option><template x-for="etiqueta in etiquetas" :key="etiqueta.id"><option :value="etiqueta.id" x-text="etiqueta.nombre"></option></template>
-                        </select>
-                        <button class="filter-chip filter-chip--clear" type="button" x-show="busqueda || filtroOrigen || filtroProvincia || filtroEtiqueta || filtroEstado !== 'abiertos'" @click="limpiarFiltros()">Limpiar</button>
+                    <div class="filtro-pills" role="tablist" aria-label="Estado de contactos">
+                        <button class="filtro-pill" type="button" role="tab" :aria-selected="filtroEstado === ''" @click="filtroEstado = ''; aplicarFiltros()">Todos</button>
+                        <button class="filtro-pill filtro-pill--nuevo" type="button" role="tab" :aria-selected="filtroEstado === 'pendiente'" @click="filtroEstado = 'pendiente'; aplicarFiltros()"><span class="filtro-pill__punto"></span>Nuevos</button>
+                        <button class="filtro-pill filtro-pill--seguimiento" type="button" role="tab" :aria-selected="filtroEstado === 'seguimiento'" @click="filtroEstado = 'seguimiento'; aplicarFiltros()"><span class="filtro-pill__punto"></span>En seguimiento</button>
+                        <button class="filtro-pill filtro-pill--concreto" type="button" role="tab" :aria-selected="filtroEstado === 'concreto'" @click="filtroEstado = 'concreto'; aplicarFiltros()"><span class="filtro-pill__punto"></span>Concretaron</button>
+                        <button class="filtro-pill filtro-pill--cerrado" type="button" role="tab" :aria-selected="filtroEstado === 'cerrados'" @click="filtroEstado = 'cerrados'; aplicarFiltros()"><span class="filtro-pill__punto"></span>Cerrados</button>
                     </div>
 
                     <p class="error-inline" x-show="errorContactos" x-text="errorContactos"></p>
                     <template x-if="contactos.length">
-                        <div class="group contact-list">
+                        <div class="card-pastel-grid contact-list">
                             <template x-for="contacto in contactos" :key="contacto.id">
-                                <button class="cell cell--avatar-offset" type="button" @click="abrirFicha(contacto.id)">
-                                    <span class="avatar" :style="`background:${colorAvatar(contacto.nombre)}`" x-text="iniciales(contacto.nombre)"></span>
-                                    <span class="cell__content">
-                                        <span class="cell__title" x-text="contacto.nombre"></span>
-                                        <span class="cell__subtitle" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle' "></span>
-                                    </span>
-                                    <span class="cell__trailing"><span class="tabular" x-text="fechaCorta(contacto.proximo_contacto)"></span><span class="cell__chevron"><i data-lucide="chevron-right"></i></span></span>
+                                <button
+                                    type="button"
+                                    class="card-pastel"
+                                    :class="[`card-pastel--${estadoVisual(contacto)}`, {'card-pastel--seleccionada': contactoActual && Number(contactoActual.id) === Number(contacto.id)}]"
+                                    @click="abrirFicha(contacto.id)"
+                                >
+                                    <div class="card-pastel__head">
+                                        <span class="avatar" :style="`background:${colorAvatar(contacto.nombre)}`" x-text="iniciales(contacto.nombre)"></span>
+                                        <span class="card-pastel__cuerpo">
+                                            <span class="card-pastel__nombre" x-text="contacto.nombre"></span>
+                                            <span class="card-pastel__detalle" x-text="contacto.celular"></span>
+                                        </span>
+                                    </div>
+                                    <div class="card-pastel__tags">
+                                        <span class="chip-estado" x-show="contacto.producto_interes" x-text="contacto.producto_interes"></span>
+                                        <span class="chip-estado chip-estado--estado" x-text="etiquetaEstado(contacto)"></span>
+                                    </div>
+                                    <p class="card-pastel__pie">
+                                        <span x-text="[contacto.localidad, etiquetaOrigen(contacto.origen)].filter(Boolean).join(' · ')"></span>
+                                        <span x-text="fechaRelativa(contacto.creado_en)"></span>
+                                    </p>
                                 </button>
                             </template>
                         </div>
                     </template>
                     <div class="empty-state" x-show="!cargandoContactos && !contactos.length && !errorContactos">
                         <i data-lucide="users"></i>
-                        <p class="body-text" x-text="busqueda || filtroOrigen || filtroProvincia || filtroEtiqueta ? 'No encontramos contactos con esos filtros' : 'Todavía no cargaste ningún contacto'"></p>
-                        <button class="empty-state__boton" type="button" @click="abrirNuevoContacto()" x-show="!busqueda && !filtroOrigen && !filtroProvincia && !filtroEtiqueta">Cargar consulta</button>
+                        <p class="body-text" x-text="busqueda || filtroEstado ? 'No encontramos contactos con esos filtros' : 'Todavía no cargaste ningún contacto'"></p>
+                        <button class="empty-state__boton" type="button" @click="abrirNuevoContacto()" x-show="!busqueda && !filtroEstado">Cargar consulta</button>
                     </div>
                     <button class="btn-texto contacts-load-more" type="button" x-show="hayMasContactos" @click="cargarContactos()" :disabled="cargandoContactos" x-text="cargandoContactos ? 'Cargando…' : 'Cargar más contactos'"></button>
                 </div>
@@ -339,7 +342,7 @@ $usuarioNombre = $stmtUsuario->fetchColumn() ?: 'Usuario';
         <div class="sheet-backdrop" x-show="sheetSesiones" x-transition.opacity @click.self="sheetSesiones = false" x-cloak><section class="sheet sheet--media alert-sheet" role="alertdialog" aria-modal="true"><div class="sheet__grabber"></div><div class="sheet__body"><i class="alert-sheet__icon" data-lucide="monitor-off"></i><h2 class="title2">¿Cerrar sesiones guardadas?</h2><p class="subhead">Los otros dispositivos tendrán que iniciar sesión nuevamente. Este dispositivo seguirá abierto.</p><div class="alert-sheet__actions"><button class="btn-principal" type="button" :disabled="guardandoAjuste" @click="cerrarSesiones()">Cerrar sesiones</button><button class="btn-texto" type="button" @click="sheetSesiones = false">Cancelar</button></div></div></section></div>
 
         <div class="sheet-backdrop detail-backdrop" x-show="sheetFicha" x-transition.opacity @keydown.escape.window="sheetFicha = false" @click.self="sheetFicha = false" x-cloak>
-            <article class="sheet contact-detail" x-show="contactoActual"><div class="sheet__grabber"></div><header class="sheet__header"><button class="btn-texto" type="button" @click="sheetFicha = false">Cerrar</button><span class="sheet__title">Contacto</span><button class="btn-texto btn-texto--negrita" type="button" @click="editarContacto()">Editar</button></header><div class="sheet__body"><div class="contact-detail__identity"><span class="avatar avatar--grande" :style="`background:${colorAvatar(contactoActual?.nombre)}`" x-text="iniciales(contactoActual?.nombre)"></span><h2 class="title2" x-text="contactoActual?.nombre"></h2><p class="subhead" x-text="contactoActual?.producto_interes || 'Consulta' "></p></div><div class="action-buttons"><a class="action-button" :href="`tel:+${contactoActual?.celular_norm}`"><span class="action-button__icon"><i data-lucide="phone"></i></span><span class="action-button__label">Llamar</span></a><a class="action-button" target="_blank" rel="noopener" :href="`https://wa.me/${contactoActual?.celular_norm}`"><span class="action-button__icon"><i data-lucide="message-circle"></i></span><span class="action-button__label">WhatsApp</span></a><button class="action-button" type="button" @click="mostrarHud('Disponible en la Fase 3', 'clock-3')"><span class="action-button__icon"><i data-lucide="phone-call"></i></span><span class="action-button__label">Recontacto</span></button><button class="action-button" type="button" @click="mostrarHud('Disponible en la Fase 3', 'sticky-note')"><span class="action-button__icon"><i data-lucide="sticky-note"></i></span><span class="action-button__label">Nota</span></button></div><p class="group__header footnote">datos</p><div class="group"><div class="cell"><span class="cell__label">Celular</span><a class="cell__value" :href="`tel:+${contactoActual?.celular_norm}`" x-text="contactoActual?.celular"></a></div><div class="cell"><span class="cell__label">Origen</span><span class="cell__value" x-text="etiquetaOrigen(contactoActual?.origen)"></span></div><div class="cell" x-show="contactoActual?.localidad || contactoActual?.provincia"><span class="cell__label">Ubicación</span><span class="cell__value" x-text="[contactoActual?.localidad, contactoActual?.provincia].filter(Boolean).join(', ')"></span></div><div class="cell" x-show="contactoActual?.etiquetas?.length"><span class="cell__label">Etiquetas</span><span class="contact-tags"><template x-for="etiqueta in contactoActual?.etiquetas" :key="etiqueta.id"><span class="tag tag--readonly"><span class="tag__dot" :style="`background:${etiqueta.color}`"></span><span x-text="etiqueta.nombre"></span></span></template></span></div></div><p class="group__header footnote">estado</p><div class="group"><div class="cell"><span class="cell__label">Estado</span><span class="cell__value" x-text="contactoActual?.estado === 'cerrada' ? 'Cerrada' : (contactoActual?.estado === 'seguimiento' ? 'En seguimiento' : 'Pendiente')"></span></div><div class="cell"><span class="cell__label">Próximo contacto</span><span class="cell__value tabular" x-text="fechaLarga(contactoActual?.proximo_contacto)"></span></div></div><p class="group__header footnote">historial</p><div class="group timeline"><template x-for="registro in contactoActual?.historial" :key="registro.id"><div class="cell timeline__item"><span class="timeline__icon"><i :data-lucide="registro.tipo === 'consulta' ? 'message-square' : 'clock-3'"></i></span><span class="cell__content"><span class="cell__title" x-text="registro.tipo === 'consulta' ? 'Consulta' : registro.tipo"></span><span class="cell__subtitle" x-text="registro.nota || 'Sin nota'"></span></span><time class="cell__trailing tabular" x-text="fechaCorta(registro.fecha)"></time></div></template></div><button class="btn-texto btn-texto--peligro delete-contact" type="button" @click="pedirEliminar()">Eliminar contacto</button></div></article>
+            <article class="sheet contact-detail" :class="`contact-detail--${estadoVisual(contactoActual)}`" x-show="contactoActual"><div class="sheet__grabber"></div><header class="sheet__header"><button class="btn-texto" type="button" @click="sheetFicha = false">Cerrar</button><span class="sheet__title">Contacto</span><button class="btn-texto btn-texto--negrita" type="button" @click="editarContacto()">Editar</button></header><div class="sheet__body"><div class="contact-detail__identity"><span class="avatar avatar--grande" :style="`background:${colorAvatar(contactoActual?.nombre)}`" x-text="iniciales(contactoActual?.nombre)"></span><h2 class="title2" x-text="contactoActual?.nombre"></h2><span class="contact-detail__badge" x-text="etiquetaEstado(contactoActual)"></span></div><div class="action-buttons"><a class="action-button" :href="`tel:+${contactoActual?.celular_norm}`"><span class="action-button__icon"><i data-lucide="phone"></i></span><span class="action-button__label">Llamar</span></a><a class="action-button" target="_blank" rel="noopener" :href="`https://wa.me/${contactoActual?.celular_norm}`"><span class="action-button__icon"><i data-lucide="message-circle"></i></span><span class="action-button__label">WhatsApp</span></a><button class="action-button" type="button" @click="abrirSeguimiento(contactoActual)"><span class="action-button__icon"><i data-lucide="phone-call"></i></span><span class="action-button__label">Recontacto</span></button><button class="action-button" type="button" @click="abrirNota(contactoActual)"><span class="action-button__icon"><i data-lucide="sticky-note"></i></span><span class="action-button__label">Nota</span></button></div><div class="group"><div class="cell"><span class="cell__label">Celular</span><a class="cell__value" :href="`tel:+${contactoActual?.celular_norm}`" x-text="contactoActual?.celular"></a></div><div class="cell" x-show="contactoActual?.producto_interes"><span class="cell__label">Producto</span><span class="cell__value" x-text="contactoActual?.producto_interes"></span></div><div class="cell" x-show="contactoActual?.localidad"><span class="cell__label">Localidad</span><span class="cell__value" x-text="contactoActual?.localidad"></span></div><div class="cell"><span class="cell__label">Origen</span><span class="cell__value" x-text="etiquetaOrigen(contactoActual?.origen)"></span></div><div class="cell" x-show="contactoActual?.estado !== 'cerrada'"><span class="cell__label">Próximo contacto</span><span class="cell__value tabular" x-text="fechaLarga(contactoActual?.proximo_contacto)"></span></div><div class="cell" x-show="contactoActual?.etiquetas?.length"><span class="cell__label">Etiquetas</span><span class="contact-tags"><template x-for="etiqueta in contactoActual?.etiquetas" :key="etiqueta.id"><span class="tag tag--readonly"><span class="tag__dot" :style="`background:${etiqueta.color}`"></span><span x-text="etiqueta.nombre"></span></span></template></span></div></div><p class="group__header footnote">historial</p><div class="group timeline"><template x-for="registro in contactoActual?.historial" :key="registro.id"><div class="cell timeline__item"><span class="timeline__punto" :style="`background:var(--${colorTimeline(registro)})`"></span><span class="cell__content"><span class="cell__title" x-text="tituloTimeline(registro)"></span><span class="cell__subtitle" x-text="`${fechaLarga(registro.fecha)}${registro.nota ? ' · ' + registro.nota : ''}`"></span></span></div></template></div><button class="btn-texto btn-texto--peligro delete-contact" type="button" @click="pedirEliminar()">Eliminar contacto</button></div></article>
         </div>
 
         <div class="sheet-backdrop" x-show="sheetEliminar" x-transition.opacity @click.self="sheetEliminar = false" x-cloak><section class="sheet sheet--media alert-sheet" role="alertdialog" aria-modal="true"><div class="sheet__grabber"></div><div class="sheet__body"><i class="alert-sheet__icon alert-sheet__icon--danger" data-lucide="trash-2"></i><h2 class="title2">¿Eliminar contacto?</h2><p class="subhead">Se eliminarán también sus consultas y su historial. Esta acción no se puede deshacer.</p><div class="alert-sheet__actions"><button class="btn-principal btn-principal--danger" type="button" @click="eliminarContacto()">Eliminar contacto</button><button class="btn-texto" type="button" @click="sheetEliminar = false">Cancelar</button></div></div></section></div>

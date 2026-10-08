@@ -39,18 +39,6 @@ function appShell() {
                 if (tab === 'hoy') this.cargarPanel();
                 if (tab === 'agenda') this.cargarAgendaMes();
             });
-            this.$el.addEventListener('click', (event) => {
-                const action = event.target.closest('.contact-detail .action-button');
-                if (!action) return;
-                const actions = [...this.$el.querySelectorAll('.contact-detail .action-button')];
-                const index = actions.indexOf(action);
-                if (index !== 2 && index !== 3) return;
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                if (index === 2) this.abrirSeguimiento(this.contactoActual);
-                else this.abrirNota(this.contactoActual);
-            }, true);
-
             this.$nextTick(() => {
                 if (window.lucide) {
                     window.lucide.createIcons();

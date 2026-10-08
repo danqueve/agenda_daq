@@ -12,6 +12,22 @@ function seguimientosModule() {
             };
         },
 
+        // Color del punto en la línea de tiempo de la ficha: reagendar queda
+        // naranja, cerrar sin reagendar queda verde (se concretó o no).
+        colorTimeline(registro) {
+            if (registro.tipo === 'recontacto') {
+                return registro.proximo_asignado ? 'orange' : 'green';
+            }
+            return { consulta: 'indigo', nota: 'gray', cambio_estado: 'tint' }[registro.tipo] || 'gray';
+        },
+
+        tituloTimeline(registro) {
+            if (registro.tipo === 'recontacto') {
+                return { atendio: 'Llamada', no_atendio: 'No atendió', mensaje_enviado: 'Mensaje enviado' }[registro.resultado] || 'Recontacto';
+            }
+            return { consulta: 'Consulta cargada', nota: 'Nota', cambio_estado: 'Reabierto' }[registro.tipo] || registro.tipo;
+        },
+
         abrirSeguimiento(contacto) {
             if (!contacto) return;
             this.seguimientoContacto = contacto;

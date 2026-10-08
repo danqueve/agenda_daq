@@ -184,6 +184,12 @@ function contactos_listar(PDO $db): never
         $params['estado'] = $estado;
     } elseif ($estado === 'abiertos') {
         $where[] = "c.estado <> 'cerrada'";
+    } elseif ($estado === 'concreto') {
+        $where[] = "c.estado = 'cerrada' AND c.motivo_cierre = 'concreto'";
+    } elseif ($estado === 'cerrados') {
+        // "Cerrados" en los filtros de Contactos = cerrada sin concretar
+        // (no_interesa/sin_respuesta); "Concretaron" es su propio filtro.
+        $where[] = "c.estado = 'cerrada' AND (c.motivo_cierre IS NULL OR c.motivo_cierre <> 'concreto')";
     }
     if (in_array($origen, ['whatsapp', 'instagram', 'facebook', 'llamada', 'local', 'referido', 'otro'], true)) {
         $where[] = 'c.origen = :origen';
@@ -227,7 +233,18 @@ function contactos_listar(PDO $db): never
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
     $items = $stmt->fetchAll();
-    json_response(['ok' => true, 'data' => ['items' => $items, 'pagina' => $page, 'total' => $total, 'hay_mas' => $offset + count($items) < $total]]);
+
+    // Conteos globales para el subtítulo de la pantalla, sin los filtros
+    // actuales: siempre "todos los contactos" / "todos en seguimiento".
+    $resumen = $db->query("SELECT COUNT(*) AS total, SUM(estado = 'seguimiento') AS en_seguimiento FROM contactos")->fetch();
+
+    json_response(['ok' => true, 'data' => [
+        'items' => $items,
+        'pagina' => $page,
+        'total' => $total,
+        'hay_mas' => $offset + count($items) < $total,
+        'resumen' => ['total' => (int) $resumen['total'], 'en_seguimiento' => (int) $resumen['en_seguimiento']],
+    ]]);
 }
 
 $db = Db::get();
