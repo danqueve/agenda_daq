@@ -166,16 +166,84 @@ $usuarioId = usuario_actual_id();
 
             <section class="screen" x-show="activo === 'agenda'">
                 <header class="navbar">
+                    <p class="subhead" x-text="`${eventosDelMes()} recontactos agendados este mes`"></p>
                     <div class="navbar__large-row">
-                        <h1 class="navbar__large-title">Agenda</h1>
+                        <h1 class="navbar__large-title" x-text="tituloMes()"></h1>
                     </div>
                 </header>
                 <div class="screen__body">
-                    <div class="week-strip"><button type="button" class="week-strip__nav" @click="moverSemana(-1)" aria-label="Semana anterior"><i data-lucide="chevron-left"></i></button><div class="week-strip__days"><template x-for="dia in diasSemana()" :key="dia.iso"><button type="button" class="week-strip__day" :class="{'week-strip__day--selected': diaSeleccionado === dia.iso, 'week-strip__day--today': dia.esHoy}" @click="seleccionarDia(dia.iso)"><span class="caption" x-text="dia.letra"></span><strong x-text="dia.numero"></strong><span class="week-strip__dot" x-show="agenda.puntos?.[dia.iso]" :class="{'week-strip__dot--selected': diaSeleccionado === dia.iso}"></span></button></template></div><button type="button" class="week-strip__nav" @click="moverSemana(1)" aria-label="Semana siguiente"><i data-lucide="chevron-right"></i></button></div>
-                    <button type="button" class="btn-texto agenda-today" @click="volverHoy()">Hoy</button>
-                    <p class="group__header footnote" x-text="tituloDiaSeleccionado()"></p>
-                    <div class="group" x-show="contactosDiaSeleccionado().length"><template x-for="contacto in contactosDiaSeleccionado()" :key="`a-${contacto.id}`"><div class="contact-row"><button class="cell cell--avatar-offset" type="button" @click="abrirFicha(contacto.id)"><span class="avatar" :style="`background:${colorAvatar(contacto.nombre)}`" x-text="iniciales(contacto.nombre)"></span><span class="cell__content"><span class="cell__title" x-text="contacto.nombre"></span><span class="cell__subtitle" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></span></span><span class="cell__trailing tabular" x-text="fechaCorta(contacto.proximo_contacto)"></span></button><button type="button" class="quick-action quick-action--tint" @click="abrirSeguimiento(contacto)" aria-label="Registrar recontacto"><i data-lucide="phone-call"></i></button></div></template></div>
-                    <div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length"><i data-lucide="calendar-days"></i><p class="body-text">Sin recontactos agendados</p></div>
+                    <div class="calendario-toolbar">
+                        <div class="segmented" role="tablist" aria-label="Vista del calendario" style="margin-bottom:0; max-width:260px">
+                            <button type="button" class="segmented__option" role="tab" :aria-selected="vistaCalendario === 'mes'" @click="vistaCalendario = 'mes'">Mes</button>
+                            <button type="button" class="segmented__option" role="tab" :aria-selected="vistaCalendario === 'semana'" @click="vistaCalendario = 'semana'">Semana</button>
+                            <button type="button" class="segmented__option" role="tab" :aria-selected="vistaCalendario === 'dia'" @click="vistaCalendario = 'dia'">Día</button>
+                        </div>
+                        <div class="calendario-nav">
+                            <button type="button" class="calendario-nav__flecha" @click="moverMes(-1)" aria-label="Mes anterior"><i data-lucide="chevron-left"></i></button>
+                            <button type="button" class="calendario-nav__hoy" @click="volverMesHoy()">Hoy</button>
+                            <button type="button" class="calendario-nav__flecha" @click="moverMes(1)" aria-label="Mes siguiente"><i data-lucide="chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="calendario-layout">
+                        <div class="calendario-principal">
+                            <template x-if="vistaCalendario === 'mes'">
+                                <div class="calendario-grid">
+                                    <template x-for="letra in ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']" :key="letra"><div class="calendario-grid__encabezado" x-text="letra"></div></template>
+                                    <template x-for="dia in diasDelMes()" :key="dia.iso">
+                                        <button type="button" class="calendario-dia" :class="{'calendario-dia--fuera': !dia.esMesActual, 'calendario-dia--hoy': dia.esHoy}" @click="seleccionarDia(dia.iso)">
+                                            <span class="calendario-dia__numero" x-text="dia.numero"></span>
+                                            <div class="calendario-dia__eventos">
+                                                <template x-for="evento in eventosDia(dia.iso).slice(0, 2)" :key="`e-${evento.id}-${evento.fecha_evento}`">
+                                                    <span class="calendario-evento" :class="`calendario-evento--${evento.tipo_evento}`" x-text="`${fechaCorta(evento.fecha_evento)} ${evento.nombre}`"></span>
+                                                </template>
+                                                <span class="calendario-mas" x-show="eventosDia(dia.iso).length > 2" x-text="`+${eventosDia(dia.iso).length - 2} más`"></span>
+                                            </div>
+                                        </button>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <template x-if="vistaCalendario === 'semana'">
+                                <div>
+                                    <div class="week-strip"><div class="week-strip__days"><template x-for="dia in diasSemana()" :key="dia.iso"><button type="button" class="week-strip__day" :class="{'week-strip__day--selected': diaSeleccionado === dia.iso, 'week-strip__day--today': dia.esHoy}" @click="seleccionarDia(dia.iso)"><span class="caption" x-text="dia.letra"></span><strong x-text="dia.numero"></strong><span class="week-strip__dot" x-show="eventosDia(dia.iso).length" :class="{'week-strip__dot--selected': diaSeleccionado === dia.iso}"></span></button></template></div></div>
+                                    <p class="group__header footnote" x-text="tituloDiaSeleccionado()"></p>
+                                    <div class="group" x-show="contactosDiaSeleccionado().length"><template x-for="contacto in contactosDiaSeleccionado()" :key="`a-${contacto.id}`"><div class="contact-row"><button class="cell cell--avatar-offset" type="button" @click="abrirFicha(contacto.id)"><span class="avatar" :style="`background:${colorAvatar(contacto.nombre)}`" x-text="iniciales(contacto.nombre)"></span><span class="cell__content"><span class="cell__title" x-text="contacto.nombre"></span><span class="cell__subtitle" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></span></span><span class="cell__trailing tabular" x-text="fechaCorta(contacto.fecha_evento)"></span></button><button type="button" class="quick-action quick-action--tint" @click="abrirSeguimiento(contacto)" aria-label="Registrar recontacto"><i data-lucide="phone-call"></i></button></div></template></div>
+                                    <div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length"><i data-lucide="calendar-days"></i><p class="body-text">Sin recontactos agendados</p></div>
+                                </div>
+                            </template>
+
+                            <template x-if="vistaCalendario === 'dia'">
+                                <div>
+                                    <p class="group__header footnote" x-text="tituloDiaSeleccionado()"></p>
+                                    <div class="group" x-show="contactosDiaSeleccionado().length"><template x-for="contacto in contactosDiaSeleccionado()" :key="`a-${contacto.id}`"><div class="contact-row"><button class="cell cell--avatar-offset" type="button" @click="abrirFicha(contacto.id)"><span class="avatar" :style="`background:${colorAvatar(contacto.nombre)}`" x-text="iniciales(contacto.nombre)"></span><span class="cell__content"><span class="cell__title" x-text="contacto.nombre"></span><span class="cell__subtitle" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></span></span><span class="cell__trailing tabular" x-text="fechaCorta(contacto.fecha_evento)"></span></button><button type="button" class="quick-action quick-action--tint" @click="abrirSeguimiento(contacto)" aria-label="Registrar recontacto"><i data-lucide="phone-call"></i></button></div></template></div>
+                                    <div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length"><i data-lucide="calendar-days"></i><p class="body-text">Sin recontactos agendados</p></div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <aside class="calendario-panel">
+                            <div class="calendario-panel__resumen">
+                                <p class="calendario-panel__dia" x-text="new Intl.DateTimeFormat('es-AR', {weekday:'long'}).format(desdeIso(diaSeleccionado))"></p>
+                                <p class="calendario-panel__titulo" x-text="contactosDiaSeleccionado().length === 1 ? '1 recontacto pendiente' : `${contactosDiaSeleccionado().length} recontactos pendientes`"></p>
+                            </div>
+                            <div class="calendario-panel__lista">
+                                <template x-for="evento in contactosDiaSeleccionado()" :key="`p-${evento.id}-${evento.fecha_evento}`">
+                                    <button type="button" class="calendario-panel__evento" :class="`calendario-panel__evento--${evento.tipo_evento}`" @click="abrirFicha(evento.id)">
+                                        <p class="calendario-panel__hora tabular" x-text="fechaCorta(evento.fecha_evento)"></p>
+                                        <p class="calendario-panel__nombre" x-text="evento.nombre"></p>
+                                        <p class="calendario-panel__detalle" x-text="[evento.producto_interes, evento.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></p>
+                                    </button>
+                                </template>
+                            </div>
+                            <div class="calendario-leyenda">
+                                <span class="calendario-leyenda__item"><span class="calendario-leyenda__punto" style="background:var(--red)"></span>Vencido</span>
+                                <span class="calendario-leyenda__item"><span class="calendario-leyenda__punto" style="background:var(--orange)"></span>Para hoy</span>
+                                <span class="calendario-leyenda__item"><span class="calendario-leyenda__punto" style="background:var(--indigo)"></span>Próximo</span>
+                                <span class="calendario-leyenda__item"><span class="calendario-leyenda__punto" style="background:var(--green)"></span>Hecho</span>
+                            </div>
+                        </aside>
+                    </div>
                 </div>
             </section>
 

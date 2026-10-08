@@ -20,20 +20,62 @@ if ($to < $from || (strtotime($to) - strtotime($from)) > 41 * 86400) {
     json_response(['ok' => false, 'error' => 'Elegí un rango de hasta 42 días.'], 422);
 }
 
+$desde = $from . ' 00:00:00';
+$hasta = $to . ' 00:00:00';
+
 $db = Db::get();
-$stmt = $db->prepare(
-    "SELECT c.id, c.nombre, c.celular_norm, c.producto_interes, c.proximo_contacto, c.estado,
+
+// Contactos abiertos con próximo contacto en el rango (vencido/hoy/próximo
+// según la hora actual, calculado más abajo).
+$stmtAbiertos = $db->prepare(
+    "SELECT c.id, c.nombre, c.celular_norm, c.producto_interes, c.proximo_contacto AS fecha_evento, c.estado,
         (SELECT s.nota FROM seguimientos s WHERE s.contacto_id = c.id AND s.tipo = 'consulta'
          ORDER BY s.fecha DESC, s.id DESC LIMIT 1) AS consulta
      FROM contactos c
-     WHERE c.estado <> 'cerrada' AND c.proximo_contacto >= :desde AND c.proximo_contacto < DATE_ADD(:hasta, INTERVAL 1 DAY)
-     ORDER BY c.proximo_contacto ASC, c.creado_en DESC"
+     WHERE c.estado <> 'cerrada' AND c.proximo_contacto >= :desde AND c.proximo_contacto < DATE_ADD(:hasta, INTERVAL 1 DAY)"
 );
-$stmt->execute(['desde' => $from . ' 00:00:00', 'hasta' => $to . ' 00:00:00']);
-$items = $stmt->fetchAll();
+$stmtAbiertos->execute(['desde' => $desde, 'hasta' => $hasta]);
+$abiertos = $stmtAbiertos->fetchAll();
+
+// Contactos concretados: el calendario los muestra en verde el día en que
+// se cerraron (fecha del seguimiento de cierre), no en una fecha futura.
+$stmtConcretados = $db->prepare(
+    "SELECT c.id, c.nombre, c.celular_norm, c.producto_interes, s.fecha AS fecha_evento, c.estado,
+        (SELECT s2.nota FROM seguimientos s2 WHERE s2.contacto_id = c.id AND s2.tipo = 'consulta'
+         ORDER BY s2.fecha DESC, s2.id DESC LIMIT 1) AS consulta
+     FROM contactos c
+     INNER JOIN seguimientos s ON s.contacto_id = c.id
+     WHERE c.estado = 'cerrada' AND c.motivo_cierre = 'concreto'
+       AND s.tipo = 'recontacto' AND s.proximo_asignado IS NULL
+       AND s.fecha >= :desde AND s.fecha < DATE_ADD(:hasta, INTERVAL 1 DAY)"
+);
+$stmtConcretados->execute(['desde' => $desde, 'hasta' => $hasta]);
+$concretados = $stmtConcretados->fetchAll();
+
+$ahora = date('Y-m-d H:i:s');
+$finHoy = date('Y-m-d 00:00:00', strtotime('+1 day'));
+
+$items = [];
+foreach ($abiertos as $item) {
+    if ($item['fecha_evento'] < $ahora) {
+        $item['tipo_evento'] = 'vencido';
+    } elseif ($item['fecha_evento'] < $finHoy) {
+        $item['tipo_evento'] = 'hoy';
+    } else {
+        $item['tipo_evento'] = 'proximo';
+    }
+    $items[] = $item;
+}
+foreach ($concretados as $item) {
+    $item['tipo_evento'] = 'concretado';
+    $items[] = $item;
+}
+
+usort($items, fn (array $a, array $b) => $a['fecha_evento'] <=> $b['fecha_evento']);
+
 $porDia = [];
 foreach ($items as $item) {
-    $day = substr((string) $item['proximo_contacto'], 0, 10);
+    $day = substr((string) $item['fecha_evento'], 0, 10);
     $porDia[$day] ??= [];
     $porDia[$day][] = $item;
 }

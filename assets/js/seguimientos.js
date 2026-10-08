@@ -82,7 +82,7 @@ function seguimientosModule() {
         },
 
         async refrescarDespuesSeguimiento(contacto) {
-            await Promise.all([this.cargarPanel(), this.cargarAgenda(), this.cargarContactos(true)]);
+            await Promise.all([this.cargarPanel(), this.cargarAgendaMes(), this.cargarContactos(true)]);
             if (this.contactoActual && Number(this.contactoActual.id) === Number(contacto.id)) {
                 const result = await this.api(`api/contactos.php?id=${contacto.id}`);
                 this.contactoActual = result.data;

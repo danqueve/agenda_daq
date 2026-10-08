@@ -3,6 +3,8 @@ function panelModule() {
         panel: { anillo: { agendados_hoy: 0, hechos_hoy: 0 }, vencidos: [], hoy: [], proximos: {}, sin_fecha: [], contadores: {} },
         cargandoPanel: false,
         errorPanel: '',
+        vistaCalendario: 'mes',
+        mesVisible: '',
         semanaInicio: '',
         diaSeleccionado: '',
         agenda: { por_dia: {}, puntos: {} },
@@ -10,10 +12,11 @@ function panelModule() {
 
         iniciarPanel() {
             const today = new Date();
+            this.mesVisible = this.primerDiaMes(today);
             this.semanaInicio = this.inicioSemana(today);
             this.diaSeleccionado = this.fechaIso(today);
             this.cargarPanel();
-            this.cargarAgenda();
+            this.cargarAgendaMes();
         },
 
         fechaIso(date) {
@@ -25,6 +28,10 @@ function panelModule() {
             return new Date(`${value}T12:00:00`);
         },
 
+        primerDiaMes(date) {
+            return this.fechaIso(new Date(date.getFullYear(), date.getMonth(), 1));
+        },
+
         inicioSemana(date) {
             const copy = new Date(date);
             const day = copy.getDay() || 7;
@@ -32,37 +39,103 @@ function panelModule() {
             return this.fechaIso(copy);
         },
 
+        // Grilla del mes visible: desde el lunes de la semana del día 1 hasta
+        // el domingo de la semana del último día (5 o 6 filas según el mes).
+        diasDelMes() {
+            const primero = this.desdeIso(this.mesVisible);
+            const mesActual = primero.getMonth();
+            const ultimo = new Date(primero.getFullYear(), primero.getMonth() + 1, 0);
+
+            const inicioGrilla = new Date(primero);
+            const offsetInicio = inicioGrilla.getDay() || 7;
+            inicioGrilla.setDate(inicioGrilla.getDate() - offsetInicio + 1);
+
+            const finGrilla = new Date(ultimo);
+            const offsetFin = finGrilla.getDay() || 7;
+            finGrilla.setDate(finGrilla.getDate() + (7 - offsetFin));
+
+            const hoyIso = this.fechaIso(new Date());
+            const dias = [];
+            for (let d = new Date(inicioGrilla); d <= finGrilla; d.setDate(d.getDate() + 1)) {
+                const iso = this.fechaIso(d);
+                dias.push({
+                    iso,
+                    numero: d.getDate(),
+                    esHoy: iso === hoyIso,
+                    esMesActual: d.getMonth() === mesActual,
+                });
+            }
+            return dias;
+        },
+
+        semanasDelMes() {
+            const dias = this.diasDelMes();
+            const semanas = [];
+            for (let i = 0; i < dias.length; i += 7) {
+                semanas.push(dias.slice(i, i + 7));
+            }
+            return semanas;
+        },
+
+        moverMes(direction) {
+            const primero = this.desdeIso(this.mesVisible);
+            primero.setMonth(primero.getMonth() + direction);
+            this.mesVisible = this.primerDiaMes(primero);
+            this.cargarAgendaMes();
+        },
+
+        volverMesHoy() {
+            const today = new Date();
+            this.mesVisible = this.primerDiaMes(today);
+            this.semanaInicio = this.inicioSemana(today);
+            this.diaSeleccionado = this.fechaIso(today);
+            this.cargarAgendaMes();
+        },
+
+        tituloMes() {
+            const texto = new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric' }).format(this.desdeIso(this.mesVisible));
+            return texto.charAt(0).toUpperCase() + texto.slice(1);
+        },
+
+        // Cantidad de recontactos agendados dentro del mes calendario que se
+        // está mirando (no de toda la grilla, que incluye días de relleno).
+        eventosDelMes() {
+            const prefijo = this.mesVisible.slice(0, 7);
+            return Object.entries(this.agenda.por_dia || {})
+                .filter(([dia]) => dia.startsWith(prefijo))
+                .reduce((total, [, items]) => total + items.length, 0);
+        },
+
+        eventosDia(iso) {
+            return (this.agenda.por_dia || {})[iso] || [];
+        },
+
+        // La vista "Semana" reusa los mismos datos ya cargados del mes (no
+        // dispara un fetch nuevo): la semana del día seleccionado siempre
+        // cae dentro de la grilla de 5-6 semanas que ya se pidió.
         diasSemana() {
-            const start = this.desdeIso(this.semanaInicio);
+            const start = this.desdeIso(this.inicioSemana(this.desdeIso(this.diaSeleccionado)));
+            const hoyIso = this.fechaIso(new Date());
             return Array.from({ length: 7 }, (_, index) => {
                 const day = new Date(start);
                 day.setDate(start.getDate() + index);
+                const iso = this.fechaIso(day);
                 return {
-                    iso: this.fechaIso(day),
+                    iso,
                     letra: new Intl.DateTimeFormat('es-AR', { weekday: 'narrow' }).format(day),
                     numero: day.getDate(),
-                    esHoy: this.fechaIso(day) === this.fechaIso(new Date()),
+                    esHoy: iso === hoyIso,
                 };
             });
         },
 
-        moverSemana(direction) {
-            const start = this.desdeIso(this.semanaInicio);
-            start.setDate(start.getDate() + (direction * 7));
-            this.semanaInicio = this.fechaIso(start);
-            this.diaSeleccionado = this.semanaInicio;
-            this.cargarAgenda();
-        },
-
-        volverHoy() {
-            const today = new Date();
-            this.semanaInicio = this.inicioSemana(today);
-            this.diaSeleccionado = this.fechaIso(today);
-            this.cargarAgenda();
-        },
-
         seleccionarDia(day) {
             this.diaSeleccionado = day;
+            const mesDelDia = day.slice(0, 7);
+            if (mesDelDia !== this.mesVisible.slice(0, 7)) {
+                this.mesVisible = `${mesDelDia}-01`;
+                this.cargarAgendaMes();
+            }
         },
 
         tituloDiaSeleccionado() {
@@ -70,7 +143,7 @@ function panelModule() {
         },
 
         contactosDiaSeleccionado() {
-            return this.agenda.por_dia[this.diaSeleccionado] || [];
+            return this.eventosDia(this.diaSeleccionado);
         },
 
         progresoAnillo() {
@@ -129,14 +202,14 @@ function panelModule() {
             }
         },
 
-        async cargarAgenda() {
-            if (this.cargandoAgenda || !this.semanaInicio) return;
+        async cargarAgendaMes() {
+            if (this.cargandoAgenda || !this.mesVisible) return;
             this.cargandoAgenda = true;
             try {
-                const start = this.desdeIso(this.semanaInicio);
-                const end = new Date(start);
-                end.setDate(start.getDate() + 6);
-                const result = await this.api(`api/agenda.php?desde=${this.semanaInicio}&hasta=${this.fechaIso(end)}`);
+                const dias = this.diasDelMes();
+                const desde = dias[0].iso;
+                const hasta = dias[dias.length - 1].iso;
+                const result = await this.api(`api/agenda.php?desde=${desde}&hasta=${hasta}`);
                 this.agenda = result.data;
                 this.refrescarIconos();
             } catch (error) {

@@ -14,7 +14,7 @@ function appShell() {
         tabs: [
             { id: 'hoy', etiqueta: 'Hoy', icono: 'calendar-check' },
             { id: 'contactos', etiqueta: 'Contactos', icono: 'users' },
-            { id: 'agenda', etiqueta: 'Agenda', icono: 'calendar-days' },
+            { id: 'agenda', etiqueta: 'Calendario', icono: 'calendar-days' },
             { id: 'ajustes', etiqueta: 'Ajustes', icono: 'settings' },
         ],
 
@@ -37,7 +37,7 @@ function appShell() {
             this.$watch('activo', (tab) => {
                 if (tab === 'contactos' && this.contactos.length === 0) this.cargarContactos(true);
                 if (tab === 'hoy') this.cargarPanel();
-                if (tab === 'agenda') this.cargarAgenda();
+                if (tab === 'agenda') this.cargarAgendaMes();
             });
             this.$el.addEventListener('click', (event) => {
                 const action = event.target.closest('.contact-detail .action-button');
