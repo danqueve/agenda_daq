@@ -363,7 +363,9 @@ button.card-pastel { cursor: pointer; font: inherit; }
    6. HOJAS (sheets) Y FORMULARIOS  ·  referencias 01b, 03b
    ===================================================================== */
 .sheet-backdrop { background: rgba(47, 56, 79, .35); }
-.sheet { background: var(--bg-grouped); box-shadow: var(--sombra-lg); }
+/* El velo puede atenuar la página, pero cada hoja debe ser una superficie
+   completamente sólida: nunca debe transparentarse el contenido de atrás. */
+.sheet { background-color: var(--bg-grouped); background-image: none; box-shadow: var(--sombra-lg); }
 .sheet__header { background: var(--pastel-tint); border-bottom: 1px solid var(--pastel-tint-borde); color: var(--pastel-label); }
 .sheet__header .btn-texto { color: var(--tint-texto); }
 .group__header { font-size: var(--fs-footnote); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--label-2); }
@@ -960,13 +962,22 @@ button.card-pastel { cursor: pointer; font: inherit; }
     width: 100%; max-width: 560px;
     border-radius: var(--radio-grupo);
     border: 0;
+    /* Respaldo opaco incluso si una nota antigua no tuviera color válido. */
+    background-color: var(--pastel-tint);
+    background-image: none;
     box-shadow: var(--sombra-lg);
     overflow: hidden;
     color: var(--pastel-label);
 }
+.nota-editor.nota--celeste { background-color: var(--pastel-tint); }
+.nota-editor.nota--durazno { background-color: var(--pastel-orange); }
+.nota-editor.nota--lavanda { background-color: var(--pastel-indigo); }
+.nota-editor.nota--menta   { background-color: var(--pastel-green); }
+.nota-editor.nota--rosa    { background-color: var(--pastel-red); }
 .nota-editor__barra {
     display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
     padding: 14px 18px;
+    background-color: inherit;
     border-bottom: 1px solid rgba(47, 56, 79, .08);
 }
 .nota-editor__acciones { margin-left: auto; display: flex; gap: 6px; }
@@ -976,7 +987,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
     background: #fff; color: var(--pastel-label-2); cursor: pointer;
 }
 .nota-editor__icono[aria-pressed="true"] { background: var(--tint); color: #fff; }
-.nota-editor__cuerpo { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+.nota-editor__cuerpo { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; background-color: inherit; }
 .nota-editor__titulo {
     border: 0; outline: none; background: transparent; padding: 0;
     font: inherit; font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: -0.03em;
@@ -989,13 +1000,14 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .nota-editor__contacto {
     display: flex; flex-direction: column; gap: 8px;
     padding: 14px; border-radius: var(--radio-grupo);
-    background: rgba(255, 255, 255, .7);
+    background-color: #fff;
 }
 .nota-editor__contacto-fila { display: flex; align-items: center; gap: 10px; }
 .nota-editor__contacto-nombre { flex: 1; min-width: 0; font-weight: 600; }
 .nota-editor__pie {
     display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
     padding: 14px 18px;
+    background-color: inherit;
     border-top: 1px solid rgba(47, 56, 79, .08);
 }
 .nota-editor__pie .btn-principal { width: auto; padding: 0 20px; }
@@ -1006,7 +1018,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .recordatorio-pill {
     min-height: 36px; padding: 0 12px;
     border: 1px solid rgba(47, 56, 79, .15); border-radius: var(--radio-chico);
-    background: rgba(255, 255, 255, .6); color: var(--pastel-label);
+    background-color: #fff; color: var(--pastel-label);
     font-size: var(--fs-subhead); cursor: pointer;
 }
 .recordatorio-pill[aria-checked="true"] { border-color: var(--tint); background: #fff; color: var(--tint-texto); font-weight: 700; }
