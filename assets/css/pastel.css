@@ -19,7 +19,7 @@
 .tabbar__item[aria-current="page"] { color: var(--tint-texto); font-weight: 600; }
 .tabbar__badge { background: var(--red); font-weight: 600; }
 
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
     /* La caja fija evita que el SVG de Lucide herede la línea del texto y
        quede visualmente descentrado en la barra inferior. */
     .tabbar {
@@ -55,7 +55,73 @@
     }
 }
 
-@media (min-width: 900px) {
+/* Algunos Android entregan un viewport CSS cercano a 980 px cuando la app
+   todavía conserva una vista anterior. Hasta 1023 px la interfaz siempre
+   debe conservar la navegación móvil, no el sidebar de escritorio. */
+@media (min-width: 900px) and (max-width: 1023px) {
+    .tabbar {
+        position: fixed;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 60;
+        width: auto;
+        height: auto;
+        min-height: calc(58px + env(safe-area-inset-bottom));
+        padding: 0 0 env(safe-area-inset-bottom);
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0;
+        background: color-mix(in srgb, var(--bg-card) 96%, transparent);
+        border-top: 1px solid var(--separator);
+        border-right: 0;
+        box-shadow: var(--sombra-sm);
+    }
+
+    .tabbar__brand,
+    .tabbar__perfil { display: none; }
+    .tabbar__items { display: contents; }
+
+    .tabbar__item,
+    .tabbar__item--ajustes-movil {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        min-width: 0;
+        min-height: 58px;
+        padding: 6px 0 4px;
+        border-radius: 0;
+        background: transparent;
+        color: var(--gray);
+        font-size: inherit;
+    }
+
+    .tabbar__item[aria-current="page"] { background: transparent; color: var(--tint-texto); }
+    .tabbar__icon { display: grid; place-items: center; width: 22px; height: 22px; line-height: 0; }
+    .tabbar__icon svg { width: 22px; height: 22px; }
+    .tabbar__label { display: block; min-height: var(--lh-caption); font-size: var(--fs-caption); line-height: var(--lh-caption); white-space: nowrap; }
+    .tabbar__badge { position: absolute; top: 2px; right: calc(50% - 18px); margin-left: 0; }
+
+    .app-shell__content { min-height: 100dvh; margin-left: 0; padding-bottom: calc(98px + env(safe-area-inset-bottom)); }
+    .screen { max-width: 680px; padding-bottom: 98px; }
+    .screen__body { padding-right: 16px; padding-bottom: 98px; padding-left: 16px; }
+
+    .sheet-backdrop { padding: 0; }
+    .sheet { width: 100%; max-width: 560px; max-height: 90dvh; border-radius: var(--radio-sheet) var(--radio-sheet) 0 0; }
+    .sheet__grabber { display: block; }
+    .contact-detail--ancho { width: 100%; }
+    .contact-detail__columnas { display: flex; flex-direction: column; }
+    .contact-detail__identidad { flex-direction: column; align-items: center; padding: 20px; text-align: center; }
+    .contact-detail__texto { align-items: center; }
+    .contact-detail__nombre-fila { justify-content: center; }
+    .contact-detail__identidad .action-buttons { width: 100%; }
+}
+
+@media (min-width: 1024px) {
     .tabbar {
         width: var(--sidebar-width);
         padding: 24px 16px;
@@ -444,7 +510,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 /* El panel de detalle de escritorio y la hoja de celular comparten el mismo
    estado (eventoAbierto): cada uno se muestra solo en su ancho. */
 .cal-evento-sheet { display: none; }
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
     .cal-detalle-wrap { display: none; }
     .cal-evento-sheet { display: block; }
 }
@@ -491,7 +557,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
    ===================================================================== */
 
 /* En escritorio la ficha deja de ser una hoja angosta: panel ancho de 2 columnas */
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
     .contact-detail--ancho {
         width: min(960px, calc(100vw - var(--sidebar-width) - 48px));
         max-width: none;
@@ -528,7 +594,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .contact-detail__identidad--cerrado .contact-detail__badge { color: var(--pastel-label-2); }
 .contact-detail__identidad .action-buttons { width: 100%; }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
     .contact-detail__identidad { flex-direction: row; flex-wrap: wrap; text-align: left; gap: 24px; padding: 28px; }
     .contact-detail__texto { align-items: flex-start; flex: 1 1 280px; }
     .contact-detail__nombre-fila { justify-content: flex-start; }
@@ -945,7 +1011,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 }
 .recordatorio-pill[aria-checked="true"] { border-color: var(--tint); background: #fff; color: var(--tint-texto); font-weight: 700; }
 
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
     .nota-editor-backdrop { padding: 0 !important; align-items: stretch !important; }
     .nota-editor {
         max-width: none;

@@ -11,7 +11,7 @@
     padding-bottom: calc(50px + env(safe-area-inset-bottom));
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
     .app-shell__content {
         padding-bottom: 0;
     }
@@ -143,7 +143,7 @@
     text-align: center;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
     .tabbar {
         position: sticky;
         top: 0;
@@ -448,7 +448,7 @@ button.cell:active,
     border: 1px solid var(--separator);
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
     .search-field--header {
         width: 34px;
         padding: 0;
@@ -745,7 +745,7 @@ button.cell:active,
     justify-content: center;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
     .sheet-backdrop {
         align-items: center;
     }
@@ -761,7 +761,7 @@ button.cell:active,
     padding-bottom: env(safe-area-inset-bottom);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
     .sheet {
         border-radius: var(--radio-sheet);
         max-height: 85dvh;
@@ -780,7 +780,7 @@ button.cell:active,
     background: var(--label-3);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
     .sheet__grabber {
         display: none;
     }
@@ -1129,7 +1129,7 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
    el padding-left del backdrop, igual al ancho del sidebar, evita que el
    diálogo aparezca corrido hacia la derecha o se superponga al sidebar,
    que era la causa del bug de paneles "fuera de encuadre" en escritorio. */
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
     .tabbar { position: fixed; top: var(--topbar-height); bottom: 0; left: 0; z-index: 60; width: var(--sidebar-width); height: auto; padding: 14px 10px; background: var(--bg-card); border-top: 0; border-right: 1px solid var(--separator); box-shadow: none; }
     .tabbar__item { flex-direction: row; justify-content: flex-start; gap: 11px; min-height: 38px; padding: 0 10px; font-size: 14px; border-radius: var(--radio-chico); }
     .tabbar__item.is-active,
@@ -1155,7 +1155,7 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     .sheet__grabber { display: none; }
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
     .workspace-header { gap: 10px; padding-right: 14px; padding-left: 14px; }
     .workspace-search { width: 34px; padding: 0; }
     .workspace-search span, .workspace-create span { display: none; }

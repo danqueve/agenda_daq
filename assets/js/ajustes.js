@@ -123,7 +123,13 @@ function ajustesModule() {
         },
 
         async instalarApp() {
-            if (!this.eventoInstalacion) return;
+            if (!this.eventoInstalacion) {
+                const origenSeguro = window.isSecureContext || location.hostname === 'localhost';
+                this.mostrarHud(origenSeguro
+                    ? 'Chrome todavía está preparando el instalador'
+                    : 'Para instalar en Android, abrí Agenda con HTTPS');
+                return;
+            }
             this.eventoInstalacion.prompt();
             const choice = await this.eventoInstalacion.userChoice;
             if (choice.outcome === 'accepted') this.mostrarHud('Instalando Agenda');
