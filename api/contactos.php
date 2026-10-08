@@ -92,6 +92,8 @@ function contacto_validar(array $body): array
 function contacto_crear_o_agregar(PDO $db, array $body): never
 {
     $values = contacto_validar($body);
+    $creadoPorUsuarioId = usuario_actual_id();
+    $creadoPorNombre = usuario_actual_nombre();
     $search = $db->prepare('SELECT id FROM contactos WHERE celular_norm = :celular_norm LIMIT 1');
     $search->execute(['celular_norm' => $values['celularNorm']]);
     $duplicateId = (int) $search->fetchColumn();
@@ -120,15 +122,17 @@ function contacto_crear_o_agregar(PDO $db, array $body): never
         } else {
             $insert = $db->prepare(
                 'INSERT INTO contactos
-                    (nombre, celular, celular_norm, producto_interes, origen, localidad, provincia, estado, proximo_contacto)
+                    (nombre, celular, celular_norm, producto_interes, origen, localidad, provincia, estado, proximo_contacto, creado_por_usuario_id, creado_por_nombre)
                  VALUES
-                    (:nombre, :celular, :celular_norm, :producto, :origen, :localidad, :provincia, :estado, :proximo_contacto)'
+                    (:nombre, :celular, :celular_norm, :producto, :origen, :localidad, :provincia, :estado, :proximo_contacto, :creado_por_usuario_id, :creado_por_nombre)'
             );
             $insert->execute([
                 'nombre' => $values['nombre'], 'celular' => $values['celular'], 'celular_norm' => $values['celularNorm'],
                 'producto' => $values['producto'], 'origen' => $values['origen'], 'localidad' => $values['localidad'],
                 'provincia' => $values['provincia'], 'estado' => $values['proximo'] === null ? 'pendiente' : 'seguimiento',
                 'proximo_contacto' => $values['proximo'],
+                'creado_por_usuario_id' => $creadoPorUsuarioId,
+                'creado_por_nombre' => $creadoPorNombre,
             ]);
             $contactoId = (int) $db->lastInsertId();
         }

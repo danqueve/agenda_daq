@@ -7,7 +7,7 @@ require_once __DIR__ . '/../app/api.php';
 /** @return list<array<string, mixed>> */
 function panel_contactos(PDO $db, string $condition, array $params = []): array
 {
-    $sql = "SELECT c.id, c.nombre, c.celular_norm, c.producto_interes, c.proximo_contacto, c.estado,
+    $sql = "SELECT c.id, c.nombre, c.celular_norm, c.producto_interes, c.proximo_contacto, c.estado, c.creado_por_nombre,
                 (SELECT s.nota FROM seguimientos s WHERE s.contacto_id = c.id AND s.tipo = 'consulta'
                  ORDER BY s.fecha DESC, s.id DESC LIMIT 1) AS consulta
             FROM contactos c WHERE {$condition} ORDER BY c.proximo_contacto ASC, c.creado_en DESC";

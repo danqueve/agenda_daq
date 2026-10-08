@@ -52,6 +52,22 @@ function usuario_actual_id(): ?int
     return isset($_SESSION['usuario_id']) ? (int) $_SESSION['usuario_id'] : null;
 }
 
+function usuario_actual_nombre(): string
+{
+    $usuarioId = usuario_actual_id();
+    if ($usuarioId === null) {
+        return 'Usuario';
+    }
+
+    $stmt = Db::get()->prepare('SELECT nombre, usuario FROM usuarios WHERE id = :id');
+    $stmt->execute(['id' => $usuarioId]);
+    $usuario = $stmt->fetch();
+
+    return trim((string) ($usuario['nombre'] ?? ''))
+        ?: trim((string) ($usuario['usuario'] ?? ''))
+        ?: 'Usuario';
+}
+
 function usuario_actual_rol(): ?string
 {
     $usuarioId = usuario_actual_id();

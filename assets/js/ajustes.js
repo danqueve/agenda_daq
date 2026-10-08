@@ -20,7 +20,7 @@ function ajustesModule() {
         usuarios: [],
         cargandoUsuarios: false,
         guardandoUsuario: false,
-        formularioUsuario: { usuario: '', password: '', confirmacion: '', rol: 'supervisor' },
+        formularioUsuario: { nombre: '', usuario: '', password: '', confirmacion: '', rol: 'supervisor' },
 
         iniciarAjustes() {
             window.addEventListener('beforeinstallprompt', (event) => {
@@ -62,9 +62,9 @@ function ajustesModule() {
             try {
                 await this.api('api/usuarios.php', {
                     method: 'POST',
-                    body: JSON.stringify({ usuario: form.usuario, password: form.password, rol: form.rol }),
+                    body: JSON.stringify({ nombre: form.nombre, usuario: form.usuario, password: form.password, rol: form.rol }),
                 });
-                this.formularioUsuario = { usuario: '', password: '', confirmacion: '', rol: 'supervisor' };
+                this.formularioUsuario = { nombre: '', usuario: '', password: '', confirmacion: '', rol: 'supervisor' };
                 await this.cargarUsuarios();
                 this.mostrarHud('Usuario creado');
             } catch (error) {
@@ -75,7 +75,7 @@ function ajustesModule() {
         },
 
         async eliminarUsuario(usuario) {
-            if (!confirm(`¿Eliminar al usuario “${usuario.usuario}”?`)) return;
+            if (!confirm(`¿Eliminar al usuario “${usuario.nombre || usuario.usuario}”?`)) return;
             try {
                 await this.api(`api/usuarios.php?id=${usuario.id}`, { method: 'DELETE', body: '{}' });
                 await this.cargarUsuarios();

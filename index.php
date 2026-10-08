@@ -10,9 +10,10 @@ requireLogin();
 
 $usuarioId = usuario_actual_id();
 
-$stmtUsuario = Db::get()->prepare('SELECT usuario FROM usuarios WHERE id = :id');
+$stmtUsuario = Db::get()->prepare('SELECT usuario, nombre FROM usuarios WHERE id = :id');
 $stmtUsuario->execute(['id' => $usuarioId]);
-$usuarioNombre = $stmtUsuario->fetchColumn() ?: 'Usuario';
+$usuarioActual = $stmtUsuario->fetch() ?: [];
+$usuarioNombre = trim((string) ($usuarioActual['nombre'] ?? '')) ?: ($usuarioActual['usuario'] ?? 'Usuario');
 $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
 ?>
 <!doctype html>
@@ -139,6 +140,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <span class="chip-estado" x-text="{vencido:'Vencido', hoy:'Para hoy', proximo:'Próximo', sinfecha:'Sin fecha'}[item.estado]"></span>
                                 </div>
                                 <p class="card-pastel__fecha tabular" x-show="item.estado !== 'sinfecha'"><i data-lucide="clock"></i><span x-text="fechaCorta(item.contacto.proximo_contacto)"></span></p>
+                                <p class="card-pastel__autor" x-text="`Cargó: ${item.contacto.creado_por_nombre || 'Sin registrar'}`"></p>
                                 <div class="card-pastel__acciones">
                                     <a class="quick-action-card quick-action-card--llamar" :href="`tel:+${item.contacto.celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
                                     <a class="quick-action-card quick-action-card--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${item.contacto.celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
@@ -198,6 +200,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                         <span class="chip-estado" x-show="contacto.producto_interes" x-text="contacto.producto_interes"></span>
                                         <span class="chip-estado chip-estado--estado" x-text="etiquetaEstado(contacto)"></span>
                                     </div>
+                                    <p class="card-pastel__autor" x-text="`Cargó: ${contacto.creado_por_nombre || 'Sin registrar'}`"></p>
                                     <p class="card-pastel__pie">
                                         <span x-text="[contacto.localidad, etiquetaOrigen(contacto.origen)].filter(Boolean).join(' · ')"></span>
                                         <span class="tabular" x-text="fechaRelativa(contacto.creado_en)"></span>
@@ -259,7 +262,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 <div>
                                     <div class="week-strip"><div class="week-strip__days"><template x-for="dia in diasSemana()" :key="dia.iso"><button type="button" class="week-strip__day" :class="{'week-strip__day--selected': diaSeleccionado === dia.iso, 'week-strip__day--today': dia.esHoy}" @click="seleccionarDia(dia.iso)"><span class="caption" x-text="dia.letra"></span><strong x-text="dia.numero"></strong><span class="week-strip__dot" x-show="eventosDia(dia.iso).length" :class="{'week-strip__dot--selected': diaSeleccionado === dia.iso}"></span></button></template></div></div>
                                     <p class="group__header footnote" x-text="tituloDiaSeleccionado()"></p>
-                                    <div class="cal-item-lista" x-show="contactosDiaSeleccionado().length"><template x-for="contacto in contactosDiaSeleccionado()" :key="`a-${contacto.id}`"><button type="button" class="cal-item" :class="`cal-item--${contacto.tipo_evento}`" @click="abrirEventoCalendario(contacto)"><span class="cal-item__hora tabular" x-text="fechaCorta(contacto.fecha_evento)"></span><span class="cal-item__texto"><span class="cal-item__nombre" x-text="contacto.nombre"></span><span class="cal-item__motivo" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></span></span><i data-lucide="chevron-right"></i></button></template></div>
+                                    <div class="cal-item-lista" x-show="contactosDiaSeleccionado().length"><template x-for="contacto in contactosDiaSeleccionado()" :key="`a-${contacto.id}`"><button type="button" class="cal-item" :class="`cal-item--${contacto.tipo_evento}`" @click="abrirEventoCalendario(contacto)"><span class="cal-item__hora tabular" x-text="fechaCorta(contacto.fecha_evento)"></span><span class="cal-item__texto"><span class="cal-item__nombre" x-text="contacto.nombre"></span><span class="cal-item__motivo" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></span><span class="cal-item__autor" x-text="`Cargó: ${contacto.creado_por_nombre || 'Sin registrar'}`"></span></span><i data-lucide="chevron-right"></i></button></template></div>
                                     <div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length"><i data-lucide="calendar-days"></i><p class="body-text">Sin recontactos agendados</p></div>
                                 </div>
                             </template>
@@ -267,7 +270,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                             <template x-if="vistaCalendario === 'dia'">
                                 <div>
                                     <p class="group__header footnote" x-text="tituloDiaSeleccionado()"></p>
-                                    <div class="cal-item-lista" x-show="contactosDiaSeleccionado().length"><template x-for="contacto in contactosDiaSeleccionado()" :key="`a-${contacto.id}`"><button type="button" class="cal-item" :class="`cal-item--${contacto.tipo_evento}`" @click="abrirEventoCalendario(contacto)"><span class="cal-item__hora tabular" x-text="fechaCorta(contacto.fecha_evento)"></span><span class="cal-item__texto"><span class="cal-item__nombre" x-text="contacto.nombre"></span><span class="cal-item__motivo" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></span></span><i data-lucide="chevron-right"></i></button></template></div>
+                                    <div class="cal-item-lista" x-show="contactosDiaSeleccionado().length"><template x-for="contacto in contactosDiaSeleccionado()" :key="`a-${contacto.id}`"><button type="button" class="cal-item" :class="`cal-item--${contacto.tipo_evento}`" @click="abrirEventoCalendario(contacto)"><span class="cal-item__hora tabular" x-text="fechaCorta(contacto.fecha_evento)"></span><span class="cal-item__texto"><span class="cal-item__nombre" x-text="contacto.nombre"></span><span class="cal-item__motivo" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></span><span class="cal-item__autor" x-text="`Cargó: ${contacto.creado_por_nombre || 'Sin registrar'}`"></span></span><i data-lucide="chevron-right"></i></button></template></div>
                                     <div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length"><i data-lucide="calendar-days"></i><p class="body-text">Sin recontactos agendados</p></div>
                                 </div>
                             </template>
@@ -286,6 +289,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                             <div class="cal-detalle__persona-texto">
                                                 <p class="cal-detalle__nombre" x-text="eventoAbierto?.nombre"></p>
                                                 <p class="cal-detalle__sub tabular" x-text="[eventoAbierto?.celular, eventoAbierto?.localidad].filter(Boolean).join(' · ')"></p>
+                                                <p class="cal-detalle__autor" x-text="`Cargó: ${eventoAbierto?.creado_por_nombre || 'Sin registrar'}`"></p>
                                             </div>
                                         </div>
                                         <p class="cal-detalle__cuando tabular"><i data-lucide="clock"></i><span x-text="fechaEventoCalendario(eventoAbierto)"></span></p>
@@ -327,6 +331,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                         <p class="calendario-panel__hora tabular" x-text="fechaCorta(evento.fecha_evento)"></p>
                                         <p class="calendario-panel__nombre" x-text="evento.nombre"></p>
                                         <p class="calendario-panel__detalle" x-text="[evento.producto_interes, evento.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></p>
+                                        <p class="calendario-panel__autor" x-text="`Cargó: ${evento.creado_por_nombre || 'Sin registrar'}`"></p>
                                     </button>
                                 </template>
                             </div>
@@ -346,6 +351,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                             <div class="cal-detalle__persona-texto">
                                                 <p class="cal-detalle__nombre" x-text="eventoAbierto?.nombre"></p>
                                                 <p class="cal-detalle__sub tabular" x-text="`${fechaEventoCalendario(eventoAbierto)} · ${etiquetaEventoCalendario(eventoAbierto)}`"></p>
+                                                <p class="cal-detalle__autor" x-text="`Cargó: ${eventoAbierto?.creado_por_nombre || 'Sin registrar'}`"></p>
                                             </div>
                                             <button type="button" aria-label="Cerrar" class="cal-detalle__cerrar" @click="cerrarEventoCalendario()"><i data-lucide="x"></i></button>
                                         </div>
@@ -543,6 +549,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                             <p class="group__header footnote">equipo</p>
                             <form class="usuarios-form" @submit.prevent="crearUsuario()">
                                 <div class="group form-group">
+                                    <label class="cell form-cell"><span class="cell__label">Nombre completo</span><input x-model.trim="formularioUsuario.nombre" autocomplete="name" minlength="2" maxlength="100" required placeholder="Ej. María Gómez"></label>
                                     <label class="cell form-cell"><span class="cell__label">Usuario</span><input x-model.trim="formularioUsuario.usuario" autocomplete="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9_.-]+" required placeholder="nombre.apellido"></label>
                                     <label class="cell form-cell"><span class="cell__label">Contraseña</span><input type="password" x-model="formularioUsuario.password" inputmode="numeric" pattern="[0-9]*" autocomplete="new-password" minlength="10" required placeholder="Solo números · mínimo 10 dígitos"></label>
                                     <label class="cell form-cell"><span class="cell__label">Repetir</span><input type="password" x-model="formularioUsuario.confirmacion" inputmode="numeric" pattern="[0-9]*" autocomplete="new-password" minlength="10" required placeholder="Repetí los 10 dígitos"></label>
@@ -554,9 +561,9 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 <template x-for="usuario in usuarios" :key="usuario.id">
                                     <div class="cell usuario-fila">
                                         <span class="cell__icon-box cell__icon-box--indigo"><i data-lucide="user-round"></i></span>
-                                        <span class="cell__content"><span class="cell__title" x-text="usuario.usuario"></span><span class="cell__subtitle tabular" x-text="`Creado ${fechaLarga(usuario.creado_en)}`"></span></span>
+                                        <span class="cell__content"><span class="cell__title" x-text="usuario.nombre || usuario.usuario"></span><span class="cell__subtitle tabular" x-text="`@${usuario.usuario} · Creado ${fechaLarga(usuario.creado_en)}`"></span></span>
                                         <span class="usuario-rol" :class="`usuario-rol--${usuario.rol}`" x-text="usuario.rol === 'admin' ? 'Admin' : 'Supervisor'"></span>
-                                        <button class="btn-texto btn-texto--peligro" type="button" x-show="Number(usuario.id) !== usuarioActual.id" @click="eliminarUsuario(usuario)" :aria-label="`Eliminar a ${usuario.usuario}`"><i data-lucide="trash-2"></i></button>
+                                        <button class="btn-texto btn-texto--peligro" type="button" x-show="Number(usuario.id) !== usuarioActual.id" @click="eliminarUsuario(usuario)" :aria-label="`Eliminar a ${usuario.nombre || usuario.usuario}`"><i data-lucide="trash-2"></i></button>
                                     </div>
                                 </template>
                             </div>
@@ -648,6 +655,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 <span class="contact-detail__badge" x-text="etiquetaEstado(contactoActual)"></span>
                             </div>
                             <p class="contact-detail__sub tabular" x-text="`${contactoActual?.celular} · Cliente desde el ${fechaSoloDia(contactoActual?.creado_en)}`"></p>
+                            <p class="contact-detail__cargado" x-text="`Cargó: ${contactoActual?.creado_por_nombre || 'Sin registrar'}`"></p>
                             <div class="card-pastel__tags" x-show="contactoActual?.producto_interes || contactoActual?.etiquetas?.length">
                                 <span class="chip-estado" x-show="contactoActual?.producto_interes" x-text="contactoActual?.producto_interes"></span>
                                 <template x-for="etiqueta in contactoActual?.etiquetas" :key="etiqueta.id"><span class="chip-estado" x-text="etiqueta.nombre"></span></template>

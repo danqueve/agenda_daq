@@ -7,6 +7,7 @@ SET time_zone = '-03:00';
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     usuario VARCHAR(50) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     rol ENUM('admin','supervisor') NOT NULL DEFAULT 'supervisor',
     creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -51,11 +52,15 @@ CREATE TABLE IF NOT EXISTS contactos (
     motivo_cierre ENUM('concreto','no_interesa','sin_respuesta') DEFAULT NULL,
     proximo_contacto DATETIME DEFAULT NULL,
     creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    creado_por_usuario_id INT UNSIGNED DEFAULT NULL,
+    creado_por_nombre VARCHAR(100) NOT NULL DEFAULT '',
     actualizado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_contactos_celular_norm (celular_norm),
     KEY idx_contactos_proximo_contacto (proximo_contacto),
-    KEY idx_contactos_estado (estado)
+    KEY idx_contactos_estado (estado),
+    KEY idx_contactos_creado_por_usuario (creado_por_usuario_id),
+    CONSTRAINT fk_contactos_creado_por_usuario FOREIGN KEY (creado_por_usuario_id) REFERENCES usuarios (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS seguimientos (

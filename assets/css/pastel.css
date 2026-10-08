@@ -301,6 +301,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .card-pastel__acciones { display: flex; gap: 8px; }
 .card-pastel__tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .card-pastel__pie { display: flex; justify-content: space-between; gap: 8px; margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.card-pastel__autor { margin: -4px 0 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
 
 /* Chip blanco de estado / producto */
 .chip-estado {
@@ -593,6 +594,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .contact-detail__nombre-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
 .contact-detail__nombre-fila h2 { margin: 0; }
 .contact-detail__sub { margin: 0; font-size: var(--fs-subhead); color: var(--pastel-label-2); }
+.contact-detail__cargado { margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
 .contact-detail__identidad .chip-estado { text-transform: none; letter-spacing: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label); }
 .contact-detail__badge { display: inline-flex; font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; background: #fff; border-radius: var(--radio-chico); padding: 4px 8px; }
 .contact-detail__identidad--nuevo .contact-detail__badge { color: var(--tint-texto); }
@@ -822,6 +824,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .cal-detalle__persona .avatar { width: 52px; height: 52px; font-size: 18px; border: 3px solid #fff; }
 .cal-detalle__nombre { margin: 0; font-size: var(--fs-title2); line-height: var(--lh-title2); font-weight: 600; }
 .cal-detalle__sub { font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); font-variant-numeric: tabular-nums; }
+.cal-detalle__autor, .cal-item__autor, .calendario-panel__autor { margin: 2px 0 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
 .cal-detalle__cuando { display: flex; align-items: center; gap: 8px; font-size: var(--fs-headline); font-weight: 600; font-variant-numeric: tabular-nums; }
 .cal-detalle__cuerpo { padding: 18px 20px; display: flex; flex-direction: column; gap: 16px; }
 .cal-detalle__contacto { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }

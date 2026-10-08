@@ -10,7 +10,7 @@ $db = Db::get();
 $method = api_method();
 
 if ($method === 'GET') {
-    $stmt = $db->query('SELECT id, usuario, rol, creado_en FROM usuarios ORDER BY usuario ASC');
+    $stmt = $db->query('SELECT id, usuario, nombre, rol, creado_en FROM usuarios ORDER BY nombre ASC, usuario ASC');
     json_response(['ok' => true, 'data' => $stmt->fetchAll()]);
 }
 
@@ -18,11 +18,15 @@ if ($method === 'POST') {
     api_require_write();
     $body = api_body();
     $usuario = api_string($body, 'usuario', 50);
+    $nombre = api_string($body, 'nombre', 100);
     $password = (string) ($body['password'] ?? '');
     $rol = api_string($body, 'rol', 20);
 
     if (!preg_match('/^[A-Za-z0-9_.-]{3,50}$/', $usuario)) {
         json_response(['ok' => false, 'error' => 'El usuario debe tener entre 3 y 50 caracteres: letras, números, punto, guion o guion bajo.'], 422);
+    }
+    if (mb_strlen($nombre) < 2 || preg_match('/[<>\x00-\x1F\x7F]/u', $nombre)) {
+        json_response(['ok' => false, 'error' => 'Ingresá un nombre válido de al menos 2 caracteres.'], 422);
     }
     if (!in_array($rol, [ROL_ADMIN, ROL_SUPERVISOR], true)) {
         json_response(['ok' => false, 'error' => 'El rol indicado no es válido.'], 422);
@@ -33,10 +37,11 @@ if ($method === 'POST') {
 
     try {
         $stmt = $db->prepare(
-            'INSERT INTO usuarios (usuario, password_hash, rol) VALUES (:usuario, :password_hash, :rol)'
+            'INSERT INTO usuarios (usuario, nombre, password_hash, rol) VALUES (:usuario, :nombre, :password_hash, :rol)'
         );
         $stmt->execute([
             'usuario' => $usuario,
+            'nombre' => $nombre,
             'password_hash' => password_hash($password, PASSWORD_DEFAULT),
             'rol' => $rol,
         ]);
@@ -50,6 +55,7 @@ if ($method === 'POST') {
     json_response(['ok' => true, 'data' => [
         'id' => (int) $db->lastInsertId(),
         'usuario' => $usuario,
+        'nombre' => $nombre,
         'rol' => $rol,
     ]], 201);
 }
