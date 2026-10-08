@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'agenda-daq-v12';
+const CACHE_VERSION = 'agenda-daq-v13';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const SHELL_ASSETS = [

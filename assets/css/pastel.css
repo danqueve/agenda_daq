@@ -19,6 +19,42 @@
 .tabbar__item[aria-current="page"] { color: var(--tint-texto); font-weight: 600; }
 .tabbar__badge { background: var(--red); font-weight: 600; }
 
+@media (max-width: 899px) {
+    /* La caja fija evita que el SVG de Lucide herede la línea del texto y
+       quede visualmente descentrado en la barra inferior. */
+    .tabbar {
+        min-height: calc(58px + env(safe-area-inset-bottom));
+        align-items: stretch;
+    }
+
+    .tabbar__item {
+        min-width: 0;
+        min-height: 58px;
+        justify-content: center;
+    }
+
+    .tabbar__icon {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        flex: none;
+        line-height: 0;
+    }
+
+    .tabbar__icon svg {
+        width: 22px;
+        height: 22px;
+        flex: none;
+    }
+
+    .tabbar__label {
+        display: block;
+        min-height: var(--lh-caption);
+        white-space: nowrap;
+    }
+}
+
 @media (min-width: 900px) {
     .tabbar {
         width: var(--sidebar-width);
@@ -530,6 +566,14 @@ button.card-pastel { cursor: pointer; font: inherit; }
 
 /* Botones blancos de la fila de acciones (Llamar, WhatsApp, Recontacto, Nota) */
 .action-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.action-button__icon {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    flex: none;
+    line-height: 0;
+}
 .action-button {
     flex: 1 1 130px;
     display: flex; align-items: center; justify-content: center; gap: 8px;
