@@ -300,8 +300,22 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .card-pastel__fecha svg { width: 15px; height: 15px; }
 .card-pastel__acciones { display: flex; gap: 8px; }
 .card-pastel__tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.card-pastel__pie { display: flex; justify-content: space-between; gap: 8px; margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.card-pastel__pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.card-pastel__pie .origen-chip { margin-right: auto; }
 .card-pastel__autor { margin: -4px 0 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.origen-chip {
+    display: inline-flex; align-items: center; gap: 5px; flex: none;
+    min-height: 26px; padding: 3px 8px;
+    border-radius: var(--radio-chico); background: var(--bg-card-2);
+    color: var(--pastel-label-2); font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600;
+    white-space: nowrap;
+}
+.origen-chip svg { width: 14px; height: 14px; }
+.origen-chip--whatsapp, .origen-chip--referido { background: var(--pastel-green); color: var(--green-texto); }
+.origen-chip--instagram { background: var(--pastel-indigo); color: var(--indigo-texto); }
+.origen-chip--facebook { background: var(--pastel-tint); color: var(--tint-texto); }
+.origen-chip--llamada, .origen-chip--local { background: var(--pastel-orange); color: var(--orange-texto); }
+.origen-chip--otro { background: var(--bg-card-2); color: var(--pastel-label-2); }
 
 /* Chip blanco de estado / producto */
 .chip-estado {

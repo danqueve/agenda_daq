@@ -283,6 +283,18 @@ function contactosModule() {
             return ({ whatsapp: 'WhatsApp', instagram: 'Instagram', facebook: 'Facebook', llamada: 'Llamada', local: 'Local', referido: 'Referido', otro: 'Otro' })[origen] || 'Otro';
         },
 
+        origenVisual(origen) {
+            return ({
+                whatsapp: { etiqueta: 'WhatsApp', icono: 'message-circle', clase: 'whatsapp' },
+                instagram: { etiqueta: 'Instagram', icono: 'camera', clase: 'instagram' },
+                facebook: { etiqueta: 'Facebook', icono: 'thumbs-up', clase: 'facebook' },
+                llamada: { etiqueta: 'Llamada', icono: 'phone', clase: 'llamada' },
+                local: { etiqueta: 'Local', icono: 'store', clase: 'local' },
+                referido: { etiqueta: 'Referido', icono: 'users', clase: 'referido' },
+                otro: { etiqueta: 'Otro', icono: 'ellipsis', clase: 'otro' },
+            })[origen] || { etiqueta: 'Otro', icono: 'ellipsis', clase: 'otro' };
+        },
+
         refrescarIconos() {
             this.$nextTick(() => window.lucide && window.lucide.createIcons());
         },

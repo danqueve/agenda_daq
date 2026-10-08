@@ -202,7 +202,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     </div>
                                     <p class="card-pastel__autor" x-text="`Cargó: ${contacto.creado_por_nombre || 'Sin registrar'}`"></p>
                                     <p class="card-pastel__pie">
-                                        <span x-text="[contacto.localidad, etiquetaOrigen(contacto.origen)].filter(Boolean).join(' · ')"></span>
+                                        <span x-show="contacto.localidad" x-text="contacto.localidad"></span>
+                                        <span class="origen-chip" :class="`origen-chip--${origenVisual(contacto.origen).clase}`"><i :data-lucide="origenVisual(contacto.origen).icono"></i><span x-text="origenVisual(contacto.origen).etiqueta"></span></span>
                                         <span class="tabular" x-text="fechaRelativa(contacto.creado_en)"></span>
                                     </p>
                                 </button>
@@ -716,7 +717,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                             <div class="group">
                                 <div class="cell" x-show="contactoActual?.producto_interes"><span class="cell__label">Producto</span><span class="cell__value" x-text="contactoActual?.producto_interes"></span></div>
                                 <div class="cell" x-show="contactoActual?.localidad"><span class="cell__label">Localidad</span><span class="cell__value" x-text="contactoActual?.localidad"></span></div>
-                                <div class="cell"><span class="cell__label">Origen</span><span class="cell__value" x-text="etiquetaOrigen(contactoActual?.origen)"></span></div>
+                                <div class="cell"><span class="cell__label">Origen</span><span class="cell__value"><span class="origen-chip" :class="`origen-chip--${origenVisual(contactoActual?.origen).clase}`"><i :data-lucide="origenVisual(contactoActual?.origen).icono"></i><span x-text="origenVisual(contactoActual?.origen).etiqueta"></span></span></span></div>
                             </div>
 
                             <template x-if="notasDelContacto(contactoActual).length">
