@@ -27,8 +27,8 @@ if ($method === 'POST') {
     if (!in_array($rol, [ROL_ADMIN, ROL_SUPERVISOR], true)) {
         json_response(['ok' => false, 'error' => 'El rol indicado no es válido.'], 422);
     }
-    if (mb_strlen($password) < 10) {
-        json_response(['ok' => false, 'error' => 'La contraseña debe tener al menos 10 caracteres.'], 422);
+    if (!preg_match('/^\d{10,}$/D', $password)) {
+        json_response(['ok' => false, 'error' => 'La contraseña debe contener solo números y tener al menos 10 dígitos.'], 422);
     }
 
     try {

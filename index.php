@@ -544,8 +544,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                             <form class="usuarios-form" @submit.prevent="crearUsuario()">
                                 <div class="group form-group">
                                     <label class="cell form-cell"><span class="cell__label">Usuario</span><input x-model.trim="formularioUsuario.usuario" autocomplete="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9_.-]+" required placeholder="nombre.apellido"></label>
-                                    <label class="cell form-cell"><span class="cell__label">Contraseña</span><input type="password" x-model="formularioUsuario.password" autocomplete="new-password" minlength="10" required placeholder="Mínimo 10 caracteres"></label>
-                                    <label class="cell form-cell"><span class="cell__label">Repetir</span><input type="password" x-model="formularioUsuario.confirmacion" autocomplete="new-password" minlength="10" required placeholder="Repetí la contraseña"></label>
+                                    <label class="cell form-cell"><span class="cell__label">Contraseña</span><input type="password" x-model="formularioUsuario.password" inputmode="numeric" pattern="[0-9]*" autocomplete="new-password" minlength="10" required placeholder="Solo números · mínimo 10 dígitos"></label>
+                                    <label class="cell form-cell"><span class="cell__label">Repetir</span><input type="password" x-model="formularioUsuario.confirmacion" inputmode="numeric" pattern="[0-9]*" autocomplete="new-password" minlength="10" required placeholder="Repetí los 10 dígitos"></label>
                                     <label class="cell form-cell"><span class="cell__label">Rol</span><select x-model="formularioUsuario.rol"><option value="supervisor">Supervisor</option><option value="admin">Admin</option></select></label>
                                 </div>
                                 <button class="btn-principal" type="submit" :disabled="guardandoUsuario"><i data-lucide="user-plus"></i><span x-text="guardandoUsuario ? 'Creando…' : 'Agregar usuario'"></span></button>
