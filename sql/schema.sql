@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     usuario VARCHAR(50) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    rol ENUM('admin','supervisor') NOT NULL DEFAULT 'supervisor',
     creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_usuarios_usuario (usuario)

@@ -15,6 +15,12 @@ function ajustesModule() {
         push: { dispositivos: [], hora_resumen: '08:30', configurado: false, vapid_public: '' },
         cargandoPush: false,
         activandoPush: false,
+        esAdmin: window.APP_CONFIG.usuario?.rol === 'admin',
+        usuarioActual: window.APP_CONFIG.usuario || { id: 0, rol: 'supervisor' },
+        usuarios: [],
+        cargandoUsuarios: false,
+        guardandoUsuario: false,
+        formularioUsuario: { usuario: '', password: '', confirmacion: '', rol: 'supervisor' },
 
         iniciarAjustes() {
             window.addEventListener('beforeinstallprompt', (event) => {
@@ -29,6 +35,54 @@ function ajustesModule() {
             window.addEventListener('online', () => { this.sinConexion = false; });
             window.addEventListener('offline', () => { this.sinConexion = true; });
             this.cargarPush();
+            if (this.esAdmin) this.cargarUsuarios();
+        },
+
+        async cargarUsuarios() {
+            if (!this.esAdmin) return;
+            this.cargandoUsuarios = true;
+            try {
+                const result = await this.api('api/usuarios.php');
+                this.usuarios = result.data;
+                this.refrescarIconos();
+            } catch (error) {
+                this.mostrarHud(error.message, 'circle-alert');
+            } finally {
+                this.cargandoUsuarios = false;
+            }
+        },
+
+        async crearUsuario() {
+            const form = this.formularioUsuario;
+            if (form.password !== form.confirmacion) {
+                this.mostrarHud('Las contraseñas no coinciden', 'circle-alert');
+                return;
+            }
+            this.guardandoUsuario = true;
+            try {
+                await this.api('api/usuarios.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ usuario: form.usuario, password: form.password, rol: form.rol }),
+                });
+                this.formularioUsuario = { usuario: '', password: '', confirmacion: '', rol: 'supervisor' };
+                await this.cargarUsuarios();
+                this.mostrarHud('Usuario creado');
+            } catch (error) {
+                this.mostrarHud(error.message, 'circle-alert');
+            } finally {
+                this.guardandoUsuario = false;
+            }
+        },
+
+        async eliminarUsuario(usuario) {
+            if (!confirm(`¿Eliminar al usuario “${usuario.usuario}”?`)) return;
+            try {
+                await this.api(`api/usuarios.php?id=${usuario.id}`, { method: 'DELETE', body: '{}' });
+                await this.cargarUsuarios();
+                this.mostrarHud('Usuario eliminado');
+            } catch (error) {
+                this.mostrarHud(error.message, 'circle-alert');
+            }
         },
 
         base64UrlBytes(value) {

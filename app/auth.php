@@ -10,6 +10,8 @@ const RECORDAR_COOKIE = 'agenda_daq_recordar';
 const RECORDAR_DIAS = 90;
 const INTENTOS_MAXIMOS = 5;
 const BLOQUEO_MINUTOS = 15;
+const ROL_ADMIN = 'admin';
+const ROL_SUPERVISOR = 'supervisor';
 
 function cliente_ip(): string
 {
@@ -40,7 +42,7 @@ function iniciar_sesion(): void
     ]);
     session_start();
 
-    if (usuario_actual_id() === null) {
+    if (usuario_actual_rol() === null) {
         intentar_recordar_sesion();
     }
 }
@@ -50,9 +52,34 @@ function usuario_actual_id(): ?int
     return isset($_SESSION['usuario_id']) ? (int) $_SESSION['usuario_id'] : null;
 }
 
+function usuario_actual_rol(): ?string
+{
+    $usuarioId = usuario_actual_id();
+    if ($usuarioId === null) {
+        return null;
+    }
+
+    $stmt = Db::get()->prepare('SELECT rol FROM usuarios WHERE id = :id');
+    $stmt->execute(['id' => $usuarioId]);
+    $rol = $stmt->fetchColumn();
+
+    if (!in_array($rol, [ROL_ADMIN, ROL_SUPERVISOR], true)) {
+        unset($_SESSION['usuario_id'], $_SESSION['usuario_rol']);
+        return null;
+    }
+
+    $_SESSION['usuario_rol'] = $rol;
+    return $rol;
+}
+
+function es_admin(): bool
+{
+    return usuario_actual_rol() === ROL_ADMIN;
+}
+
 function requireLogin(): void
 {
-    if (usuario_actual_id() !== null) {
+    if (usuario_actual_rol() !== null) {
         return;
     }
 
@@ -62,6 +89,21 @@ function requireLogin(): void
 
     header('Location: ' . APP_URL . '/login.php');
     exit;
+}
+
+function requireAdmin(): void
+{
+    requireLogin();
+    if (es_admin()) {
+        return;
+    }
+
+    if (preg_match('#(?:^|/)api/#', parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '')) {
+        json_response(['ok' => false, 'error' => 'No tenés permisos de administrador.'], 403);
+    }
+
+    http_response_code(403);
+    exit('No tenés permisos de administrador.');
 }
 
 function intento_login_bloqueado(string $ip): bool
@@ -98,7 +140,7 @@ function login(string $usuario, string $password, bool $recordar, string $ip): s
         return 'bloqueado';
     }
 
-    $stmt = Db::get()->prepare('SELECT id, password_hash FROM usuarios WHERE usuario = :usuario');
+    $stmt = Db::get()->prepare('SELECT id, password_hash, rol FROM usuarios WHERE usuario = :usuario');
     $stmt->execute(['usuario' => $usuario]);
     $fila = $stmt->fetch();
 
@@ -111,6 +153,7 @@ function login(string $usuario, string $password, bool $recordar, string $ip): s
 
     session_regenerate_id(true);
     $_SESSION['usuario_id'] = (int) $fila['id'];
+    $_SESSION['usuario_rol'] = (string) $fila['rol'];
 
     if ($recordar) {
         crear_token_recordar((int) $fila['id']);
@@ -160,8 +203,10 @@ function intentar_recordar_sesion(): void
     [$selector, $validador] = explode(':', $cookie, 2);
 
     $stmt = Db::get()->prepare(
-        'SELECT id, usuario_id, validador_hash FROM tokens_recordar
-         WHERE selector = :selector AND expira_en > NOW()'
+        'SELECT tokens_recordar.id, tokens_recordar.usuario_id, tokens_recordar.validador_hash, usuarios.rol
+         FROM tokens_recordar
+         INNER JOIN usuarios ON usuarios.id = tokens_recordar.usuario_id
+         WHERE tokens_recordar.selector = :selector AND tokens_recordar.expira_en > NOW()'
     );
     $stmt->execute(['selector' => $selector]);
     $fila = $stmt->fetch();
@@ -178,6 +223,7 @@ function intentar_recordar_sesion(): void
 
     session_regenerate_id(true);
     $_SESSION['usuario_id'] = (int) $fila['usuario_id'];
+    $_SESSION['usuario_rol'] = (string) $fila['rol'];
     crear_token_recordar((int) $fila['usuario_id']);
 }
 

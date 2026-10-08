@@ -13,6 +13,7 @@ $usuarioId = usuario_actual_id();
 $stmtUsuario = Db::get()->prepare('SELECT usuario FROM usuarios WHERE id = :id');
 $stmtUsuario->execute(['id' => $usuarioId]);
 $usuarioNombre = $stmtUsuario->fetchColumn() ?: 'Usuario';
+$usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
 ?>
 <!doctype html>
 <html lang="es-AR">
@@ -538,6 +539,30 @@ $usuarioNombre = $stmtUsuario->fetchColumn() ?: 'Usuario';
                             </div>
                         </div>
 
+                        <div x-show="esAdmin" x-cloak>
+                            <p class="group__header footnote">equipo</p>
+                            <form class="usuarios-form" @submit.prevent="crearUsuario()">
+                                <div class="group form-group">
+                                    <label class="cell form-cell"><span class="cell__label">Usuario</span><input x-model.trim="formularioUsuario.usuario" autocomplete="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9_.-]+" required placeholder="nombre.apellido"></label>
+                                    <label class="cell form-cell"><span class="cell__label">Contraseña</span><input type="password" x-model="formularioUsuario.password" autocomplete="new-password" minlength="10" required placeholder="Mínimo 10 caracteres"></label>
+                                    <label class="cell form-cell"><span class="cell__label">Repetir</span><input type="password" x-model="formularioUsuario.confirmacion" autocomplete="new-password" minlength="10" required placeholder="Repetí la contraseña"></label>
+                                    <label class="cell form-cell"><span class="cell__label">Rol</span><select x-model="formularioUsuario.rol"><option value="supervisor">Supervisor</option><option value="admin">Admin</option></select></label>
+                                </div>
+                                <button class="btn-principal" type="submit" :disabled="guardandoUsuario"><i data-lucide="user-plus"></i><span x-text="guardandoUsuario ? 'Creando…' : 'Agregar usuario'"></span></button>
+                            </form>
+                            <div class="group usuarios-lista" x-show="usuarios.length">
+                                <template x-for="usuario in usuarios" :key="usuario.id">
+                                    <div class="cell usuario-fila">
+                                        <span class="cell__icon-box cell__icon-box--indigo"><i data-lucide="user-round"></i></span>
+                                        <span class="cell__content"><span class="cell__title" x-text="usuario.usuario"></span><span class="cell__subtitle tabular" x-text="`Creado ${fechaLarga(usuario.creado_en)}`"></span></span>
+                                        <span class="usuario-rol" :class="`usuario-rol--${usuario.rol}`" x-text="usuario.rol === 'admin' ? 'Admin' : 'Supervisor'"></span>
+                                        <button class="btn-texto btn-texto--peligro" type="button" x-show="Number(usuario.id) !== usuarioActual.id" @click="eliminarUsuario(usuario)" :aria-label="`Eliminar a ${usuario.usuario}`"><i data-lucide="trash-2"></i></button>
+                                    </div>
+                                </template>
+                            </div>
+                            <p class="empty-inline" x-show="!cargandoUsuarios && !usuarios.length">Todavía no hay usuarios cargados.</p>
+                        </div>
+
                         <div>
                             <p class="group__header footnote">seguridad</p>
                             <div class="group">
@@ -709,7 +734,7 @@ $usuarioNombre = $stmtUsuario->fetchColumn() ?: 'Usuario';
         <div class="hud-capa" x-show="hudVisible" x-transition.opacity x-cloak><div class="hud"><i :data-lucide="hudIcono"></i><span x-text="hudTexto"></span></div></div>
     </div>
 
-    <script>window.APP_CONFIG = { csrf: <?= json_encode(csrf_token(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> };</script>
+    <script>window.APP_CONFIG = { csrf: <?= json_encode(csrf_token(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>, usuario: <?= json_encode(['id' => $usuarioId, 'nombre' => $usuarioNombre, 'rol' => $usuarioRol], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> };</script>
     <script src="assets/vendor/alpine.min.js" defer></script>
     <script src="assets/vendor/lucide/lucide.min.js"></script>
     <script src="assets/js/contactos.js"></script>

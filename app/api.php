@@ -30,6 +30,13 @@ function api_require_write(): void
     csrf_require();
 }
 
+function api_require_admin(): void
+{
+    if (!es_admin()) {
+        json_response(['ok' => false, 'error' => 'No tenés permisos de administrador.'], 403);
+    }
+}
+
 function api_method(): string
 {
     return strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');

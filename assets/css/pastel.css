@@ -1069,6 +1069,28 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .toggle__perilla { position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.2); transition: left .3s var(--curva-ios); }
 .toggle[aria-checked="true"] .toggle__perilla { left: 22px; }
 
+/* Gestión de usuarios (solo Admin) */
+.usuarios-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.usuarios-form .btn-principal { align-self: flex-start; }
+.usuarios-form .btn-principal svg { width: 18px; height: 18px; }
+.usuario-fila { gap: 10px; }
+.usuario-rol {
+    flex: none;
+    padding: 3px 7px;
+    border-radius: var(--radio-chico);
+    font-size: var(--fs-footnote);
+    line-height: var(--lh-footnote);
+    font-weight: 600;
+}
+.usuario-rol--admin { background: var(--pastel-indigo); color: var(--indigo-texto); }
+.usuario-rol--supervisor { background: var(--pastel-green); color: var(--green-texto); }
+@media (max-width: 599px) {
+    .usuario-fila { align-items: flex-start; flex-wrap: wrap; }
+    .usuario-fila .cell__content { flex-basis: calc(100% - 58px); }
+    .usuario-fila .usuario-rol { margin-left: 44px; }
+    .usuario-fila .btn-texto--peligro { margin-left: auto; }
+}
+
 /* =====================================================================
    12. LOGIN (login.php)  ·  referencia 00-login.html
    Reemplaza el login oscuro. login.php carga tokens.css, base.css y pastel.css.
