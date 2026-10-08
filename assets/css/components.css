@@ -1137,14 +1137,6 @@ button.cell:active,
 body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 .app-shell { min-height: 100dvh; }
 
-.workspace-header {
-    position: fixed; inset: 0 0 auto; z-index: 70; display: flex; align-items: center; gap: 24px;
-    min-height: var(--topbar-height); padding: env(safe-area-inset-top) 24px 0; background: var(--bg-card);
-    border-bottom: 1px solid var(--separator); box-shadow: var(--sombra-sm);
-}
-.workspace-search, .workspace-create { font: inherit; }
-.workspace-header__actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-
 /* Marca, dentro del sidebar (ver .tabbar más abajo) en vez de en el header. */
 .tabbar__brand { display: none; font: inherit; align-items: center; gap: 8px; padding: 0 2px 16px; color: var(--label); font-size: 16px; font-weight: 700; letter-spacing: -.03em; background: transparent; border: 0; cursor: pointer; }
 .tabbar__brand-mark { display: grid; flex-shrink: 0; width: 25px; height: 25px; place-items: center; color: var(--tint-contraste); background: var(--tint); border-radius: var(--radio-chico); }
@@ -1167,10 +1159,15 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 .workspace-create { color: var(--tint-contraste); background: var(--tint); border: 1px solid var(--tint); box-shadow: none; }
 .workspace-create:hover { background: var(--tint-hover); border-color: var(--tint-hover); }
 .workspace-create svg { width: 16px; height: 16px; stroke-width: 2.5; }
-.app-shell__content { padding-top: calc(var(--topbar-height) + env(safe-area-inset-top)); }
-.app-shell > .banner { top: calc(var(--topbar-height) + env(safe-area-inset-top)); border-radius: 0; }
+.app-shell__content { padding-top: env(safe-area-inset-top); }
+.app-shell > .banner { top: env(safe-area-inset-top); border-radius: 0; }
+
+/* Buscar/Nueva consulta van pegados al título de cada pantalla (ver
+   .navbar más abajo), no en una barra fija aparte arriba de todo. */
+.navbar__acciones { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 .navbar { min-height: 76px; padding: 16px 24px 12px; background: transparent; border-bottom: 0; }
+.navbar > .subhead { margin-bottom: 4px; }
 .navbar__title { color: var(--label); font-size: 28px; line-height: 34px; letter-spacing: -.04em; }
 .navbar__subtitle { color: var(--label-2); font-size: 14px; }
 .navbar__button, .icon-button { color: var(--label-2); background: var(--bg-card); border: 1px solid var(--separator); border-radius: var(--radio-chico); box-shadow: none; }

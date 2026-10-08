@@ -95,7 +95,10 @@
     --radio-chico: 4px;
     --celda-alto-min: 44px;
     --sidebar-width: 260px;
-    --topbar-height: 70px;
+    /* La barra superior fija se sacó (ver nota en components.css); queda
+       en 0 para que los calc() que todavía la restan sigan siendo válidos
+       sin tener que tocar cada uno. */
+    --topbar-height: 0px;
 
     /* Sombras (valores reales del tema de referencia) */
     --sombra-sm: 0 2px 8px rgba(9, 30, 66, .06);

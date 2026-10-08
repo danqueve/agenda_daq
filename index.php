@@ -33,9 +33,6 @@ $usuarioNombre = $stmtUsuario->fetchColumn() ?: 'Usuario';
 <body>
     <div class="app-shell" x-data="appShell()" x-init="init()" :class="{'modo-contactos': activo === 'contactos'}">
         <div class="banner" x-show="sinConexion" x-cloak>Sin conexión. Mostrando los últimos datos guardados.</div>
-        <header class="workspace-header">
-            <div class="workspace-header__actions"><button class="workspace-search" type="button" @click="activo = 'contactos'; $nextTick(() => $el.closest('.app-shell').querySelector('.search-field input')?.focus())" aria-label="Buscar contactos"><i data-lucide="search"></i><span>Buscar</span></button><button class="workspace-create" type="button" @click="abrirNuevoContacto()"><i data-lucide="plus"></i><span>Nueva consulta</span></button></div>
-        </header>
         <nav class="tabbar" aria-label="Navegación principal">
             <button class="tabbar__brand" type="button" @click="activo = 'hoy'" aria-label="Ir al inicio de Agenda DAQ"><span class="tabbar__brand-mark"><i data-lucide="calendar-check-2"></i></span><span>Agenda DAQ</span></button>
             <div class="tabbar__items">
@@ -63,13 +60,16 @@ $usuarioNombre = $stmtUsuario->fetchColumn() ?: 'Usuario';
         <div class="app-shell__content">
             <section class="screen" x-show="activo === 'hoy'">
                 <header class="navbar">
+                    <p class="subhead" x-text="fechaHoy"></p>
                     <div class="navbar__large-row">
                         <h1 class="navbar__large-title">Hoy</h1>
-                        <button class="navbar__button navbar__button--large" type="button" aria-label="Cargar consulta" @click="abrirNuevoContacto()"><i data-lucide="plus"></i></button>
+                        <div class="navbar__acciones">
+                            <button class="workspace-search" type="button" @click="activo = 'contactos'; $nextTick(() => $el.closest('.app-shell').querySelector('.search-field input')?.focus())" aria-label="Buscar contacto"><i data-lucide="search"></i><span>Buscar contacto</span></button>
+                            <button class="workspace-create" type="button" @click="abrirNuevoContacto()"><i data-lucide="plus"></i><span>Nueva consulta</span></button>
+                        </div>
                     </div>
                 </header>
                 <div class="screen__body">
-                    <p class="subhead" x-text="fechaHoy"></p>
                     <p class="error-inline" x-show="errorPanel" x-text="errorPanel"></p>
                     <div class="anillo-dia anillo-dia--pastel" x-show="!errorPanel">
                         <div class="anillo-dia__grafico" aria-label="Progreso de recontactos de hoy">
