@@ -20,9 +20,8 @@ Los avisos son el panel "Hoy" y notificaciones push. NO hay envío de emails.
 - Credenciales y claves SOLO en `.env` (nunca en el repo). Incluir `.env.example`.
 
 ## Diseño
-TODA la interfaz sigue docs/DESIGN.md (sistema de diseño estilo iOS). Antes de tocar
-cualquier pantalla, leelo. Si el skill frontend-design está disponible, usalo respetando
-DESIGN.md como brief: la dirección visual ya está definida, no la cambies.
+La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML exactas +
+`assets/css/pastel.css`). `docs/DESIGN.md` queda para voz, íconos y reglas generales.
 
 ## Restricción de hosting (importante)
 En el VPS de producción todos los dominios sirven el mismo public_html y no se puede

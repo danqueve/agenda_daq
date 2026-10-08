@@ -1,14 +1,18 @@
 function panelModule() {
     return {
-        panel: { anillo: { agendados_hoy: 0, hechos_hoy: 0 }, vencidos: [], hoy: [], proximos: {}, sin_fecha: [], contadores: {} },
+        panel: { anillo: { agendados_hoy: 0, hechos_hoy: 0 }, vencidos: [], hoy: [], proximos: {}, sin_fecha: [], semana: [], contadores: {} },
         cargandoPanel: false,
         errorPanel: '',
+        filtroRecontactos: '',
         vistaCalendario: 'mes',
         mesVisible: '',
         semanaInicio: '',
         diaSeleccionado: '',
         agenda: { por_dia: {}, puntos: {} },
         cargandoAgenda: false,
+        eventoAbierto: null,
+        reprogramandoEvento: false,
+        resultadoEventoAbierto: '',
 
         iniciarPanel() {
             const today = new Date();
@@ -146,6 +150,67 @@ function panelModule() {
             return this.eventosDia(this.diaSeleccionado);
         },
 
+        // Recontacto abierto en el calendario (04b/04c/04d): un solo estado
+        // para el panel de escritorio y la hoja de celular.
+        abrirEventoCalendario(evento) {
+            this.eventoAbierto = evento;
+            this.resultadoEventoAbierto = '';
+        },
+
+        cerrarEventoCalendario() {
+            this.eventoAbierto = null;
+            this.resultadoEventoAbierto = '';
+        },
+
+        etiquetaEventoCalendario(evento) {
+            return { vencido: 'Vencido', hoy: 'Para hoy', proximo: 'Próximo', hecho: 'Concretó' }[evento?.tipo_evento] || '';
+        },
+
+        // Clase del panel .cal-detalle: "para hoy" es el estilo de base de
+        // pastel.css (sin modificador); reprogramado/hecho pisan el tipo
+        // original una vez que el usuario termina la acción.
+        claseCalDetalle() {
+            if (this.resultadoEventoAbierto === 'reprogramado') return 'cal-detalle--reprogramado';
+            if (this.resultadoEventoAbierto === 'hecho') return 'cal-detalle--hecho';
+            const tipo = this.eventoAbierto?.tipo_evento;
+            return tipo && tipo !== 'hoy' ? `cal-detalle--${tipo}` : '';
+        },
+
+        fechaEventoCalendario(evento) {
+            if (!evento?.fecha_evento) return '';
+            const fecha = new Date(evento.fecha_evento.replace(' ', 'T'));
+            const hoy = new Date();
+            const esHoy = fecha.toDateString() === hoy.toDateString();
+            const diaTexto = esHoy ? 'Hoy' : new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric' }).format(fecha);
+            const hora = new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit' }).format(fecha);
+            return `${diaTexto} · ${hora}`;
+        },
+
+        async marcarEventoCalendarioHecho() {
+            if (!this.eventoAbierto) return;
+            this.abrirSeguimiento(this.eventoAbierto);
+            this.cerrarEventoCalendario();
+        },
+
+        // Las 3 opciones reusan las mismas opciones ya existentes de
+        // api/seguimientos.php (accion=posponer): hora, manana, tres_dias.
+        async reprogramarEventoCalendario(opcion) {
+            if (!this.eventoAbierto || this.reprogramandoEvento) return;
+            this.reprogramandoEvento = true;
+            try {
+                const result = await this.api('api/seguimientos.php', {
+                    method: 'POST', body: JSON.stringify({ accion: 'posponer', contacto_id: this.eventoAbierto.id, opcion }),
+                });
+                await Promise.all([this.cargarPanel(), this.cargarAgendaMes()]);
+                this.resultadoEventoAbierto = 'reprogramado';
+                this.mostrarHud(result.mensaje || 'Recontacto reprogramado');
+            } catch (error) {
+                this.mostrarHud(error.message, 'circle-alert');
+            } finally {
+                this.reprogramandoEvento = false;
+            }
+        },
+
         progresoAnillo() {
             const total = Number(this.panel.anillo?.agendados_hoy || 0);
             return total ? Math.min(Number(this.panel.anillo?.hechos_hoy || 0) / total, 1) : 0;
@@ -171,6 +236,22 @@ function panelModule() {
                 ...marcar(proximos, 'proximo'),
                 ...marcar(this.panel.sin_fecha, 'sinfecha'),
             ];
+        },
+
+        // Tira "Esta semana" de la pantalla Hoy: le agrega a panel.semana
+        // (iso/estado/cantidad, ya calculado por api/panel.php) la letra del
+        // día y el número, que son de presentación y no hace falta pedirlos.
+        semanaConLabel() {
+            return (this.panel.semana || []).map((dia) => ({
+                ...dia,
+                letra: new Intl.DateTimeFormat('es-AR', { weekday: 'short' }).format(this.desdeIso(dia.iso)).replace(/^./, (c) => c.toUpperCase()).replace('.', ''),
+                numero: this.desdeIso(dia.iso).getDate(),
+            }));
+        },
+
+        irACalendarioDia(iso) {
+            this.activo = 'agenda';
+            this.seleccionarDia(iso);
         },
 
         mensajeAnillo() {

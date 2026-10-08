@@ -4,6 +4,7 @@ function appShell() {
         ...seguimientosModule(),
         ...panelModule(),
         ...ajustesModule(),
+        ...notasModule(),
         activo: 'hoy',
         badgeHoy: 0,
         fechaHoy: '',
@@ -11,11 +12,13 @@ function appShell() {
         hudTexto: '',
         hudIcono: 'check',
         hudTimer: null,
+        // Ajustes no va acá: en escritorio se entra por tabbar__perfil y en
+        // celular es un tabbar__item aparte (ver index.php).
         tabs: [
             { id: 'hoy', etiqueta: 'Hoy', icono: 'calendar-check' },
             { id: 'contactos', etiqueta: 'Contactos', icono: 'users' },
             { id: 'agenda', etiqueta: 'Calendario', icono: 'calendar-days' },
-            { id: 'ajustes', etiqueta: 'Ajustes', icono: 'settings' },
+            { id: 'notas', etiqueta: 'Notas', icono: 'sticky-note' },
         ],
 
         init() {
@@ -30,6 +33,7 @@ function appShell() {
             this.cargarContactos(true);
             this.iniciarPanel();
             this.iniciarAjustes();
+            this.iniciarNotas();
             const contactoNotificado = new URLSearchParams(window.location.search).get('contacto');
             if (contactoNotificado && /^\d+$/.test(contactoNotificado)) {
                 window.setTimeout(() => this.abrirFicha(Number(contactoNotificado)), 250);
@@ -38,6 +42,7 @@ function appShell() {
                 if (tab === 'contactos' && this.contactos.length === 0) this.cargarContactos(true);
                 if (tab === 'hoy') this.cargarPanel();
                 if (tab === 'agenda') this.cargarAgendaMes();
+                if (tab === 'notas') this.cargarNotas();
             });
             this.$nextTick(() => {
                 if (window.lucide) {

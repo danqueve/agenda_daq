@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda DAQ · Ajustes</title>
+<!--
+  REFERENCIA VISUAL ESTÁTICA · Agenda DAQ diseño pastel
+  No es código de producción: los datos son de ejemplo y no hay Alpine.
+  Copiá de acá los valores exactos (colores, tamaños, espaciados, radios, sombras,
+  estructura) y llevalos a las clases de assets/css/components.css usando los
+  tokens de assets/css/tokens.css. Ver docs/diseno-pastel/README.md.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#f6f8fb}
+a{color:#0b63b8}a:hover{color:#108dff}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #108dff;outline-offset:2px}
+.tabular{font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div style="position: relative; min-height: 100vh; display: flex; flex-wrap: wrap; background: #f6f8fb; font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #2f384f; letter-spacing: -0.01em; font-size: 14px; line-height: 20px">
+<aside style="flex: 1 1 240px; box-sizing: border-box; background: #ffffff; border-right: 1px solid #dee2e6; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; align-items: center; gap: 12px; padding: 0 8px">
+<div style="width: 36px; height: 36px; border-radius: 8px; background: #e4f1ff; display: flex; align-items: center; justify-content: center; color: #108dff">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="m9 16 2 2 4-4"></path></svg>
+</div>
+<div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em">Agenda DAQ</div>
+</div>
+<nav aria-label="Secciones" style="display: flex; flex-direction: column; gap: 4px">
+<a href="01-hoy.html" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 8px; color: #4a5a6b; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="m9 16 2 2 4-4"></path></svg>
+Hoy
+<span class="tabular" style="margin-left: auto; font-size: 11px; line-height: 14px; font-weight: 600; background: #e7366b; color: #ffffff; border-radius: 10px; padding: 2px 7px">3</span>
+</a>
+<a href="02-contactos.html" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 8px; color: #4a5a6b; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+Contactos
+</a>
+<a href="04-calendario.html" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 8px; color: #4a5a6b; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path><path d="M8 18h.01"></path><path d="M12 18h.01"></path></svg>
+Calendario
+</a>
+<a href="05-notas.html" style="display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: 8px; color: #4a5a6b; text-decoration: none">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"></path><path d="M15 3v4a2 2 0 0 0 2 2h4"></path></svg>
+Notas
+</a>
+</nav>
+<a href="06-ajustes.html" aria-current="page" style="margin-top: auto; display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; background: #e4f1ff; color: #2f384f; text-decoration: none; box-shadow: inset 0 0 0 1px #c9e3ff">
+<div style="width: 36px; height: 36px; border-radius: 50%; background: #522c8f; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px">AQ</div>
+<div style="min-width: 0">
+<div style="font-size: 14px; font-weight: 600">Alejandro Q.</div>
+<div style="font-size: 12px; line-height: 16px; color: #4a5a6b">Imperio Comercial</div>
+</div>
+</a>
+</aside>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 32px 24px 48px; max-width: 1180px">
+<div style="max-width: 760px; display: flex; flex-direction: column; gap: 24px">
+<header>
+<h1 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.04em">Ajustes</h1>
+</header>
+
+<section style="display: flex; align-items: center; gap: 16px; padding: 20px; border-radius: 8px; background: #eee9f7; border: 1px solid #dcd2ee">
+<div style="width: 56px; height: 56px; flex: none; border-radius: 50%; background: #522c8f; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; border: 3px solid #ffffff">AQ</div>
+<div style="flex: 1; min-width: 0">
+<div style="font-size: 20px; line-height: 26px; font-weight: 600">Alejandro Q.</div>
+<div style="font-size: 13px; line-height: 18px; color: #4a5a6b">Agenda personal · Imperio Comercial</div>
+</div>
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; background: #ffffff; color: #1f6b5f; border-radius: 4px; padding: 4px 8px">App instalada</span>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 8px"><h2 style="margin: 0 4px; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #4a5a6b">Aplicación</h2><div style="border-radius: 8px; background: #ffffff; border: 1px solid #dee2e6; box-shadow: 0 2px 8px rgba(9, 30, 66, .06); overflow: hidden"><button type="button" style="display: flex; align-items: center; gap: 14px; box-sizing: border-box; width: 100%; min-height: 60px; padding: 10px 18px; border: 0; border-bottom: 1px solid #dee2e6; background: transparent; text-align: left; color: #2f384f; text-decoration: none"><span style="width: 36px; height: 36px; flex: none; border-radius: 10px; background: #e4f1ff; color: #108dff; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Instalar app</span><span style="font-size: 13px; line-height: 18px; color: #4a5a6b">Abrir como una app independiente</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c98a4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><div style="display: flex; align-items: center; gap: 14px; box-sizing: border-box; width: 100%; min-height: 60px; padding: 10px 18px; border: 0; border-bottom: 1px solid #dee2e6; background: transparent; text-align: left; color: #2f384f; text-decoration: none"><span style="width: 36px; height: 36px; flex: none; border-radius: 10px; background: #fdeee4; color: #e77636; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Notificaciones</span><span style="font-size: 13px; line-height: 18px; color: #4a5a6b">2 dispositivos activos</span></span><button type="button" role="switch" aria-checked="true" aria-label="Notificaciones activas" style="border: 0; background: transparent; padding: 8px; margin: -8px"><span style="position: relative; display: block; width: 51px; height: 31px; border-radius: 16px; background: #287f71; transition: background .3s cubic-bezier(.32,.72,0,1)"><span style="position: absolute; top: 2px; left: 22px; width: 27px; height: 27px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,.2); transition: left .3s cubic-bezier(.32,.72,0,1)"></span></span></button></div><div style="display: flex; align-items: center; gap: 14px; box-sizing: border-box; width: 100%; min-height: 60px; padding: 10px 18px; border: 0; background: transparent; text-align: left; color: #2f384f; text-decoration: none"><span style="width: 36px; height: 36px; flex: none; border-radius: 10px; background: #e2f1ee; color: #287f71; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16.5 12"></polyline></svg></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Resumen diario</span><span style="font-size: 13px; line-height: 18px; color: #4a5a6b">Push con los recontactos del día</span></span><span class="tabular" style="font-size: 15px; font-weight: 600; padding: 6px 10px; border-radius: 4px; background: #f0f4f7">08:30</span></div></div></section>
+
+<section style="display: flex; flex-direction: column; gap: 8px"><h2 style="margin: 0 4px; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #4a5a6b">Organización</h2><div style="border-radius: 8px; background: #ffffff; border: 1px solid #dee2e6; box-shadow: 0 2px 8px rgba(9, 30, 66, .06); overflow: hidden"><button type="button" style="display: flex; align-items: center; gap: 14px; box-sizing: border-box; width: 100%; min-height: 60px; padding: 10px 18px; border: 0; background: transparent; text-align: left; color: #2f384f; text-decoration: none"><span style="width: 36px; height: 36px; flex: none; border-radius: 10px; background: #fdeee4; color: #e77636; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l3.58-3.58c.94-.94.94-2.48 0-3.42L9 5Z"></path><path d="M6 9.01V9"></path><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"></path></svg></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Etiquetas</span><span style="font-size: 13px; line-height: 18px; color: #4a5a6b">5 creadas</span></span><span style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end"><span style="display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 4px; background: #fdeee4; color: #a4501f"><span style="width: 7px; height: 7px; border-radius: 50%; background: #e77636"></span>Urgente</span><span style="display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 4px; background: #eee9f7; color: #522c8f"><span style="width: 7px; height: 7px; border-radius: 50%; background: #522c8f"></span>Cliente vieja</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c98a4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button></div></section>
+
+<section style="display: flex; flex-direction: column; gap: 8px"><h2 style="margin: 0 4px; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #4a5a6b">Seguridad</h2><div style="border-radius: 8px; background: #ffffff; border: 1px solid #dee2e6; box-shadow: 0 2px 8px rgba(9, 30, 66, .06); overflow: hidden"><button type="button" style="display: flex; align-items: center; gap: 14px; box-sizing: border-box; width: 100%; min-height: 60px; padding: 10px 18px; border: 0; border-bottom: 1px solid #dee2e6; background: transparent; text-align: left; color: #2f384f; text-decoration: none"><span style="width: 36px; height: 36px; flex: none; border-radius: 10px; background: #eee9f7; color: #522c8f; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"></path><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle></svg></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Cambiar contraseña</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c98a4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button><button type="button" style="display: flex; align-items: center; gap: 14px; box-sizing: border-box; width: 100%; min-height: 60px; padding: 10px 18px; border: 0; background: transparent; text-align: left; color: #2f384f; text-decoration: none"><span style="width: 36px; height: 36px; flex: none; border-radius: 10px; background: #eef1f4; color: #4a5a6b; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 17H4a2 2 0 0 1-2-2V5c0-1.5 1-2 1-2"></path><path d="M22 15V5a2 2 0 0 0-2-2H9"></path><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="m2 2 20 20"></path></svg></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Cerrar sesión en todos los dispositivos</span><span style="font-size: 13px; line-height: 18px; color: #4a5a6b">Revoca las sesiones guardadas</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8c98a4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button></div></section>
+
+<section style="display: flex; flex-direction: column; gap: 8px"><h2 style="margin: 0 4px; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #4a5a6b">Cuenta</h2><div style="border-radius: 8px; background: #ffffff; border: 1px solid #dee2e6; box-shadow: 0 2px 8px rgba(9, 30, 66, .06); overflow: hidden"><a href="#" style="display: flex; align-items: center; gap: 14px; box-sizing: border-box; width: 100%; min-height: 60px; padding: 10px 18px; border: 0; background: transparent; text-align: left; color: #b3204f; text-decoration: none"><span style="width: 36px; height: 36px; flex: none; border-radius: 10px; background: #fde8ef; color: #e7366b; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 15px; line-height: 20px; font-weight: 600">Cerrar sesión</span></span></a></div></section>
+
+<p style="margin: 0; text-align: center; font-size: 12px; line-height: 16px; color: #4a5a6b">Agenda DAQ · versión [VERSIÓN]</p>
+</div>
+</main>
+</div>
+</body>
+</html>

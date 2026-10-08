@@ -56,6 +56,50 @@ foreach ($proximos as $contacto) {
     $porDia[$dia][] = $contacto;
 }
 
+// "Esta semana" del panel Hoy: estado por día (lunes a domingo) para los
+// puntos de la tira .semana-card. Pendientes cubre vencidos (días pasados
+// con algo sin resolver) y próximos (días futuros con algo agendado);
+// historial cubre días pasados ya resueltos (proximo_anterior = ese día).
+$hoyIso = date('Y-m-d');
+$diaSemanaIso = (int) date('N');
+$lunes = date('Y-m-d', strtotime("-" . ($diaSemanaIso - 1) . " days"));
+$domingo = date('Y-m-d', strtotime("+" . (7 - $diaSemanaIso) . " days"));
+
+$pendientesPorDia = [];
+$stmtPend = $db->prepare("SELECT DATE(proximo_contacto) AS dia, COUNT(DISTINCT id) AS cantidad
+    FROM contactos WHERE estado <> 'cerrada' AND DATE(proximo_contacto) BETWEEN :lunes AND :domingo
+    GROUP BY DATE(proximo_contacto)");
+$stmtPend->execute(['lunes' => $lunes, 'domingo' => $domingo]);
+foreach ($stmtPend->fetchAll() as $fila) {
+    $pendientesPorDia[$fila['dia']] = (int) $fila['cantidad'];
+}
+
+$historialPorDia = [];
+$stmtHist = $db->prepare("SELECT DATE(proximo_anterior) AS dia, COUNT(DISTINCT contacto_id) AS cantidad
+    FROM seguimientos WHERE tipo = 'recontacto' AND proximo_anterior IS NOT NULL
+      AND DATE(proximo_anterior) BETWEEN :lunes AND :domingo
+    GROUP BY DATE(proximo_anterior)");
+$stmtHist->execute(['lunes' => $lunes, 'domingo' => $domingo]);
+foreach ($stmtHist->fetchAll() as $fila) {
+    $historialPorDia[$fila['dia']] = (int) $fila['cantidad'];
+}
+
+$semana = [];
+for ($i = 0; $i < 7; $i++) {
+    $dia = date('Y-m-d', strtotime("{$lunes} +{$i} days"));
+    if ($dia === $hoyIso) {
+        $estado = 'hoy';
+        $cantidad = $pendientesPorDia[$dia] ?? 0;
+    } elseif ($dia < $hoyIso) {
+        $estado = isset($pendientesPorDia[$dia]) ? 'vencido' : (isset($historialPorDia[$dia]) ? 'hecho' : null);
+        $cantidad = $pendientesPorDia[$dia] ?? $historialPorDia[$dia] ?? 0;
+    } else {
+        $estado = isset($pendientesPorDia[$dia]) ? 'proximo' : null;
+        $cantidad = $pendientesPorDia[$dia] ?? 0;
+    }
+    $semana[] = ['iso' => $dia, 'estado' => $estado, 'cantidad' => $cantidad];
+}
+
 json_response([
     'ok' => true,
     'data' => [
@@ -64,6 +108,7 @@ json_response([
         'hoy' => $hoy,
         'proximos' => $porDia,
         'sin_fecha' => $sinFecha,
+        'semana' => $semana,
         'contadores' => [
             'abiertos' => panel_count($db, "SELECT COUNT(*) FROM contactos WHERE estado <> 'cerrada'"),
             'cerrados_mes' => $cerradosMes,

@@ -274,6 +274,11 @@ function contactosModule() {
             return new Intl.DateTimeFormat('es-AR', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(value.replace(' ', 'T')));
         },
 
+        fechaSoloDia(value) {
+            if (!value) return '';
+            return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long' }).format(new Date(value.replace(' ', 'T')));
+        },
+
         etiquetaOrigen(origen) {
             return ({ whatsapp: 'WhatsApp', instagram: 'Instagram', facebook: 'Facebook', llamada: 'Llamada', local: 'Local', referido: 'Referido', otro: 'Otro' })[origen] || 'Otro';
         },

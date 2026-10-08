@@ -28,6 +28,53 @@ function seguimientosModule() {
             return { consulta: 'Consulta cargada', nota: 'Nota', cambio_estado: 'Reabierto' }[registro.tipo] || registro.tipo;
         },
 
+        // Ícono del historial de la ficha: mismo criterio que colorTimeline()
+        // pero para el ícono (plan Fase 5, referencia 03-ficha-contacto.html).
+        iconoTimeline(registro) {
+            if (registro.tipo === 'recontacto') {
+                return { atendio: 'phone', no_atendio: 'phone-missed', mensaje_enviado: 'message-circle' }[registro.resultado] || 'phone';
+            }
+            return { consulta: 'plus', nota: 'sticky-note', cambio_estado: 'rotate-ccw' }[registro.tipo] || 'sticky-note';
+        },
+
+        // Últimas notas sueltas del contacto (tipo 'nota' en el historial),
+        // para las .nota-mini de la columna derecha de la ficha.
+        notasDelContacto(contacto) {
+            return (contacto?.historial || []).filter((registro) => registro.tipo === 'nota').slice(0, 2);
+        },
+
+        // Nota más reciente con texto, para el detalle de .ficha-proximo
+        // ("Pidió que la llamen después del trabajo").
+        ultimaNotaProximo(contacto) {
+            const registro = (contacto?.historial || []).find((item) => item.nota);
+            return registro ? registro.nota : '';
+        },
+
+        fichaProximoVencido(contacto) {
+            if (!contacto || contacto.estado === 'cerrada' || !contacto.proximo_contacto) return false;
+            return new Date(contacto.proximo_contacto.replace(' ', 'T')) < new Date();
+        },
+
+        // El selector de Estado de la ficha no crea endpoints nuevos: abre el
+        // flujo de cerrar (con el motivo que corresponde) o el de reabrir,
+        // que ya existen en abrirSeguimiento().
+        cambiarEstadoSelector(contacto, destino) {
+            if (!contacto) return;
+            const actual = this.estadoVisual(contacto);
+            if (actual === destino) return;
+            if (destino === 'concreto' || destino === 'cerrado') {
+                this.abrirSeguimiento(contacto);
+                this.formularioSeguimiento.accion = 'cerrar';
+                this.formularioSeguimiento.motivo_cierre = destino === 'concreto' ? 'concreto' : 'sin_respuesta';
+                return;
+            }
+            // Nuevo / En seguimiento: solo tiene sentido si hoy está cerrado
+            // (reabrir). Si ya está abierto en el otro estado, no hay acción.
+            if (actual === 'concreto' || actual === 'cerrado') {
+                this.abrirSeguimiento(contacto);
+            }
+        },
+
         abrirSeguimiento(contacto) {
             if (!contacto) return;
             this.seguimientoContacto = contacto;

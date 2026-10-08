@@ -70,6 +70,30 @@ if ($pendientes !== []) {
 }
 push_eliminar_endpoints($db, $expirados);
 
+// Notas con recordatorio propio (independiente de los recontactos de
+// arriba). El link abre la nota con el mismo mecanismo que ?contacto=.
+$notasPendientes = $db->query(
+    "SELECT id, titulo, texto FROM notas WHERE recordar_en IS NOT NULL AND recordar_en <= NOW() AND recordatorio_enviado = 0"
+)->fetchAll();
+if ($notasPendientes !== []) {
+    $expiradosNotas = [];
+    foreach ($notasPendientes as $nota) {
+        $titulo = trim((string) $nota['titulo']) ?: 'Nota';
+        $body = mb_substr(trim((string) $nota['texto']), 0, 100) ?: 'Tenés un recordatorio.';
+        [, $invalidos] = push_enviar_a_dispositivos($dispositivos, [
+            'title' => $titulo, 'body' => $body,
+            'url' => APP_URL . '/?nota=' . (int) $nota['id'], 'tag' => 'nota-' . (int) $nota['id'],
+        ]);
+        $expiradosNotas = array_merge($expiradosNotas, $invalidos);
+    }
+    $marcar = $db->prepare('UPDATE notas SET recordatorio_enviado = 1 WHERE id = :id');
+    foreach ($notasPendientes as $nota) {
+        $marcar->execute(['id' => $nota['id']]);
+    }
+    push_eliminar_endpoints($db, $expiradosNotas);
+    cron_push_log('Recordatorios de notas procesados: ' . count($notasPendientes) . '.');
+}
+
 $hora = $db->query("SELECT valor FROM config WHERE clave = 'hora_resumen_diario'")->fetchColumn() ?: '08:30';
 $ultimoResumen = $db->query("SELECT valor FROM config WHERE clave = 'ultimo_resumen_push'")->fetchColumn();
 $hoy = date('Y-m-d');

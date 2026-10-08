@@ -44,8 +44,11 @@
     --pastel-green: #E2F1EE;
     --pastel-green-borde: #C4E2DC;
     --green-texto: #1F6B5F;
+    --pastel-gray: #EEF1F4;
+    --pastel-gray-borde: #DDE2E8;
     --pastel-label: #2F384F;
     --pastel-label-2: #4A5A6B;
+    --halo-foco: rgba(16, 141, 255, .18);
 
     /* Paleta de avatares (8 tonos, tomados de la paleta de acento de Hando) */
     --avatar-1: #0A6CCC;

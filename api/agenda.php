@@ -28,7 +28,7 @@ $db = Db::get();
 // Contactos abiertos con próximo contacto en el rango (vencido/hoy/próximo
 // según la hora actual, calculado más abajo).
 $stmtAbiertos = $db->prepare(
-    "SELECT c.id, c.nombre, c.celular_norm, c.producto_interes, c.proximo_contacto AS fecha_evento, c.estado,
+    "SELECT c.id, c.nombre, c.celular, c.celular_norm, c.producto_interes, c.localidad, c.proximo_contacto AS fecha_evento, c.estado,
         (SELECT s.nota FROM seguimientos s WHERE s.contacto_id = c.id AND s.tipo = 'consulta'
          ORDER BY s.fecha DESC, s.id DESC LIMIT 1) AS consulta
      FROM contactos c
@@ -40,7 +40,7 @@ $abiertos = $stmtAbiertos->fetchAll();
 // Contactos concretados: el calendario los muestra en verde el día en que
 // se cerraron (fecha del seguimiento de cierre), no en una fecha futura.
 $stmtConcretados = $db->prepare(
-    "SELECT c.id, c.nombre, c.celular_norm, c.producto_interes, s.fecha AS fecha_evento, c.estado,
+    "SELECT c.id, c.nombre, c.celular, c.celular_norm, c.producto_interes, c.localidad, s.fecha AS fecha_evento, c.estado,
         (SELECT s2.nota FROM seguimientos s2 WHERE s2.contacto_id = c.id AND s2.tipo = 'consulta'
          ORDER BY s2.fecha DESC, s2.id DESC LIMIT 1) AS consulta
      FROM contactos c
@@ -67,7 +67,7 @@ foreach ($abiertos as $item) {
     $items[] = $item;
 }
 foreach ($concretados as $item) {
-    $item['tipo_evento'] = 'concretado';
+    $item['tipo_evento'] = 'hecho';
     $items[] = $item;
 }
 
