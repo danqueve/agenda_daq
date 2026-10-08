@@ -9,6 +9,10 @@ iniciar_sesion();
 requireLogin();
 
 $usuarioId = usuario_actual_id();
+
+$stmtUsuario = Db::get()->prepare('SELECT usuario FROM usuarios WHERE id = :id');
+$stmtUsuario->execute(['id' => $usuarioId]);
+$usuarioNombre = $stmtUsuario->fetchColumn() ?: 'Usuario';
 ?>
 <!doctype html>
 <html lang="es-AR">
@@ -30,25 +34,30 @@ $usuarioId = usuario_actual_id();
     <div class="app-shell" x-data="appShell()" x-init="init()" :class="{'modo-contactos': activo === 'contactos'}">
         <div class="banner" x-show="sinConexion" x-cloak>Sin conexión. Mostrando los últimos datos guardados.</div>
         <header class="workspace-header">
-            <button class="workspace-brand" type="button" @click="activo = 'hoy'" aria-label="Ir al inicio de Agenda DAQ"><span class="workspace-brand__mark"><i data-lucide="calendar-check-2"></i></span><span>Agenda DAQ</span></button>
-            <nav class="workspace-header__nav" aria-label="Secciones de trabajo"><button type="button" :class="{'is-active': activo === 'hoy'}" @click="activo = 'hoy'">Resumen</button><button type="button" :class="{'is-active': activo === 'contactos'}" @click="activo = 'contactos'">Contactos</button><button type="button" :class="{'is-active': activo === 'agenda'}" @click="activo = 'agenda'">Calendario</button></nav>
             <div class="workspace-header__actions"><button class="workspace-search" type="button" @click="activo = 'contactos'; $nextTick(() => $el.closest('.app-shell').querySelector('.search-field input')?.focus())" aria-label="Buscar contactos"><i data-lucide="search"></i><span>Buscar</span></button><button class="workspace-create" type="button" @click="abrirNuevoContacto()"><i data-lucide="plus"></i><span>Nueva consulta</span></button></div>
         </header>
         <nav class="tabbar" aria-label="Navegación principal">
-            <template x-for="tab in tabs" :key="tab.id">
-                <button
-                    class="tabbar__item"
-                    type="button"
-                    :aria-current="activo === tab.id ? 'page' : null"
-                    @click="activo = tab.id"
-                >
-                    <span class="tabbar__icon">
-                        <i :data-lucide="tab.icono"></i>
-                    </span>
-                    <span class="tabbar__label" x-text="tab.etiqueta"></span>
-                    <span class="tabbar__badge" x-show="tab.id === 'hoy' && badgeHoy > 0" x-text="badgeHoy"></span>
-                </button>
-            </template>
+            <button class="tabbar__brand" type="button" @click="activo = 'hoy'" aria-label="Ir al inicio de Agenda DAQ"><span class="tabbar__brand-mark"><i data-lucide="calendar-check-2"></i></span><span>Agenda DAQ</span></button>
+            <div class="tabbar__items">
+                <template x-for="tab in tabs" :key="tab.id">
+                    <button
+                        class="tabbar__item"
+                        type="button"
+                        :aria-current="activo === tab.id ? 'page' : null"
+                        @click="activo = tab.id"
+                    >
+                        <span class="tabbar__icon">
+                            <i :data-lucide="tab.icono"></i>
+                        </span>
+                        <span class="tabbar__label" x-text="tab.etiqueta"></span>
+                        <span class="tabbar__badge" x-show="tab.id === 'hoy' && badgeHoy > 0" x-text="badgeHoy"></span>
+                    </button>
+                </template>
+            </div>
+            <button class="tabbar__perfil" type="button" @click="activo = 'ajustes'" aria-label="Ir a Ajustes">
+                <span class="avatar" style="background:var(--tint)" x-text="iniciales(<?= json_encode($usuarioNombre, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>)"></span>
+                <span class="tabbar__perfil-nombre"><?= e($usuarioNombre) ?></span>
+            </button>
         </nav>
 
         <div class="app-shell__content">

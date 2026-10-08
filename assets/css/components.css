@@ -1142,16 +1142,24 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     min-height: var(--topbar-height); padding: env(safe-area-inset-top) 24px 0; background: var(--bg-card);
     border-bottom: 1px solid var(--separator); box-shadow: var(--sombra-sm);
 }
-.workspace-brand, .workspace-header__nav button, .workspace-search, .workspace-create { font: inherit; }
-.workspace-brand { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 8px; padding: 0; color: var(--label); font-size: 16px; font-weight: 700; letter-spacing: -.03em; background: transparent; border: 0; cursor: pointer; }
-.workspace-brand__mark { display: grid; width: 25px; height: 25px; place-items: center; color: var(--tint-contraste); background: var(--tint); border-radius: var(--radio-chico); }
-.workspace-brand__mark svg { width: 15px; height: 15px; stroke-width: 2.5; }
-.workspace-header__nav { display: flex; align-self: stretch; align-items: stretch; gap: 2px; }
-.workspace-header__nav button { position: relative; padding: 0 10px; color: var(--label); font-size: 14px; font-weight: 500; background: transparent; border: 0; cursor: pointer; }
-.workspace-header__nav button:hover { background: var(--bg-card-2); }
-.workspace-header__nav button.is-active { color: var(--tint); font-weight: 700; }
-.workspace-header__nav button.is-active::after { position: absolute; right: 8px; bottom: 0; left: 8px; height: 3px; content: ""; background: var(--tint); border-radius: 3px 3px 0 0; }
+.workspace-search, .workspace-create { font: inherit; }
 .workspace-header__actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+/* Marca, dentro del sidebar (ver .tabbar más abajo) en vez de en el header. */
+.tabbar__brand { display: none; font: inherit; align-items: center; gap: 8px; padding: 0 2px 16px; color: var(--label); font-size: 16px; font-weight: 700; letter-spacing: -.03em; background: transparent; border: 0; cursor: pointer; }
+.tabbar__brand-mark { display: grid; flex-shrink: 0; width: 25px; height: 25px; place-items: center; color: var(--tint-contraste); background: var(--tint); border-radius: var(--radio-chico); }
+.tabbar__brand-mark svg { width: 15px; height: 15px; stroke-width: 2.5; }
+
+/* Envoltorio de los 4 botones de navegación: display:contents en los dos
+   layouts (fila en móvil, columna en escritorio) para que los botones
+   sigan siendo hijos flex directos de .tabbar sin alterar su disposición;
+   solo existe para poder meter marca/perfil antes y después en el DOM. */
+.tabbar__items { display: contents; }
+
+.tabbar__perfil { display: none; font: inherit; align-items: center; gap: 10px; margin-top: auto; padding: 10px 8px; border-radius: var(--radio-chico); background: transparent; border: 0; cursor: pointer; text-align: left; }
+.tabbar__perfil:hover { background: var(--bg-card-2); }
+.tabbar__perfil .avatar { width: 32px; height: 32px; font-size: var(--fs-caption); }
+.tabbar__perfil-nombre { color: var(--label); font-size: var(--fs-subhead); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .workspace-search, .workspace-create { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; padding: 0 11px; font-size: 14px; font-weight: 600; border-radius: var(--radio-chico); cursor: pointer; }
 .workspace-search { color: var(--label); background: var(--bg-card); border: 1px solid var(--separator); }
 .workspace-search:hover { background: var(--bg-card-2); }
@@ -1217,6 +1225,8 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
     .tabbar__item[aria-current="page"] { color: var(--tint); background: color-mix(in srgb, var(--tint) 12%, var(--bg-card)); }
     .tabbar__icon { width: 18px; height: 18px; }
     .tabbar__label { font-size: 14px; }
+    .tabbar__brand { display: flex; }
+    .tabbar__perfil { display: flex; }
     .app-shell__content { min-height: calc(100dvh - var(--topbar-height)); margin-left: var(--sidebar-width); }
     .screen { max-width: 1240px; }
 
@@ -1235,8 +1245,6 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 
 @media (max-width: 899px) {
     .workspace-header { gap: 10px; padding-right: 14px; padding-left: 14px; }
-    .workspace-header__nav { display: none; }
-    .workspace-brand { font-size: 15px; }
     .workspace-search { width: 34px; padding: 0; }
     .workspace-search span, .workspace-create span { display: none; }
     .workspace-create { min-width: 34px; padding: 0 9px; }
