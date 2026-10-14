@@ -7,7 +7,7 @@ Esta carpeta es la fuente visual del diseño pastel para **toda** la app y susti
 | Archivo | Para qué |
 |---|---|
 | `referencias/00-login.html` … `06-ajustes.html` | Las 15 pantallas en HTML estático. Se abren con doble clic en el navegador. |
-| `pastel.css` | Toda la capa visual (tokens, barra lateral, Hoy, formularios, Contactos, Ficha, Calendario, Notas, Ajustes y Login) escrita con los tokens de `tokens.css`. Va en `assets/css/pastel.css`. |
+| `assets/css/pastel.css` | Toda la capa visual (barra lateral, Hoy, formularios, Contactos, Ficha, Calendario, Notas, Ajustes y Login) escrita con los tokens de `tokens.css`. La copia original que traía esta carpeta se borró: la única fuente es la de `assets/css/`. |
 | `../plans/2026-10-08-diseno-pastel-completo.md` | El plan en 11 fases (0 a 10) para Claude Code, partiendo de cero. |
 
 | # | Referencia | Fase del plan |

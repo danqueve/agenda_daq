@@ -116,8 +116,8 @@
 /* El modo oscuro automático (prefers-color-scheme) queda desactivado a
    pedido: la app es siempre clara sin importar el tema del sistema/
    navegador. El bloque [data-theme="dark"] queda abajo solo para poder
-   previsualizar el tema oscuro a mano desde ui.php si hace falta más
-   adelante; no se activa solo. */
+   previsualizar el tema oscuro a mano (poniendo data-theme="dark" en
+   <html>) si hace falta más adelante; no se activa solo. */
 :root[data-theme="dark"] {
     --bg-grouped: #2A2B34;
     --bg-card: #1F2028;

@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instructivo · Agenda DAQ</title>
+<style>
+@font-face { font-family: "Public Sans"; font-weight: 400; src: url("../../assets/vendor/fonts/publicsans-400.woff2") format("woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 600; src: url("../../assets/vendor/fonts/publicsans-600.woff2") format("woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 700; src: url("../../assets/vendor/fonts/publicsans-700.woff2") format("woff2"); }
+
+:root {
+    --label: #2f384f; --label-2: #4a5a6b; --separator: #dee2e6; --tint: #0a6ccc; --tint-texto: #0b63b8;
+    --pastel-tint: #e4f1ff; --pastel-tint-borde: #c9e3ff;
+    --pastel-red: #fde8ef; --red-texto: #b3204f; --pastel-orange: #fdeee4; --orange-texto: #a4501f;
+    --pastel-indigo: #eee9f7; --indigo-texto: #522c8f; --pastel-green: #e2f1ee; --green-texto: #1f6b5f;
+    --pastel-gray: #eef1f4;
+}
+* { box-sizing: border-box; }
+html { background: #f6f8fb; }
+body {
+    margin: 0 auto; max-width: 860px; padding: 40px 32px 80px;
+    font-family: "Public Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14.5px; line-height: 1.6; color: var(--label); background: #fff;
+}
+h1, h2, h3 { line-height: 1.25; letter-spacing: -0.02em; }
+h2 { font-size: 24px; margin: 0 0 6px; padding-top: 8px; }
+h3 { font-size: 16px; margin: 26px 0 6px; }
+p { margin: 0 0 10px; }
+ul, ol { margin: 0 0 12px; padding-left: 22px; }
+li { margin-bottom: 4px; }
+strong { font-weight: 600; }
+.ui { font-weight: 600; color: var(--tint-texto); white-space: nowrap; }
+
+.portada {
+    min-height: 92vh; display: flex; flex-direction: column; justify-content: center; gap: 18px;
+    padding: 48px; border-radius: 12px; background: var(--pastel-tint); border: 1px solid var(--pastel-tint-borde);
+}
+.portada__marca { display: flex; align-items: center; gap: 14px; font-size: 20px; font-weight: 700; }
+.portada__icono { width: 52px; height: 52px; border-radius: 12px; background: #fff; display: grid; place-items: center; color: var(--tint); }
+.portada h1 { font-size: 44px; margin: 24px 0 0; letter-spacing: -0.04em; }
+.portada__sub { font-size: 18px; color: var(--label-2); max-width: 520px; }
+.portada__meta { margin-top: 32px; font-size: 13px; color: var(--label-2); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chip { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 4px; }
+
+.indice { margin: 48px 0; }
+.indice ol { columns: 2; column-gap: 32px; }
+.indice a { color: var(--label); text-decoration: none; }
+
+section { margin-top: 56px; }
+.seccion-num { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tint-texto); }
+.intro { font-size: 15.5px; color: var(--label-2); margin-bottom: 18px; }
+
+figure { margin: 18px 0 22px; }
+figure img { display: block; width: 100%; border: 1px solid var(--separator); border-radius: 8px; box-shadow: 0 2px 8px rgba(9,30,66,.06); }
+figcaption { margin-top: 8px; font-size: 12.5px; color: var(--label-2); }
+.par-movil { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; justify-items: center; }
+.par-movil figure { max-width: 270px; margin: 0; }
+
+.paso { counter-reset: paso; list-style: none; padding: 0; }
+.paso li { counter-increment: paso; position: relative; padding-left: 36px; margin-bottom: 10px; }
+.paso li::before {
+    content: counter(paso); position: absolute; left: 0; top: 1px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--tint); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center;
+}
+.nota {
+    margin: 14px 0; padding: 12px 16px; border-radius: 8px; font-size: 13.5px;
+    background: var(--pastel-orange); border: 1px solid #f8d9c4;
+}
+.nota--info { background: var(--pastel-tint); border-color: var(--pastel-tint-borde); }
+
+table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--separator); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--label-2); }
+.muestra { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 8px; border: 1px solid rgba(47,56,79,.15); }
+
+.boton-imprimir {
+    position: fixed; right: 24px; bottom: 24px; padding: 12px 20px; border: 0; border-radius: 8px;
+    background: var(--tint); color: #fff; font: inherit; font-weight: 600; cursor: pointer;
+    box-shadow: 0 8px 16px rgba(9,30,66,.14);
+}
+
+@page { size: A4; margin: 16mm 15mm 18mm; }
+@media print {
+    html, body { background: #fff; }
+    body { max-width: none; padding: 0; font-size: 11pt; }
+    .boton-imprimir { display: none; }
+    .portada { min-height: 255mm; break-after: page; }
+    .indice { break-after: page; margin: 0; }
+    section { margin-top: 0; break-before: page; }
+    figure, table, .nota, .par-movil { break-inside: avoid; }
+    h2, h3 { break-after: avoid; }
+    figure img { box-shadow: none; }
+    a { color: inherit; text-decoration: none; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<button class="boton-imprimir" type="button" onclick="window.print()">Imprimir / Guardar PDF</button>
+
+<div class="portada">
+    <div class="portada__marca">
+        <span class="portada__icono">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+        </span>
+        Agenda DAQ
+    </div>
+    <h1>Instructivo de uso</h1>
+    <p class="portada__sub">Cómo cargar consultas, agendar recontactos y seguir a cada cliente desde la computadora o el celular.</p>
+    <div class="chips">
+        <span class="chip" style="background:var(--pastel-red);color:var(--red-texto)">Vencidos</span>
+        <span class="chip" style="background:var(--pastel-orange);color:var(--orange-texto)">Para hoy</span>
+        <span class="chip" style="background:var(--pastel-indigo);color:var(--indigo-texto)">Próximos</span>
+        <span class="chip" style="background:var(--pastel-green);color:var(--green-texto)">Concretados</span>
+    </div>
+    <p class="portada__meta">Imperio Comercial · agenda.imperiocomercial.com.ar · Versión 21 · Octubre 2026</p>
+</div>
+
+<nav class="indice">
+    <h2>Contenido</h2>
+    <ol>
+        <li><a href="#que-es">Qué es Agenda DAQ</a></li>
+        <li><a href="#ingresar">Ingresar e instalar la app</a></li>
+        <li><a href="#hoy">La pantalla Hoy</a></li>
+        <li><a href="#nueva">Cargar una nueva consulta</a></li>
+        <li><a href="#contactos">Contactos</a></li>
+        <li><a href="#ficha">La ficha del contacto</a></li>
+        <li><a href="#recontacto">Registrar un recontacto</a></li>
+        <li><a href="#calendario">Calendario</a></li>
+        <li><a href="#notas">Notas</a></li>
+        <li><a href="#ajustes">Ajustes</a></li>
+        <li><a href="#equipo">Usuarios y roles</a></li>
+        <li><a href="#celular">Usarla en el celular</a></li>
+        <li><a href="#colores">Qué significa cada color</a></li>
+        <li><a href="#preguntas">Preguntas frecuentes</a></li>
+    </ol>
+</nav>
+
+<section id="que-es">
+    <p class="seccion-num">1</p>
+    <h2>Qué es Agenda DAQ</h2>
+    <p class="intro">Agenda DAQ es la agenda de consultas de Imperio Comercial. Sirve para anotar a cada cliente que pregunta por un producto y para no olvidarse de volver a contactarlo en el momento justo.</p>
+    <p>El circuito es siempre el mismo:</p>
+    <ol class="paso">
+        <li><strong>Cargás la consulta</strong>: nombre, celular, qué busca y cuándo volver a llamarlo.</li>
+        <li><strong>La app te avisa</strong> ese día en la pantalla <span class="ui">Hoy</span> y, si las activaste, con una notificación en el celular.</li>
+        <li><strong>Lo contactás</strong> con un toque (llamada o WhatsApp) y <strong>registrás qué pasó</strong>.</li>
+        <li>Si hay que volver a hablar, lo <strong>reagendás</strong>; si compró o no le interesa, <strong>lo cerrás</strong>.</li>
+    </ol>
+    <p>Funciona en la computadora, en el celular y en la tablet, y se puede instalar como una app más. No manda emails: todos los avisos se ven en la app o llegan como notificación.</p>
+</section>
+
+<section id="ingresar">
+    <p class="seccion-num">2</p>
+    <h2>Ingresar e instalar la app</h2>
+    <p class="intro">Entrá desde el navegador a <strong>agenda.imperiocomercial.com.ar</strong> con tu usuario y contraseña. Los usuarios los crea un administrador desde Ajustes.</p>
+    <figure>
+        <img src="img/01-login.png" alt="Pantalla de inicio de sesión">
+        <figcaption>Pantalla de ingreso. El ojo al lado de la contraseña la muestra u oculta.</figcaption>
+    </figure>
+    <p>La sesión queda guardada en ese dispositivo, así que no hace falta volver a ingresar cada vez. Si te equivocás de contraseña varias veces seguidas, el ingreso se bloquea unos minutos por seguridad.</p>
+
+    <h3>Instalarla como app</h3>
+    <ul>
+        <li><strong>Android (Chrome):</strong> en <span class="ui">Ajustes › Instalar en Android</span>, o desde el menú de Chrome › <em>Instalar app</em>.</li>
+        <li><strong>iPhone o iPad (Safari):</strong> tocá <em>Compartir</em> › <em>Agregar a inicio</em>.</li>
+        <li><strong>Computadora (Chrome o Edge):</strong> el ícono de instalar en la barra de direcciones.</li>
+    </ul>
+    <p>Instalada se abre a pantalla completa, sin la barra del navegador, y en el iPhone es la única forma de recibir notificaciones.</p>
+</section>
+
+<section id="hoy">
+    <p class="seccion-num">3</p>
+    <h2>La pantalla Hoy</h2>
+    <p class="intro">Es la primera pantalla que ves al entrar. Junta todo lo que tenés que hacer: lo que se te pasó, lo de hoy y lo que viene.</p>
+    <figure>
+        <img src="img/02-hoy.png" alt="Pantalla Hoy">
+        <figcaption>Pantalla Hoy con los datos de la base local: seis recontactos vencidos.</figcaption>
+    </figure>
+    <h3>Qué muestra</h3>
+    <ul>
+        <li><strong>Anillo del día:</strong> cuántos recontactos de hoy ya registraste sobre el total agendado. Cada vez que registrás uno, el anillo avanza.</li>
+        <li><strong>Esta semana:</strong> los siete días con un punto de color. Tocá un día para verlo en el Calendario.</li>
+        <li><strong>Resumen:</strong> cuatro tarjetas con los <em>Vencidos</em>, los <em>Para hoy</em>, los <em>Próximos días</em> y los que <em>Concretaron</em> en el mes.</li>
+        <li><strong>Recontactos:</strong> una tarjeta por cliente, ordenadas primero los vencidos, después los de hoy y después los próximos. Con los botones de arriba (<span class="ui">Todos</span>, <span class="ui">Vencidos</span>, <span class="ui">Para hoy</span>, <span class="ui">Próximos</span>) filtrás la lista.</li>
+    </ul>
+    <h3>Las acciones de cada tarjeta</h3>
+    <ul>
+        <li><span class="ui">Llamar</span> abre el teléfono con el número cargado.</li>
+        <li><span class="ui">WhatsApp</span> abre un chat con ese cliente.</li>
+        <li><span class="ui">Posponer</span> corre el recontacto: si era para hoy lo pasa una hora más tarde; si estaba vencido, lo deja para mañana a las 9:00.</li>
+        <li>Tocando el nombre se abre la <a href="#ficha">ficha del contacto</a>.</li>
+    </ul>
+    <p>Cada tarjeta indica también quién la cargó (<em>Cargó: …</em>). El número rojo sobre <span class="ui">Hoy</span>, en el menú, es la suma de vencidos y pendientes del día.</p>
+</section>
+
+<section id="nueva">
+    <p class="seccion-num">4</p>
+    <h2>Cargar una nueva consulta</h2>
+    <p class="intro">Cada vez que un cliente pregunta por algo, tocá <span class="ui">Nueva consulta</span> (arriba a la derecha en Hoy y en Contactos).</p>
+    <figure>
+        <img src="img/03-nueva-consulta.png" alt="Hoja de Nueva consulta">
+        <figcaption>Hoja de nueva consulta con el recontacto agendado para mañana.</figcaption>
+    </figure>
+    <ol class="paso">
+        <li>Completá <strong>Nombre</strong> y <strong>Celular</strong>. El celular se puede escribir como venga (con 0, con 15, con espacios): la app lo ordena sola.</li>
+        <li>Escribí la <strong>Consulta</strong>: qué busca, en cuántas cuotas, lo que te dijo.</li>
+        <li>En <strong>Recontactar</strong> elegí <span class="ui">Mañana</span> (queda a las 9:00) o tocá <span class="ui">Elegir…</span> para abrir el calendario y marcar otro día. Debajo aparece la fecha elegida.</li>
+        <li>Si querés sumar datos, abrí <span class="ui">Más datos</span>: producto, origen (WhatsApp, Instagram, Facebook, llamada, local, referido u otro), localidad, provincia y etiquetas.</li>
+        <li>Tocá <span class="ui">Guardar</span>.</li>
+    </ol>
+    <div class="nota"><strong>Si el número ya existe</strong>, la app avisa <em>«Este número ya está cargado»</em> y ofrece <span class="ui">Agregar consulta</span>: la nueva consulta se suma al historial del cliente existente en vez de crear uno repetido.</div>
+    <p>Si no elegís fecha de recontacto, el contacto queda como <strong>Nuevo</strong>; con fecha, pasa a <strong>En seguimiento</strong>.</p>
+</section>
+
+<section id="contactos">
+    <p class="seccion-num">5</p>
+    <h2>Contactos</h2>
+    <p class="intro">La lista completa de clientes, con un buscador y filtros por estado.</p>
+    <figure>
+        <img src="img/04-contactos.png" alt="Pantalla Contactos">
+        <figcaption>Contactos: arriba el total y cuántos están en seguimiento.</figcaption>
+    </figure>
+    <ul>
+        <li><strong>Buscar:</strong> por nombre, por celular, por producto o por algo escrito en la consulta.</li>
+        <li><strong>Filtros:</strong> <span class="ui">Todos</span>, <span class="ui">Nuevos</span>, <span class="ui">En seguimiento</span>, <span class="ui">Concretaron</span> y <span class="ui">Cerrados</span>.</li>
+        <li>Cada tarjeta muestra nombre y celular, el producto, el estado, quién lo cargó, el origen (con su ícono) y hace cuánto se cargó. Tocala para abrir la ficha.</li>
+        <li>Al final de la lista, <span class="ui">Cargar más contactos</span> trae los siguientes.</li>
+    </ul>
+</section>
+
+<section id="ficha">
+    <p class="seccion-num">6</p>
+    <h2>La ficha del contacto</h2>
+    <p class="intro">Todo lo que sabés de un cliente en un solo lugar. Se abre tocando su nombre en cualquier pantalla.</p>
+    <figure>
+        <img src="img/05-ficha.png" alt="Ficha del contacto">
+        <figcaption>Ficha abierta al lado de la lista. El color de arriba depende del estado del cliente.</figcaption>
+    </figure>
+    <ul>
+        <li><strong>Arriba:</strong> nombre, estado, celular, desde cuándo es cliente, quién lo cargó y sus etiquetas.</li>
+        <li><strong>Acciones:</strong> <span class="ui">Llamar</span>, <span class="ui">WhatsApp</span>, <span class="ui">Recontacto</span> (registrar cómo te fue) y <span class="ui">Nota</span> (dejar un comentario en el historial).</li>
+        <li><strong>Próximo recontacto:</strong> cuándo toca volver a hablarle, con <span class="ui">Posponer</span> (lo pasa a mañana a las 9:00) y <span class="ui">Hecho</span> (registrar el recontacto). Se pone rosa si la fecha ya pasó.</li>
+        <li><strong>Historial:</strong> cada consulta, llamada, mensaje y nota, con su fecha.</li>
+        <li><strong>Estado:</strong> Nuevo, En seguimiento, Concretó o Cerrado. Al elegir <em>Concretó</em> o <em>Cerrado</em> se abre el registro para cerrarlo con el motivo; si el cliente estaba cerrado, elegir <em>Nuevo</em> o <em>En seguimiento</em> lo reabre.</li>
+        <li><span class="ui">Editar</span> (arriba a la derecha) cambia los datos; <span class="ui">Eliminar contacto</span> (al final) lo borra junto con su historial, previa confirmación.</li>
+    </ul>
+</section>
+
+<section id="recontacto">
+    <p class="seccion-num">7</p>
+    <h2>Registrar un recontacto</h2>
+    <p class="intro">Después de hablar con un cliente, registrá cómo te fue. Así el historial queda completo y el anillo del día avanza.</p>
+    <figure>
+        <img src="img/06-registrar-recontacto.png" alt="Hoja de registrar recontacto">
+        <figcaption>Hoja «Registrar recontacto».</figcaption>
+    </figure>
+    <ol class="paso">
+        <li>Elegí el resultado: <span class="ui">Atendió</span>, <span class="ui">No atendió</span> o <span class="ui">Mensaje</span>.</li>
+        <li>Si querés, escribí una nota con lo que te dijo.</li>
+        <li>Elegí qué sigue:
+            <ul>
+                <li><span class="ui">Reagendar</span>: marcá cuándo volver a llamarlo (mañana, en 3 días, en una semana o elegí la fecha).</li>
+                <li><span class="ui">Cerrar</span>: elegí el motivo, <em>Concretó</em>, <em>No interesa</em> o <em>Sin respuesta</em>.</li>
+            </ul>
+        </li>
+        <li>Tocá <span class="ui">Guardar</span>.</li>
+    </ol>
+    <p>Si el contacto ya estaba cerrado, la misma hoja sirve para <strong>reabrirlo</strong>: escribís el motivo (opcional) y la nueva fecha.</p>
+</section>
+
+<section id="calendario">
+    <p class="seccion-num">8</p>
+    <h2>Calendario</h2>
+    <p class="intro">Todos los recontactos del mes en una grilla, con el detalle del día al costado.</p>
+    <figure>
+        <img src="img/07-calendario.png" alt="Calendario mensual">
+        <figcaption>Vista Mes. Cada día muestra hasta dos recontactos y «+N más» si hay otros.</figcaption>
+    </figure>
+    <ul>
+        <li>Con <span class="ui">Mes</span>, <span class="ui">Semana</span> y <span class="ui">Día</span> cambiás la vista; con las flechas pasás de mes y <span class="ui">Hoy</span> vuelve al día actual.</li>
+        <li>Tocá un día para ver a la derecha todos sus recontactos.</li>
+        <li>Los colores indican el estado (ver la <a href="#colores">tabla de colores</a>).</li>
+    </ul>
+    <h3>Abrir un recontacto</h3>
+    <p>Tocá cualquier recontacto (en la grilla o en la lista del día) y se abre su detalle arriba del panel:</p>
+    <figure>
+        <img src="img/08-calendario-detalle.png" alt="Detalle de un recontacto en el calendario">
+        <figcaption>Detalle de un recontacto vencido, con las opciones para reprogramarlo.</figcaption>
+    </figure>
+    <ul>
+        <li><span class="ui">Llamar</span> y <span class="ui">WhatsApp</span> para contactarlo directo.</li>
+        <li><strong>Reprogramar</strong> en un toque: <span class="ui">Hoy +1 h</span>, <span class="ui">Mañana 9:00</span> o <span class="ui">En 3 días</span>. El calendario se actualiza solo.</li>
+        <li><span class="ui">Marcar hecho</span> abre el registro del recontacto; <span class="ui">Abrir ficha</span> lleva a la ficha completa.</li>
+        <li>La tecla <strong>Escape</strong> o la cruz cierran el detalle.</li>
+    </ul>
+</section>
+
+<section id="notas">
+    <p class="seccion-num">9</p>
+    <h2>Notas</h2>
+    <p class="intro">Un anotador para lo que no es de un cliente puntual (promos, requisitos, ideas) o para recordatorios sueltos.</p>
+    <figure>
+        <img src="img/09-notas.png" alt="Pantalla Notas">
+        <figcaption>Notas con dos fijadas arriba y las recientes debajo.</figcaption>
+    </figure>
+    <h3>Crear una nota</h3>
+    <ol class="paso">
+        <li>Escribí en <strong>Nueva nota</strong>.</li>
+        <li>Elegí un color (celeste, durazno, lavanda, menta o rosa).</li>
+        <li>Si es de un cliente, tocá <span class="ui">Vincular contacto</span> y buscalo.</li>
+        <li>Tocá <span class="ui">Guardar</span>.</li>
+    </ol>
+    <h3>Editar una nota</h3>
+    <figure>
+        <img src="img/10-nota-abierta.png" alt="Nota abierta">
+        <figcaption>Nota abierta, vinculada a un contacto.</figcaption>
+    </figure>
+    <ul>
+        <li>Lo que escribís <strong>se guarda solo</strong>: abajo dice <em>Guardado · editada HH:MM</em>.</li>
+        <li>El pin la <strong>fija</strong> arriba de todo; los puntos de color le cambian el color.</li>
+        <li>Si está vinculada a un cliente, <span class="ui">Abrir ficha</span> lleva a su ficha.</li>
+        <li><strong>Recordarme</strong> te manda una notificación <em>más tarde hoy</em> o <em>mañana a las 9:00</em>; <em>Sin recordatorio</em> lo quita.</li>
+        <li><span class="ui">Eliminar</span> la borra (pide confirmación). <span class="ui">Listo</span> la cierra.</li>
+    </ul>
+    <p>El buscador de arriba busca en el título y el texto de todas las notas.</p>
+</section>
+
+<section id="ajustes">
+    <p class="seccion-num">10</p>
+    <h2>Ajustes</h2>
+    <p class="intro">En la computadora se entra tocando tu nombre, abajo a la izquierda; en el celular, desde la pestaña <span class="ui">Ajustes</span>.</p>
+    <figure>
+        <img src="img/11-ajustes.png" alt="Pantalla Ajustes">
+        <figcaption>Ajustes de un usuario administrador (incluye el grupo «Equipo»).</figcaption>
+    </figure>
+    <table>
+        <thead><tr><th>Opción</th><th>Para qué sirve</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Instalar</strong></td><td>Instala la app en el dispositivo (aparece solo si todavía no está instalada).</td></tr>
+            <tr><td><strong>Notificaciones</strong></td><td>Activa los avisos en este dispositivo. Hay que aceptar el permiso que pide el navegador.</td></tr>
+            <tr><td><strong>Resumen diario</strong></td><td>La hora a la que llega cada mañana un aviso con los recontactos del día y los vencidos. Tocalo para cambiarla, ver los dispositivos activos o mandar una notificación de prueba.</td></tr>
+            <tr><td><strong>Etiquetas</strong></td><td>Crear, renombrar, cambiar de color o borrar las etiquetas que usás para clasificar contactos.</td></tr>
+            <tr><td><strong>Equipo</strong></td><td>Solo administradores: alta y baja de usuarios (ver la sección siguiente).</td></tr>
+            <tr><td><strong>Cambiar contraseña</strong></td><td>Pide la actual y la nueva dos veces. Al cambiarla se cierran las sesiones guardadas en otros dispositivos.</td></tr>
+            <tr><td><strong>Cerrar sesión en todos los dispositivos</strong></td><td>Útil si perdiste un celular: los demás dispositivos tendrán que volver a ingresar.</td></tr>
+            <tr><td><strong>Cerrar sesión</strong></td><td>Sale de la cuenta en este dispositivo.</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section id="equipo">
+    <p class="seccion-num">11</p>
+    <h2>Usuarios y roles</h2>
+    <p class="intro">Varias personas pueden usar la agenda, cada una con su usuario. Todos ven y trabajan sobre los mismos contactos, y cada carga queda firmada con el nombre de quien la hizo.</p>
+    <table>
+        <thead><tr><th>Rol</th><th>Qué puede hacer</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Admin</strong></td><td>Todo lo de la agenda, y además crear y eliminar usuarios desde <span class="ui">Ajustes › Equipo</span>.</td></tr>
+            <tr><td><strong>Supervisor</strong></td><td>Todo lo de la agenda: cargar, registrar, reagendar, cerrar, notas. No ve el grupo Equipo.</td></tr>
+        </tbody>
+    </table>
+    <h3>Dar de alta un usuario (solo Admin)</h3>
+    <ol class="paso">
+        <li>En <span class="ui">Ajustes › Equipo</span> completá <strong>Nombre completo</strong> (es el que aparece en «Cargó: …»).</li>
+        <li><strong>Usuario</strong>: el que va a usar para ingresar (letras, números, punto, guion o guion bajo).</li>
+        <li><strong>Contraseña</strong> y <strong>Repetir</strong>: solo números, mínimo 10 dígitos.</li>
+        <li>Elegí el <strong>Rol</strong> y tocá <span class="ui">Agregar usuario</span>.</li>
+    </ol>
+    <p>El tacho de basura al lado de cada usuario lo elimina. No se puede eliminar la propia cuenta ni el último administrador. Lo que cargó un usuario eliminado conserva su nombre.</p>
+</section>
+
+<section id="celular">
+    <p class="seccion-num">12</p>
+    <h2>Usarla en el celular</h2>
+    <p class="intro">En el celular el menú pasa abajo, con cinco pestañas: Hoy, Contactos, Calendario, Notas y Ajustes. Todo lo demás funciona igual.</p>
+    <div class="par-movil">
+        <figure><img src="img/12-movil-hoy.png" alt="Hoy en el celular"><figcaption>Hoy en el celular.</figcaption></figure>
+        <figure><img src="img/13-movil-ficha.png" alt="Ficha en el celular"><figcaption>Ficha de un contacto.</figcaption></figure>
+    </div>
+    <div class="par-movil" style="margin-top:24px">
+        <figure><img src="img/14-movil-calendario.png" alt="Calendario en el celular"><figcaption>Calendario: la lista del día elegido.</figcaption></figure>
+        <figure><img src="img/15-movil-recontacto.png" alt="Recontacto abierto en el celular"><figcaption>Al tocar un recontacto: Llamar, WhatsApp, Posponer, Ver ficha o Marcar hecho.</figcaption></figure>
+    </div>
+    <div class="nota nota--info">Sin conexión, la app sigue abriendo y muestra los últimos datos guardados, con un aviso arriba. Para cargar o registrar algo hace falta conexión.</div>
+</section>
+
+<section id="colores">
+    <p class="seccion-num">13</p>
+    <h2>Qué significa cada color</h2>
+    <p class="intro">Los colores son siempre los mismos en toda la app, y siempre van acompañados de una palabra.</p>
+    <table>
+        <thead><tr><th>Color</th><th>Significa</th></tr></thead>
+        <tbody>
+            <tr><td><span class="muestra" style="background:var(--pastel-red)"></span>Rosa</td><td>Vencido: la fecha de recontacto ya pasó. También eliminar.</td></tr>
+            <tr><td><span class="muestra" style="background:var(--pastel-orange)"></span>Durazno</td><td>Para hoy, o en seguimiento. También posponer.</td></tr>
+            <tr><td><span class="muestra" style="background:var(--pastel-indigo)"></span>Lavanda</td><td>Próximos días, o reprogramado.</td></tr>
+            <tr><td><span class="muestra" style="background:var(--pastel-green)"></span>Menta</td><td>Concretó, hecho o guardado.</td></tr>
+            <tr><td><span class="muestra" style="background:var(--pastel-tint)"></span>Celeste</td><td>Contacto nuevo, la acción principal o la app.</td></tr>
+            <tr><td><span class="muestra" style="background:var(--pastel-gray)"></span>Gris</td><td>Cerrado o sin respuesta.</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section id="preguntas">
+    <p class="seccion-num">14</p>
+    <h2>Preguntas frecuentes</h2>
+    <h3>No me llegan las notificaciones.</h3>
+    <p>Revisá en <span class="ui">Ajustes</span> que <em>Notificaciones</em> esté activado en ese dispositivo y que el navegador tenga permiso. En iPhone, la app tiene que estar instalada desde Safari (<em>Compartir › Agregar a inicio</em>). En <span class="ui">Resumen diario</span> podés mandar una notificación de prueba.</p>
+    <h3>Cargué un cliente que ya existía.</h3>
+    <p>Si el celular coincide, la app lo detecta y te ofrece agregar la consulta al cliente existente. Si se cargó con otro número, podés eliminar el repetido desde su ficha.</p>
+    <h3>¿Cómo saco un cliente de la lista de pendientes?</h3>
+    <p>Registrá el recontacto y elegí <span class="ui">Cerrar</span> con el motivo, o cambiale el estado a <em>Concretó</em> o <em>Cerrado</em> desde la ficha. Ya no aparece en Hoy, pero sigue en Contactos.</p>
+    <h3>Me equivoqué de fecha al reagendar.</h3>
+    <p>Abrí la ficha y volvé a registrar o posponer; también podés reprogramarlo desde el Calendario.</p>
+    <h3>Olvidé mi contraseña.</h3>
+    <p>La app no tiene recuperación de contraseña. Pedile a un administrador que elimine tu usuario y te cree uno nuevo desde <span class="ui">Ajustes › Equipo</span>; lo que ya cargaste conserva tu nombre.</p>
+</section>
+
+</body>
+</html>
