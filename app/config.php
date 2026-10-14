@@ -21,6 +21,6 @@ define('VAPID_PRIVATE', $_ENV['VAPID_PRIVATE'] ?? '');
 define('VAPID_SUBJECT', $_ENV['VAPID_SUBJECT'] ?? '');
 
 // Mantener en sync con CACHE_VERSION en sw.js (ambas suben juntas en cada fase).
-define('APP_VERSION', '10');
+define('APP_VERSION', '21');
 
 date_default_timezone_set(APP_TZ);

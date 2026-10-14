@@ -161,6 +161,29 @@ function contactosModule() {
             this.formularioContacto.proximo_contacto = this.fechaInput(date);
         },
 
+        // El input type="date" del pill "Elegir…" solo da año/mes/día: se le
+        // suma una hora fija (9:00) para que el valor guardado mantenga el
+        // mismo formato que el resto del formulario (fecha y hora).
+        // El input está invisible encima del pill: en Chrome/Edge un click
+        // ahí no abre el calendario por sí solo, hay que pedirlo explícito.
+        abrirSelectorFecha(input) {
+            try {
+                input.showPicker?.();
+            } catch (error) {
+                input.focus();
+            }
+        },
+
+        elegirFechaRecontacto(valor) {
+            if (!valor) {
+                this.formularioContacto.proximo_contacto = '';
+                return;
+            }
+            const [anio, mes, dia] = valor.split('-').map(Number);
+            const date = new Date(anio, mes - 1, dia, 9, 0, 0, 0);
+            this.formularioContacto.proximo_contacto = this.fechaInput(date);
+        },
+
         alternarEtiqueta(id) {
             const tags = this.formularioContacto.etiquetas;
             const index = tags.indexOf(Number(id));
