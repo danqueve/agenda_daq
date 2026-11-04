@@ -83,6 +83,13 @@ function contactosModule() {
 
         // Compromiso de pago dentro de "Nueva consulta": el día se elige en un
         // campo de fecha visible (YYYY-MM-DD) y al guardar se le suma las 9:00.
+        // Con pago agendado, el recontacto queda deshabilitado: el aviso es
+        // la fecha del pago. Se limpia para no enviar una fecha oculta.
+        activarPagoConsulta() {
+            this.formularioContacto.conPago = true;
+            this.formularioContacto.proximo_contacto = '';
+        },
+
         diaPagoConsulta(dias) {
             const date = new Date();
             date.setDate(date.getDate() + dias);
@@ -282,6 +289,7 @@ function contactosModule() {
                     this.mostrarHud('Elegí la fecha del pago', 'circle-alert');
                     return;
                 }
+                form.proximo_contacto = '';
                 form.compromiso = { monto: pago.monto, concepto: pago.concepto, fecha_compromiso: `${pago.dia}T09:00` };
             }
             this.guardandoContacto = true;

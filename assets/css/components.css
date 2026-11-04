@@ -1186,3 +1186,6 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 /* Secciones "Contactos: filtros, grilla y ficha pastel" migradas a
    assets/css/pastel.css (clases .filtro-pill*, .card-pastel--*, .chip-estado,
    .contact-detail--*): pastel.css es ahora la única fuente. */
+
+/* Controles deshabilitados por otra opción del formulario (ej. Recontactar con pago agendado). */
+.is-disabled { opacity: .45; pointer-events: none; }

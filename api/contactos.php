@@ -100,6 +100,10 @@ function contacto_crear_o_agregar(PDO $db, array $body): never
     // "Nueva consulta" puede traer un compromiso de pago para cargarlo en el
     // mismo paso, sin tener que guardar el contacto y después ir a Pagos.
     $compromiso = compromiso_opcional_validar($body['compromiso'] ?? null);
+    if ($compromiso !== null) {
+        // Con pago agendado no hay recontacto: el aviso es el compromiso.
+        $values['proximo'] = null;
+    }
     $creadoPorUsuarioId = usuario_actual_id();
     $creadoPorNombre = usuario_actual_nombre();
     $search = $db->prepare('SELECT id FROM contactos WHERE celular_norm = :celular_norm LIMIT 1');
@@ -142,7 +146,9 @@ function contacto_crear_o_agregar(PDO $db, array $body): never
                 'nombre' => $values['nombre'], 'celular' => $values['celular'], 'celular_norm' => $values['celularNorm'],
                 'dni' => $values['dni'], 'sas_id' => $values['sasId'],
                 'producto' => $values['producto'], 'origen' => $values['origen'], 'localidad' => $values['localidad'],
-                'provincia' => $values['provincia'], 'estado' => $values['proximo'] === null ? 'pendiente' : 'seguimiento',
+                'provincia' => $values['provincia'], // Con compromiso entra en seguimiento aunque no tenga recontacto,
+                // para no aparecer como "Sin fecha" en Hoy.
+                'estado' => ($values['proximo'] === null && $compromiso === null) ? 'pendiente' : 'seguimiento',
                 'proximo_contacto' => $values['proximo'],
                 'creado_por_usuario_id' => $creadoPorUsuarioId,
                 'creado_por_nombre' => $creadoPorNombre,
