@@ -193,6 +193,25 @@ Generar las claves VAPID para push y pegarlas en `.env` (`VAPID_PUBLIC` y `VAPID
 /ruta/al/php8 cron/generar_vapid.php
 ```
 
+## 5b. Integración opcional con SAS Imperio (solo lectura)
+
+Permite buscar clientes de SAS Imperio por celular, DNI o apellido/nombre desde
+**Nueva consulta**. Requiere que la base de SAS esté en el mismo servidor MySQL.
+La Agenda solo lee `ic_clientes`; nunca escribe en SAS.
+
+1. Crear un usuario MySQL de solo lectura (reemplazar `<base_sas>` y la clave):
+
+   ```sql
+   CREATE USER 'agenda_sas_ro'@'localhost' IDENTIFIED BY '<clave-larga>';
+   GRANT SELECT ON `<base_sas>`.`ic_clientes` TO 'agenda_sas_ro'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+2. Completar en `.env`: `SAS_DB_HOST`, `SAS_DB_NAME`, `SAS_DB_USER`, `SAS_DB_PASS`.
+   Si `SAS_DB_NAME` queda vacío, el buscador no aparece.
+3. Ejecutar `sql/migrations/006_contactos_sas.sql` una sola vez (agrega `dni` y
+   `sas_cliente_id` a `contactos`).
+
 ## 6. Permisos de carpetas de escritura
 
 El usuario con el que corre PHP (Apache/PHP-FPM) necesita escribir en:

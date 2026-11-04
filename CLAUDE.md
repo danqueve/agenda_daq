@@ -19,6 +19,11 @@ Los avisos son el panel "Hoy" y notificaciones push. NO hay envío de emails.
 - Idioma de la interfaz: español rioplatense.
 - Credenciales y claves SOLO en `.env` (nunca en el repo). Incluir `.env.example`.
 
+## Integración con SAS Imperio (opcional)
+Desde Nueva consulta se buscan clientes de SAS Imperio (celular, DNI, apellido/nombre) leyendo
+`ic_clientes` de su base MySQL con un usuario de SOLO LECTURA (`SAS_DB_*` en `.env`, `app/sas.php`,
+`api/sas_clientes.php`). Nunca se escribe en SAS. El contacto guarda `dni` y `sas_cliente_id`.
+
 ## Diseño
 La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML exactas +
 `assets/css/pastel.css`). `docs/DESIGN.md` queda para voz, íconos y reglas generales.

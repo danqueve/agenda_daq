@@ -16,11 +16,17 @@ define('DB_PASS', $_ENV['DB_PASS'] ?? '');
 define('APP_URL', rtrim($_ENV['APP_URL'], '/'));
 define('APP_TZ', $_ENV['APP_TZ']);
 
+// Integración opcional de solo lectura con la base de SAS Imperio.
+define('SAS_DB_HOST', $_ENV['SAS_DB_HOST'] ?? '');
+define('SAS_DB_NAME', $_ENV['SAS_DB_NAME'] ?? '');
+define('SAS_DB_USER', $_ENV['SAS_DB_USER'] ?? '');
+define('SAS_DB_PASS', $_ENV['SAS_DB_PASS'] ?? '');
+
 define('VAPID_PUBLIC', $_ENV['VAPID_PUBLIC'] ?? '');
 define('VAPID_PRIVATE', $_ENV['VAPID_PRIVATE'] ?? '');
 define('VAPID_SUBJECT', $_ENV['VAPID_SUBJECT'] ?? '');
 
 // Mantener en sync con CACHE_VERSION en sw.js (ambas suben juntas en cada fase).
-define('APP_VERSION', '24');
+define('APP_VERSION', '26');
 
 date_default_timezone_set(APP_TZ);

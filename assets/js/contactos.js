@@ -22,14 +22,63 @@ function contactosModule() {
         etiquetaNueva: '',
         formularioContacto: {},
         duplicadoPendiente: null,
+        sasHabilitado: Boolean(window.APP_CONFIG?.sasHabilitado),
+        sasBusqueda: '',
+        sasResultados: [],
+        sasBuscando: false,
+        sasMensaje: '',
 
         nuevoFormulario() {
             return {
                 id: null,
-                nombre: '', celular: '', consulta: '', producto_interes: '', origen: 'otro',
+                nombre: '', celular: '', dni: '', sas_cliente_id: null, consulta: '', producto_interes: '', origen: 'otro',
                 localidad: '', provincia: '', proximo_contacto: '', etiquetas: [], masDatos: false,
                 conPago: false, pago: { monto: '', concepto: '', fecha_compromiso: '' },
             };
+        },
+
+        // Búsqueda de clientes de SAS Imperio (solo lectura) para autocompletar
+        // nombre, celular y localidad al cargar una consulta.
+        async buscarClienteSas() {
+            const texto = this.sasBusqueda.trim();
+            this.sasMensaje = '';
+            if (texto.length < 3) {
+                this.sasResultados = [];
+                return;
+            }
+            this.sasBuscando = true;
+            try {
+                const result = await this.api(`api/sas_clientes.php?q=${encodeURIComponent(texto)}`);
+                this.sasResultados = result.data.items;
+                if (result.data.habilitado && !result.data.items.length) this.sasMensaje = 'Sin resultados en SAS Imperio';
+            } catch (error) {
+                this.sasResultados = [];
+                this.sasMensaje = navigator.onLine ? error.message : 'Sin conexión con SAS Imperio';
+            } finally {
+                this.sasBuscando = false;
+                this.refrescarIconos();
+            }
+        },
+
+        elegirClienteSas(cliente) {
+            const form = this.formularioContacto;
+            form.nombre = cliente.nombre;
+            form.celular = cliente.telefono || form.celular;
+            form.dni = cliente.dni || '';
+            form.sas_cliente_id = cliente.id;
+            if (cliente.localidad) {
+                form.localidad = cliente.localidad;
+                form.masDatos = true;
+            }
+            this.sasBusqueda = '';
+            this.sasResultados = [];
+            this.sasMensaje = '';
+            this.refrescarIconos();
+        },
+
+        quitarClienteSas() {
+            this.formularioContacto.dni = '';
+            this.formularioContacto.sas_cliente_id = null;
         },
 
         // Compromiso de pago dentro de "Nueva consulta": mismos atajos de fecha
@@ -144,6 +193,9 @@ function contactosModule() {
         abrirNuevoContacto() {
             this.modoFormulario = 'nuevo';
             this.formularioContacto = this.nuevoFormulario();
+            this.sasBusqueda = '';
+            this.sasResultados = [];
+            this.sasMensaje = '';
             this.sheetContacto = true;
             this.refrescarIconos();
         },

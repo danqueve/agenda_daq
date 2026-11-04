@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/app/auth.php';
 require_once __DIR__ . '/app/csrf.php';
+require_once __DIR__ . '/app/sas.php';
 
 iniciar_sesion();
 requireLogin();
@@ -720,6 +721,26 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                 <div class="sheet__grabber"></div>
                 <header class="sheet__header"><button class="btn-texto" type="button" @click="sheetContacto = false">Cancelar</button><h2 class="sheet__title" x-text="modoFormulario === 'nuevo' ? 'Nuevo contacto' : 'Editar contacto'"></h2><button class="btn-texto btn-texto--negrita" type="submit" :disabled="guardandoContacto" x-text="guardandoContacto ? 'Guardando…' : 'Guardar'"></button></header>
                 <div class="sheet__body">
+                    <template x-if="modoFormulario === 'nuevo' && sasHabilitado">
+                        <div>
+                            <p class="group__header footnote">buscar en SAS Imperio</p>
+                            <div class="group form-group" x-show="!formularioContacto.sas_cliente_id">
+                                <label class="cell form-cell"><span class="cell__label">Cliente</span><input x-model="sasBusqueda" @input.debounce.300ms="buscarClienteSas()" inputmode="search" autocomplete="off" maxlength="80" placeholder="Celular, DNI o nombre"></label>
+                                <template x-for="cliente in sasResultados" :key="cliente.id">
+                                    <button type="button" class="cell" @click="elegirClienteSas(cliente)">
+                                        <span class="avatar" :style="`background:${colorAvatar(cliente.nombre)}`" x-text="iniciales(cliente.nombre)"></span>
+                                        <span class="cell__content"><span class="cell__title" x-text="cliente.nombre"></span><span class="cell__subtitle" x-text="[cliente.dni && `DNI ${cliente.dni}`, cliente.telefono, cliente.localidad].filter(Boolean).join(' · ')"></span></span>
+                                        <span class="chip-estado" x-show="cliente.estado && cliente.estado !== 'ACTIVO'" x-text="cliente.estado === 'MOROSO' ? 'Moroso' : 'Inactivo'"></span>
+                                    </button>
+                                </template>
+                                <p class="group__footer footnote" x-show="sasBuscando">Buscando…</p>
+                                <p class="group__footer footnote" x-show="sasMensaje" x-text="sasMensaje"></p>
+                            </div>
+                            <div class="group form-group" x-show="formularioContacto.sas_cliente_id">
+                                <div class="cell"><span class="cell__content"><span class="cell__title">Cliente SAS Imperio</span><span class="cell__subtitle" x-text="formularioContacto.dni ? `DNI ${formularioContacto.dni}` : 'Datos completados desde SAS'"></span></span><button type="button" class="btn-texto" @click="quitarClienteSas()">Quitar</button></div>
+                            </div>
+                        </div>
+                    </template>
                     <p class="group__header footnote">datos principales</p>
                     <div class="group form-group">
                         <label class="cell form-cell"><span class="cell__label">Nombre</span><input x-model.trim="formularioContacto.nombre" required maxlength="120" autocomplete="name" placeholder="Nombre y apellido"></label>
@@ -887,6 +908,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                             <p class="contact-detail__cargado" x-text="`Cargó: ${contactoActual?.creado_por_nombre || 'Sin registrar'}`"></p>
                             <div class="card-pastel__tags" x-show="contactoActual?.producto_interes || contactoActual?.etiquetas?.length">
                                 <span class="chip-estado" x-show="contactoActual?.producto_interes" x-text="contactoActual?.producto_interes"></span>
+                                <span class="chip-estado" x-show="contactoActual?.dni" x-text="`DNI ${contactoActual?.dni}`"></span>
+                                <span class="chip-estado chip-estado--estado" x-show="contactoActual?.sas_cliente_id">Cliente SAS</span>
                                 <template x-for="etiqueta in contactoActual?.etiquetas" :key="etiqueta.id"><span class="chip-estado" x-text="etiqueta.nombre"></span></template>
                             </div>
                         </div>
@@ -993,7 +1016,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
         <div class="hud-capa" x-show="hudVisible" x-transition.opacity x-cloak><div class="hud"><i :data-lucide="hudIcono"></i><span x-text="hudTexto"></span></div></div>
     </div>
 
-    <script>window.APP_CONFIG = { csrf: <?= json_encode(csrf_token(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>, usuario: <?= json_encode(['id' => $usuarioId, 'nombre' => $usuarioNombre, 'rol' => $usuarioRol], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> };</script>
+    <script>window.APP_CONFIG = { sasHabilitado: <?= SasDb::habilitado() ? 'true' : 'false' ?>, csrf: <?= json_encode(csrf_token(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>, usuario: <?= json_encode(['id' => $usuarioId, 'nombre' => $usuarioNombre, 'rol' => $usuarioRol], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> };</script>
     <script src="assets/vendor/alpine.min.js" defer></script>
     <script src="assets/vendor/lucide/lucide.min.js"></script>
     <script src="assets/js/contactos.js"></script>
