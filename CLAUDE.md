@@ -38,8 +38,8 @@ Por eso las carpetas privadas quedan dentro del árbol web y DEBEN bloquearse po
 `app/`, `cron/`, `sql/`, `vendor/`, `storage/`, `docs/`, `.env`, `composer.*`, `.git`.
 
 El PHP CLI por defecto del VPS es 5.6: los cron y composer deben usar el binario de PHP 8.x explícito.
-El VPS no es cPanel EasyApache (`/opt/cpanel/ea-php8*` no existe): la ruta de PHP 8 se toma del crontab
-(`crontab -l -u c2881399 | grep php`).
+PHP 8.3 de consola en el VPS: `/opt/php8-3/bin/php` (el pool FPM es `/opt/php8-3`, log en
+`/var/log/php83-fpm.log`). En el VPS, `git pull` siempre como `sudo -u c2881399`, nunca como root.
 
 ## Estructura
 agenda_daq/

@@ -131,8 +131,9 @@ whereis php8.3 php8.3-cli 2>/dev/null
 crontab -l -u c2881399 | grep -i php
 ```
 
-En este VPS **no** existe `/opt/cpanel/ea-php8*`: tomá la ruta del crontab o de
-las otras ubicaciones.
+En este VPS **no** existe `/opt/cpanel/ea-php8*`. Cada versión de PHP vive en
+`/opt/php8-X/` (se ve con `ps -eo args | grep "php-fpm: master"`); el PHP 8.3 de
+consola es **`/opt/php8-3/bin/php`** y su log de errores `/var/log/php83-fpm.log`.
 
 Con la ruta encontrada (ejemplo: `/opt/cpanel/ea-php83/root/usr/bin/php`):
 
@@ -191,13 +192,13 @@ un contacto también se eliminan sus compromisos de pago.
 Crear tu usuario de la app (pide usuario y contraseña por consola, con el PHP 8.x explícito):
 
 ```bash
-/ruta/al/php8 cron/crear_usuario.php
+/opt/php8-3/bin/php cron/crear_usuario.php
 ```
 
 Generar las claves VAPID para push y pegarlas en `.env` (`VAPID_PUBLIC` y `VAPID_PRIVATE`):
 
 ```bash
-/ruta/al/php8 cron/generar_vapid.php
+/opt/php8-3/bin/php cron/generar_vapid.php
 ```
 
 ## 5b. Integración opcional con SAS Imperio (solo lectura)
@@ -251,11 +252,13 @@ Datos de producción:
 
    ```bash
    cd public_html/agenda
-   /ruta/al/php8 -r 'require "app/sas.php"; $p = SasDb::get(); echo $p ? "Conectado\n" : "NO conecta\n"; if ($p) print_r(sas_buscar_clientes($p, "Perez"));'
+   /opt/php8-3/bin/php -r 'require "app/sas.php"; $p = SasDb::get(); echo $p ? "Conectado\n" : "NO conecta\n"; if ($p) print_r(sas_buscar_clientes($p, "Perez"));'
    ```
 
    Si la app muestra "No se pudo consultar SAS Imperio", el log de errores de
-   PHP tiene la línea `SAS Imperio: no se pudo conectar: …` con el motivo.
+   PHP (`/var/log/php83-fpm.log`) tiene la línea `SAS Imperio: no se pudo conectar: …`.
+   Los errores de los endpoints quedan ahí como `Agenda API …`:
+   `grep "Agenda API" /var/log/php83-fpm.log | tail -5`.
 
 ## 6. Permisos de carpetas de escritura
 
@@ -271,15 +274,15 @@ por SSH — en cPanel normalmente coincide con el usuario de la cuenta.)
 
 ## 7. Tareas programadas (crontab)
 
-`crontab -e` y agregar (reemplazando `/ruta/al/php8` por el binario de PHP 8.x
-del punto 4, y la ruta del proyecto si no es exactamente esta):
+`crontab -e` (como `c2881399`) y agregar, con el PHP 8.3 del punto 4
+(`/opt/php8-3/bin/php`) y la carpeta real del proyecto:
 
 ```cron
 # Recordatorios push, cada 10 minutos
-*/10 * * * * /ruta/al/php8 /home/usuario/public_html/agenda/cron/push_recordatorios.php >> /dev/null 2>&1
+*/10 * * * * /opt/php8-3/bin/php /home/c2881399/public_html/agenda/cron/push_recordatorios.php >> /dev/null 2>&1
 
 # Backup diario de la base de datos, 3:30 AM hora de Argentina
-30 3 * * * /ruta/al/php8 /home/usuario/public_html/agenda/cron/backup.php >> /dev/null 2>&1
+30 3 * * * /opt/php8-3/bin/php /home/c2881399/public_html/agenda/cron/backup.php >> /dev/null 2>&1
 ```
 
 No hace falta redirigir la salida a un log propio: ambos scripts ya escriben
@@ -327,11 +330,17 @@ gunzip -c storage/backups/c2881399_agenda_2026-01-15_033000.sql.gz | mysql -u c2
 ## 9. Flujo de actualización (cada vez que haya una fase nueva)
 
 ```bash
-cd public_html/agenda
-git pull origin main
+cd /home/c2881399/public_html/agenda
+# Siempre como el usuario de la cuenta, NUNCA como root: un pull como root deja
+# archivos de root en .git y el próximo pull falla con "permisos insuficientes".
+sudo -u c2881399 git pull origin main
+# Si ya pasó: chown -R c2881399:c2881399 /home/c2881399/public_html/agenda
+
+# Si el pull trae una migración nueva en sql/migrations/, aplicarla:
+mysql c2881399_agenda < sql/migrations/00X_nombre.sql
 
 # Solo si composer.lock cambió en este pull:
-/ruta/al/php8 /usr/local/bin/composer install --no-dev --optimize-autoloader
+/opt/php8-3/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 # Si cambiaron assets/css, assets/js o assets/vendor en este pull:
 # subir el número de CACHE_VERSION al principio de sw.js, para que el
