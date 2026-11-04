@@ -28,7 +28,21 @@ function contactosModule() {
                 id: null,
                 nombre: '', celular: '', consulta: '', producto_interes: '', origen: 'otro',
                 localidad: '', provincia: '', proximo_contacto: '', etiquetas: [], masDatos: false,
+                conPago: false, pago: { monto: '', concepto: '', fecha_compromiso: '' },
             };
+        },
+
+        // Compromiso de pago dentro de "Nueva consulta": mismos atajos de fecha
+        // (Mañana / Elegir… a las 9:00) que el sheet de Pagos.
+        asignarFechaPagoConsulta(dias) {
+            const date = new Date();
+            date.setDate(date.getDate() + dias);
+            date.setHours(9, 0, 0, 0);
+            this.formularioContacto.pago.fecha_compromiso = this.fechaInput(date);
+        },
+
+        elegirFechaPagoConsulta(valor) {
+            this.formularioContacto.pago.fecha_compromiso = this.pagosDiaA9(valor);
         },
 
         async api(url, options = {}) {
@@ -210,9 +224,21 @@ function contactosModule() {
 
         async guardarContacto(agregarAExistente = false) {
             if (this.guardandoContacto) return;
+            const { conPago, pago, masDatos, ...form } = this.formularioContacto;
+            const conCompromiso = this.modoFormulario === 'nuevo' && conPago;
+            if (conCompromiso) {
+                if (!(Number(String(pago.monto).replace(',', '.')) > 0)) {
+                    this.mostrarHud('Ingresá un monto de pago mayor a cero', 'circle-alert');
+                    return;
+                }
+                if (!pago.fecha_compromiso) {
+                    this.mostrarHud('Elegí la fecha del pago', 'circle-alert');
+                    return;
+                }
+                form.compromiso = { ...pago };
+            }
             this.guardandoContacto = true;
             try {
-                const form = this.formularioContacto;
                 let result;
                 if (this.modoFormulario === 'editar') {
                     result = await this.api(`api/contactos.php?id=${form.id}`, {
@@ -231,8 +257,10 @@ function contactosModule() {
                 this.sheetContacto = false;
                 this.sheetDuplicado = false;
                 this.contactoActual = result.data;
-                await this.cargarContactos(true);
-                this.mostrarHud(this.modoFormulario === 'editar' ? 'Contacto actualizado' : (result.agregado_a_existente ? 'Consulta agregada' : 'Contacto guardado'));
+                if (result.compromiso_creado) await this.pagosRefrescar(result.data.id);
+                else await this.cargarContactos(true);
+                const mensaje = this.modoFormulario === 'editar' ? 'Contacto actualizado' : (result.agregado_a_existente ? 'Consulta agregada' : 'Contacto guardado');
+                this.mostrarHud(result.compromiso_creado ? `${mensaje} con compromiso de pago` : mensaje);
             } catch (error) {
                 this.mostrarHud(error.message, 'circle-alert');
             } finally {

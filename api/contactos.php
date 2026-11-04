@@ -94,6 +94,9 @@ function contacto_validar(array $body): array
 function contacto_crear_o_agregar(PDO $db, array $body): never
 {
     $values = contacto_validar($body);
+    // "Nueva consulta" puede traer un compromiso de pago para cargarlo en el
+    // mismo paso, sin tener que guardar el contacto y después ir a Pagos.
+    $compromiso = compromiso_opcional_validar($body['compromiso'] ?? null);
     $creadoPorUsuarioId = usuario_actual_id();
     $creadoPorNombre = usuario_actual_nombre();
     $search = $db->prepare('SELECT id FROM contactos WHERE celular_norm = :celular_norm LIMIT 1');
@@ -148,6 +151,12 @@ function contacto_crear_o_agregar(PDO $db, array $body): never
         if ($duplicateId === 0 || $tags !== []) {
             contacto_sincronizar_etiquetas($db, $contactoId, $tags);
         }
+        if ($compromiso !== null) {
+            compromiso_insertar(
+                $db, $contactoId, $compromiso['centavos'], $compromiso['concepto'],
+                $compromiso['fecha'], $compromiso['nota'], null
+            );
+        }
         $db->commit();
     } catch (Throwable $error) {
         $db->rollBack();
@@ -157,6 +166,7 @@ function contacto_crear_o_agregar(PDO $db, array $body): never
     json_response([
         'ok' => true,
         'agregado_a_existente' => $duplicateId !== 0,
+        'compromiso_creado' => $compromiso !== null,
         'data' => contacto_buscar($db, $contactoId),
     ], $duplicateId === 0 ? 201 : 200);
 }

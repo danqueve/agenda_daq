@@ -727,6 +727,26 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                     </div>
                     <template x-if="modoFormulario === 'nuevo'"><div><p class="group__header footnote">consulta</p><label class="textarea-celeste"><span class="sr-only">Consulta</span><textarea x-model.trim="formularioContacto.consulta" required maxlength="4000" rows="3" placeholder="¿Qué está buscando?"></textarea></label></div></template>
                     <template x-if="modoFormulario === 'nuevo'"><div><p class="group__header footnote">recontactar</p><div class="pills date-pills"><button class="pill" type="button" :aria-selected="Boolean(formularioContacto.proximo_contacto)" @click="asignarFechaRapida(1)">Mañana</button><label class="pill pill--input">Elegir… <input type="date" @click="abrirSelectorFecha($event.target)" @change="elegirFechaRecontacto($event.target.value)" aria-label="Elegir fecha de recontacto"></label></div><p class="group__footer footnote" x-show="formularioContacto.proximo_contacto" x-text="fechaLarga(formularioContacto.proximo_contacto)"></p></div></template>
+                    <template x-if="modoFormulario === 'nuevo'">
+                        <div>
+                            <p class="group__header footnote">compromiso de pago</p>
+                            <div class="segmented" role="tablist" aria-label="Compromiso de pago">
+                                <button type="button" class="segmented__option" role="tab" :aria-selected="!formularioContacto.conPago" @click="formularioContacto.conPago = false">Sin pago</button>
+                                <button type="button" class="segmented__option" role="tab" :aria-selected="formularioContacto.conPago" @click="formularioContacto.conPago = true">Agendar pago</button>
+                            </div>
+                            <div x-show="formularioContacto.conPago" x-transition.opacity>
+                                <div class="group form-group">
+                                    <label class="cell form-cell"><span class="cell__label">Monto</span><input type="number" step="0.01" min="0.01" inputmode="decimal" x-model="formularioContacto.pago.monto" :required="formularioContacto.conPago" placeholder="$ 0"></label>
+                                    <label class="cell form-cell"><span class="cell__label">Concepto</span><input x-model.trim="formularioContacto.pago.concepto" maxlength="150" placeholder="Ej. seña, cuota 1"></label>
+                                </div>
+                                <div class="pills date-pills">
+                                    <button class="pill" type="button" :aria-selected="pagosEsManana(formularioContacto.pago.fecha_compromiso)" @click="asignarFechaPagoConsulta(1)">Mañana</button>
+                                    <label class="pill pill--input" :aria-selected="Boolean(formularioContacto.pago.fecha_compromiso) && !pagosEsManana(formularioContacto.pago.fecha_compromiso)">Elegir… <input type="date" @click="abrirSelectorFecha($event.target)" @change="elegirFechaPagoConsulta($event.target.value)" aria-label="Elegir fecha del pago"></label>
+                                </div>
+                                <p class="group__footer footnote" x-show="formularioContacto.pago.fecha_compromiso" x-text="`Pago: ${fechaLarga(formularioContacto.pago.fecha_compromiso)}`"></p>
+                            </div>
+                        </div>
+                    </template>
                     <button class="disclosure" type="button" @click="formularioContacto.masDatos = !formularioContacto.masDatos"><span>Más datos</span><i :data-lucide="formularioContacto.masDatos ? 'chevron-up' : 'chevron-down'"></i></button>
                     <div x-show="formularioContacto.masDatos" x-transition.opacity>
                         <div class="group form-group"><label class="cell form-cell"><span class="cell__label">Producto</span><input x-model.trim="formularioContacto.producto_interes" maxlength="120" placeholder="Opcional"></label><label class="cell form-cell"><span class="cell__label">Origen</span><select x-model="formularioContacto.origen"><option value="otro">Otro</option><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="llamada">Llamada</option><option value="local">Local</option><option value="referido">Referido</option></select></label><label class="cell form-cell"><span class="cell__label">Localidad</span><input x-model.trim="formularioContacto.localidad" maxlength="100" placeholder="Opcional"></label><label class="cell form-cell"><span class="cell__label">Provincia</span><select x-model="formularioContacto.provincia"><option value="">Sin especificar</option><option>Tucumán</option><option>Santiago del Estero</option><option>Catamarca</option><option>Otra</option></select></label></div>

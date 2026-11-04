@@ -22,11 +22,6 @@ function compromiso_buscar(PDO $db, int $id): ?array
     return $stmt->fetch() ?: null;
 }
 
-function compromiso_ya_paso(string $fechaSql): bool
-{
-    return $fechaSql <= date('Y-m-d H:i:s');
-}
-
 /**
  * Busca el contacto por celular o lo crea. Un deudor nuevo ya es cliente
  * (compró y quedó debiendo), así que entra cerrado/concretó: no aparece como
@@ -69,51 +64,6 @@ function compromiso_contacto_para(PDO $db, array $nuevo): int
     )->execute(['contacto_id' => $contactoId]);
 
     return $contactoId;
-}
-
-/** Inserta un compromiso pendiente y devuelve su id. */
-function compromiso_insertar(PDO $db, int $contactoId, int $centavos, string $concepto, string $fecha, ?string $nota, ?int $origenId): int
-{
-    $stmt = $db->prepare(
-        'INSERT INTO compromisos
-            (contacto_id, monto, concepto, fecha_compromiso, nota, origen_id, recordatorio_enviado, creado_por_usuario_id, creado_por_nombre)
-         VALUES
-            (:contacto_id, :monto, :concepto, :fecha, :nota, :origen_id, :enviado, :usuario_id, :usuario_nombre)'
-    );
-    $stmt->execute([
-        'contacto_id' => $contactoId, 'monto' => centavos_a_decimal($centavos), 'concepto' => $concepto,
-        'fecha' => $fecha, 'nota' => $nota, 'origen_id' => $origenId,
-        // Si la fecha ya pasó al cargarlo, no se manda un push de algo viejo.
-        'enviado' => compromiso_ya_paso($fecha) ? 1 : 0,
-        'usuario_id' => usuario_actual_id(), 'usuario_nombre' => usuario_actual_nombre(),
-    ]);
-
-    return (int) $db->lastInsertId();
-}
-
-function compromiso_fecha_obligatoria(array $body, string $clave): string
-{
-    $valor = isset($body[$clave]) ? trim((string) $body[$clave]) : '';
-    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $valor)) {
-        $valor .= 'T09:00';
-    }
-    $fecha = api_date($valor !== '' ? $valor : null);
-    if ($fecha === null) {
-        json_response(['ok' => false, 'error' => 'Elegí la fecha del compromiso.'], 422);
-    }
-
-    return $fecha;
-}
-
-function compromiso_monto_obligatorio(array $body, string $clave, string $mensaje): int
-{
-    $monto = api_monto($body[$clave] ?? null);
-    $centavos = $monto === null ? 0 : api_centavos($monto);
-    if ($centavos <= 0) {
-        json_response(['ok' => false, 'error' => $mensaje], 422);
-    }
-
-    return $centavos;
 }
 
 function compromiso_crear(PDO $db, array $body): never
