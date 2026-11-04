@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../app/api.php';
+require_once __DIR__ . '/../app/compromisos.php';
 
 /** @return list<array<string, mixed>> */
 function panel_contactos(PDO $db, string $condition, array $params = []): array
@@ -28,6 +29,17 @@ $vencidos = panel_contactos($db, "c.estado <> 'cerrada' AND c.proximo_contacto <
 $hoy = panel_contactos($db, "c.estado <> 'cerrada' AND c.proximo_contacto >= NOW() AND c.proximo_contacto < DATE_ADD(CURDATE(), INTERVAL 1 DAY)");
 $proximos = panel_contactos($db, "c.estado <> 'cerrada' AND c.proximo_contacto >= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND c.proximo_contacto < DATE_ADD(CURDATE(), INTERVAL 8 DAY)");
 $sinFecha = panel_contactos($db, "c.estado = 'pendiente' AND c.proximo_contacto IS NULL");
+
+// Pagos a cobrar: compromisos pendientes que vencen hoy o ya vencieron (por
+// día, no por hora), los más atrasados primero.
+$stmtPagos = $db->query(
+    'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . " AS situacion,
+            k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm
+     FROM compromisos c INNER JOIN contactos k ON k.id = c.contacto_id
+     WHERE c.estado = 'pendiente' AND DATE(c.fecha_compromiso) <= CURDATE()
+     ORDER BY c.fecha_compromiso ASC, c.id ASC"
+);
+$compromisos = $stmtPagos->fetchAll();
 
 $agendados = panel_count($db, "SELECT COUNT(DISTINCT contacto_id) FROM (
     SELECT id AS contacto_id FROM contactos WHERE DATE(proximo_contacto) = CURDATE()
@@ -108,6 +120,7 @@ json_response([
         'hoy' => $hoy,
         'proximos' => $porDia,
         'sin_fecha' => $sinFecha,
+        'compromisos' => $compromisos,
         'semana' => $semana,
         'contadores' => [
             'abiertos' => panel_count($db, "SELECT COUNT(*) FROM contactos WHERE estado <> 'cerrada'"),

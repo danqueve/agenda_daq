@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../app/api.php';
+require_once __DIR__ . '/../app/compromisos.php';
 
 function agenda_fecha(string $value, string $fallback): string
 {
@@ -80,9 +81,29 @@ foreach ($items as $item) {
     $porDia[$day][] = $item;
 }
 
+// Compromisos de pago del rango, en su propia clave: no se mezclan con los
+// recontactos porque son otra cosa (otro id, otras acciones, otro monto).
+$stmtPagos = $db->prepare(
+    'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . " AS situacion,
+            c.fecha_compromiso AS fecha_evento,
+            k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm
+     FROM compromisos c INNER JOIN contactos k ON k.id = c.contacto_id
+     WHERE c.fecha_compromiso >= :desde AND c.fecha_compromiso < DATE_ADD(:hasta, INTERVAL 1 DAY)
+     ORDER BY c.fecha_compromiso ASC, c.id ASC"
+);
+$stmtPagos->execute(['desde' => $desde, 'hasta' => $hasta]);
+$pagosPorDia = [];
+foreach ($stmtPagos->fetchAll() as $pago) {
+    $pago['tipo_evento'] = match ($pago['situacion']) {
+        'pagado', 'parcial' => 'hecho',
+        default => $pago['situacion'],
+    };
+    $pagosPorDia[substr((string) $pago['fecha_evento'], 0, 10)][] = $pago;
+}
+
 $puntos = [];
 foreach ($porDia as $day => $contactos) {
     $puntos[$day] = count($contactos);
 }
 
-json_response(['ok' => true, 'data' => ['desde' => $from, 'hasta' => $to, 'por_dia' => $porDia, 'puntos' => $puntos]]);
+json_response(['ok' => true, 'data' => ['desde' => $from, 'hasta' => $to, 'por_dia' => $porDia, 'puntos' => $puntos, 'pagos_por_dia' => $pagosPorDia]]);

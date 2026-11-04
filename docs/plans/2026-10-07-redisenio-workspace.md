@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Transformar Agenda DAQ en una interfaz de trabajo clara, blanca y azul, inspirada en la referencia compartida, sin cambiar sus flujos.
+**Goal:** Transformar Agenda IC en una interfaz de trabajo clara, blanca y azul, inspirada en la referencia compartida, sin cambiar sus flujos.
 
 **Architecture:** Se sustituye la capa de tokens y se añade una cabecera de workspace al shell. Las mismas vistas, sheets y componentes reciben overrides visuales consistentes para escritorio y móvil, manteniendo Alpine y las APIs sin cambios.
 

@@ -45,7 +45,7 @@ $pendientes = $db->query(
 $expirados = [];
 if (count($pendientes) > 5) {
     [, $expirados] = push_enviar_a_dispositivos($dispositivos, [
-        'title' => 'Agenda DAQ', 'body' => 'Tenés ' . count($pendientes) . ' recontactos pendientes.',
+        'title' => 'Agenda IC', 'body' => 'Tenés ' . count($pendientes) . ' recontactos pendientes.',
         'url' => APP_URL . '/', 'tag' => 'agenda-pendientes',
     ]);
 } else {
@@ -69,6 +69,53 @@ if ($pendientes !== []) {
     cron_push_log('Recordatorios procesados: ' . count($pendientes) . '.');
 }
 push_eliminar_endpoints($db, $expirados);
+
+// Compromisos de pago vencidos o para hoy. Se agrupan cuando son muchos para
+// no bombardear al usuario con una notificación por cada cobro.
+$compromisosPendientes = $db->query(
+    "SELECT c.id, c.contacto_id, c.monto, c.concepto, k.nombre AS contacto_nombre,
+            SUM(c.monto) OVER () AS monto_total
+     FROM compromisos c
+     INNER JOIN contactos k ON k.id = c.contacto_id
+     WHERE c.estado = 'pendiente'
+       AND c.fecha_compromiso <= NOW()
+       AND c.recordatorio_enviado = 0
+     ORDER BY c.fecha_compromiso ASC, c.id ASC"
+)->fetchAll();
+
+if ($compromisosPendientes !== []) {
+    $expiradosCompromisos = [];
+    if (count($compromisosPendientes) > 5) {
+        $montoTotal = (float) $compromisosPendientes[0]['monto_total'];
+        [, $expiradosCompromisos] = push_enviar_a_dispositivos($dispositivos, [
+            'title' => 'Pagos a cobrar',
+            'body' => 'Tenés ' . count($compromisosPendientes) . ' pagos a cobrar por $'
+                . number_format($montoTotal, 2, ',', '.') . '.',
+            'url' => APP_URL . '/?tab=pagos',
+            'tag' => 'compromisos-pendientes',
+        ]);
+    } else {
+        foreach ($compromisosPendientes as $compromiso) {
+            $concepto = trim((string) $compromiso['concepto']) ?: 'Compromiso de pago';
+            [, $invalidos] = push_enviar_a_dispositivos($dispositivos, [
+                'title' => 'Cobrar a ' . $compromiso['contacto_nombre'],
+                'body' => '$' . number_format((float) $compromiso['monto'], 2, ',', '.') . ' · ' . $concepto,
+                'url' => APP_URL . '/?contacto=' . (int) $compromiso['contacto_id'],
+                'tag' => 'compromiso-' . (int) $compromiso['id'],
+            ]);
+            $expiradosCompromisos = array_merge($expiradosCompromisos, $invalidos);
+        }
+    }
+
+    $marcarCompromisos = $db->prepare(
+        'UPDATE compromisos SET recordatorio_enviado = 1 WHERE id = :id AND recordatorio_enviado = 0'
+    );
+    foreach ($compromisosPendientes as $compromiso) {
+        $marcarCompromisos->execute(['id' => $compromiso['id']]);
+    }
+    push_eliminar_endpoints($db, $expiradosCompromisos);
+    cron_push_log('Recordatorios de compromisos procesados: ' . count($compromisosPendientes) . '.');
+}
 
 // Notas con recordatorio propio (independiente de los recontactos de
 // arriba). El link abre la nota con el mismo mecanismo que ?contacto=.
@@ -100,9 +147,20 @@ $hoy = date('Y-m-d');
 if (date('H:i') === $hora && $ultimoResumen !== $hoy) {
     $paraHoy = (int) $db->query("SELECT COUNT(*) FROM contactos WHERE estado <> 'cerrada' AND DATE(proximo_contacto) = CURDATE()")->fetchColumn();
     $vencidos = (int) $db->query("SELECT COUNT(*) FROM contactos WHERE estado <> 'cerrada' AND proximo_contacto < NOW()")->fetchColumn();
-    if ($paraHoy + $vencidos > 0) {
+    $pagos = $db->query(
+        "SELECT COUNT(*) AS cantidad, COALESCE(SUM(monto), 0) AS monto
+         FROM compromisos
+         WHERE estado = 'pendiente' AND DATE(fecha_compromiso) <= CURDATE()"
+    )->fetch();
+    $pagosCantidad = (int) $pagos['cantidad'];
+    $pagosMonto = (float) $pagos['monto'];
+    if ($paraHoy + $vencidos + $pagosCantidad > 0) {
+        $detallePagos = $pagosCantidad > 0
+            ? ' · ' . $pagosCantidad . ' pagos a cobrar ($' . number_format($pagosMonto, 2, ',', '.') . ')'
+            : '';
         [, $invalidos] = push_enviar_a_dispositivos($dispositivos, [
-            'title' => 'Agenda DAQ', 'body' => "Hoy: {$paraHoy} para recontactar, {$vencidos} vencidos.",
+            'title' => 'Agenda IC',
+            'body' => "Hoy: {$paraHoy} para recontactar, {$vencidos} vencidos." . $detallePagos,
             'url' => APP_URL . '/', 'tag' => 'agenda-resumen-' . $hoy,
         ]);
         push_eliminar_endpoints($db, $invalidos);

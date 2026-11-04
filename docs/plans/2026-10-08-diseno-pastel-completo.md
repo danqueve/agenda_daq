@@ -3,7 +3,7 @@
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 > Hacé UNA fase por vez. Al terminar cada fase: listá los archivos tocados, decí qué probar y esperá el OK antes de seguir.
 
-**Goal:** Llevar TODA la interfaz de Agenda DAQ al diseño pastel con tarjetas: login, shell, Hoy, Nueva consulta, Contactos, Ficha, Calendario, Notas y Ajustes. Partimos de cero: asumí que no hay nada del diseño pastel aplicado.
+**Goal:** Llevar TODA la interfaz de Agenda IC al diseño pastel con tarjetas: login, shell, Hoy, Nueva consulta, Contactos, Ficha, Calendario, Notas y Ajustes. Partimos de cero: asumí que no hay nada del diseño pastel aplicado.
 
 **Architecture:** Mismo stack (PHP 8.3 + PDO, Alpine.js, CSS propio, Lucide local). Toda la capa visual nueva está en `assets/css/pastel.css`, que se carga después de `components.css`. Las pantallas cambian su marcado para usar esas clases y mantienen intactos los flujos de Alpine, los endpoints y la base de datos. La única excepción es **Notas**, una funcionalidad nueva que trae tabla, API, JS y una pestaña nueva.
 
@@ -207,7 +207,7 @@
 1. Contenedor `.ajustes` (máximo 760px). Arriba `.perfil-card` lavanda, con avatar, nombre, "Agenda personal · Imperio Comercial" y `.perfil-card__chip` "App instalada" (solo si está instalada).
 2. Grupos Aplicación, Organización, Seguridad y Cuenta con `.cell`. Las cajitas de ícono pasan a pastel: `.cell__icon-box--{tint|orange|green|indigo|gray|red}` en lugar de `style="background:…"`.
 3. Notificaciones lleva el `.toggle` verde en la misma fila. "Resumen diario" muestra la hora en `.cell__valor-chip` y abre la hoja de push. Etiquetas muestra 2 `.etiqueta-chip` de ejemplo. Cerrar sesión usa `.cell--peligro`.
-4. Al pie, "Agenda DAQ · versión X" (usá la versión de `CACHE_VERSION` o una constante).
+4. Al pie, "Agenda IC · versión X" (usá la versión de `CACHE_VERSION` o una constante).
 
 ### Fase 9: Login
 

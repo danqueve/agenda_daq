@@ -1,5 +1,5 @@
 /* =====================================================================
-   Agenda DAQ · DISEÑO PASTEL (hoja completa)
+   Agenda IC · DISEÑO PASTEL (hoja completa)
    ---------------------------------------------------------------------
    Archivo: assets/css/pastel.css
    Se carga DESPUÉS de tokens.css, base.css y components.css en index.php
@@ -18,6 +18,15 @@
    ===================================================================== */
 .tabbar__item[aria-current="page"] { color: var(--tint-texto); font-weight: 600; }
 .tabbar__badge { background: var(--red); font-weight: 600; }
+
+/* En el celular y la tablet (<1024px, donde la navegación es la barra
+   inferior) Pagos ocupa el lugar de Notas; Notas se abre desde Ajustes. */
+@media (max-width: 1023px) {
+    .tabbar__item--solo-escritorio { display: none; }
+}
+@media (min-width: 1024px) {
+    .ajustes-notas-movil { display: none; }
+}
 
 @media (max-width: 1023px) {
     /* La caja fija evita que el SVG de Lucide herede la línea del texto y
@@ -166,6 +175,13 @@
 }
 .search-field--header input { font-size: 16px; }
 .search-field--header svg, .workspace-search svg { width: 17px; height: 17px; }
+/* Celular: el título y las acciones (buscador + botón) van en dos líneas, y el
+   buscador ocupa el ancho que queda en vez de los 260px fijos que desbordaban la pantalla. */
+@media (max-width: 599px) {
+    .navbar__large-row { flex-wrap: wrap; }
+    .navbar__acciones { flex: 1 1 100%; flex-wrap: nowrap; }
+    .search-field--header, .workspace-search { flex: 1 1 0; width: auto; min-width: 0; }
+}
 
 .workspace-create, .btn-principal {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -303,6 +319,10 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .card-pastel__pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
 .card-pastel__pie .origen-chip { margin-right: auto; }
 .card-pastel__autor { margin: -4px 0 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+/* Pantalla Pagos: los totales son importes, tienen que entrar en 2 columnas en el celular. */
+.stat-card-grid--montos .stat-card__numero { font-size: clamp(20px, 5.6vw, 32px); line-height: 1.15; }
+.pagos-filtros { margin: 16px 0; }
+.card-pastel__monto { margin: 0; font-size: var(--fs-title2); line-height: var(--lh-title2); font-weight: 700; letter-spacing: -0.02em; }
 .origen-chip {
     display: inline-flex; align-items: center; gap: 5px; flex: none;
     min-height: 26px; padding: 3px 8px;
@@ -354,6 +374,8 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .quick-action-card--llamar svg   { color: var(--tint); }
 .quick-action-card--whatsapp svg { color: var(--green); }
 .quick-action-card--posponer svg { color: var(--orange); }
+.quick-action-card--cobrar svg   { color: var(--green); }
+.quick-action-card--deshacer svg { color: var(--gray); }
 .quick-action-card--nota svg     { color: var(--indigo); }
 
 /* =====================================================================
@@ -502,6 +524,8 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .calendario-evento--hoy     { background: var(--pastel-orange); color: var(--orange-texto); }
 .calendario-evento--proximo { background: var(--pastel-indigo); color: var(--indigo-texto); }
 .calendario-evento--hecho   { background: var(--pastel-green);  color: var(--green-texto); }
+.calendario-evento--incumplido { background: var(--pastel-gray); color: var(--pastel-label-2); }
+.calendario-evento--pago { font-weight: 700; }
 .calendario-mas { font-size: var(--fs-caption); color: var(--label-2); padding-left: 6px; }
 
 .calendario-panel { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -528,6 +552,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .calendario-leyenda__punto--hoy { background: var(--pastel-orange); border-color: var(--orange); }
 .calendario-leyenda__punto--proximo { background: var(--pastel-indigo); border-color: var(--indigo); }
 .calendario-leyenda__punto--hecho { background: var(--pastel-green); border-color: var(--green); }
+.calendario-leyenda__punto--incumplido { background: var(--pastel-gray); border-color: var(--gray); }
 
 /* El panel de detalle de escritorio y la hoja de celular comparten el mismo
    estado (eventoAbierto): cada uno se muestra solo en su ancho. */
@@ -677,6 +702,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .action-button--whatsapp .action-button__icon { color: var(--green); }
 .action-button--recontacto .action-button__icon { color: var(--orange); }
 .action-button--nota .action-button__icon { color: var(--indigo); }
+.action-button--pago .action-button__icon { color: var(--green); }
 
 /* Próximo recontacto (tarjeta celeste) */
 .ficha-proximo {
@@ -763,6 +789,33 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .historial__icono--gray   { background: var(--bg-card-2);     color: var(--gray); }
 .historial__chip--orange { background: var(--pastel-orange); color: var(--orange-texto); }
 
+/* Compromisos de pago dentro de la ficha */
+.ficha-compromisos { display: flex; flex-direction: column; gap: 8px; }
+.ficha-compromisos__cabecera { display: flex; align-items: center; justify-content: space-between; }
+.compromiso-item { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: var(--radio-grupo); border: 1px solid; color: var(--pastel-label); }
+.compromiso-item--vencido    { background: var(--pastel-red);    border-color: var(--pastel-red-borde); }
+.compromiso-item--hoy        { background: var(--pastel-orange); border-color: var(--pastel-orange-borde); }
+.compromiso-item--proximo    { background: var(--pastel-indigo); border-color: var(--pastel-indigo-borde); }
+.compromiso-item--pagado,
+.compromiso-item--parcial    { background: var(--pastel-green);  border-color: var(--pastel-green-borde); }
+.compromiso-item--incumplido { background: var(--pastel-gray);   border-color: var(--pastel-gray-borde); }
+.compromiso-item--vencido .chip-estado    { color: var(--red-texto); }
+.compromiso-item--hoy .chip-estado        { color: var(--orange-texto); }
+.compromiso-item--proximo .chip-estado    { color: var(--indigo-texto); }
+.compromiso-item--pagado .chip-estado,
+.compromiso-item--parcial .chip-estado    { color: var(--green-texto); }
+.compromiso-item--incumplido .chip-estado { color: var(--pastel-label-2); }
+.compromiso-item__fila { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.compromiso-item__monto { font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 700; }
+.compromiso-item__detalle { margin: 0; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); }
+.compromiso-item__acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.compromiso-item__autor { margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+
+/* Pagos a cobrar en Hoy y en el panel del día del Calendario */
+.hoy-pagos { display: flex; flex-direction: column; gap: 16px; margin: 24px 0; }
+.hoy-pagos__total { font-size: var(--fs-subhead); font-weight: 600; color: var(--label-2); }
+.calendario-pagos { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+
 /* Notas del contacto en mini tarjetas pastel */
 .notas-mini-lista { display: flex; flex-direction: column; gap: 8px; }
 .nota-mini { padding: 14px 16px; border-radius: var(--radio-grupo); border: 1px solid; color: var(--pastel-label); }
@@ -771,6 +824,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 
 /* Hoja "Registrar recontacto": resultados como tarjetas pastel 2×2 */
 .resultado-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.resultado-grid--tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .resultado-opcion {
     min-height: var(--celda-alto-min);
     border: 1px solid var(--separator);
@@ -785,6 +839,9 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .resultado-opcion--atendio[aria-selected="true"]   { background: var(--pastel-tint);   border-color: var(--tint);   color: var(--tint-texto); }
 .resultado-opcion--no_atendio[aria-selected="true"]{ background: var(--pastel-red);    border-color: var(--red);    color: var(--red-texto); }
 .resultado-opcion--mensaje_enviado[aria-selected="true"] { background: var(--pastel-green); border-color: var(--green); color: var(--green-texto); }
+.resultado-opcion--pagado[aria-selected="true"]    { background: var(--pastel-green);  border-color: var(--green);  color: var(--green-texto); }
+.resultado-opcion--parcial[aria-selected="true"]   { background: var(--pastel-orange); border-color: var(--orange); color: var(--orange-texto); }
+.resultado-opcion--incumplido[aria-selected="true"]{ background: var(--bg-card-2);     border-color: var(--gray);   color: var(--label-2); }
 .resultado-opcion--pospuso[aria-selected="true"]   { background: var(--pastel-orange); border-color: var(--orange); color: var(--orange-texto); }
 
 /* =====================================================================

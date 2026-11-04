@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../app/api.php';
+require_once __DIR__ . '/../app/compromisos.php';
 
 /** @return array<string, mixed>|null */
 function contacto_buscar(PDO $db, int $id): ?array
@@ -35,6 +36,7 @@ function contacto_buscar(PDO $db, int $id): ?array
     );
     $history->execute(['id' => $id]);
     $contacto['historial'] = $history->fetchAll();
+    $contacto['compromisos'] = compromisos_de_contacto($db, $id);
 
     return $contacto;
 }

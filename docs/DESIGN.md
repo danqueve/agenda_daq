@@ -1,4 +1,4 @@
-# Agenda DAQ — Sistema de diseño
+# Agenda IC — Sistema de diseño
 
 ## Idea
 Se tiene que sentir como una app nativa de iOS (tipo Recordatorios / Contactos / Salud de Apple):
@@ -92,7 +92,7 @@ Números y horas con `font-variant-numeric: tabular-nums` (clase .tabular).
    Segmented: Reagendar | Cerrar. Si reagenda: pills de fecha. Si cierra: Concretó / No interesa / Sin respuesta.
 7. Ajustes: lista agrupada estilo app Ajustes de iOS (íconos en cuadraditos de color):
    Notificaciones, Instalar app, Etiquetas, Cambiar contraseña, Cerrar sesión en todos los dispositivos.
-8. Login: pantalla centrada con ícono de la app, "Agenda DAQ", campos en grupo inset y botón grande --tint.
+8. Login: pantalla centrada con ícono de la app, "Agenda IC", campos en grupo inset y botón grande --tint.
 
 ## Movimiento
 - Transiciones de pantalla: push lateral (como navegación iOS) 300ms, curva cubic-bezier(.32,.72,0,1).

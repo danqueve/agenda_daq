@@ -1,13 +1,13 @@
-# Agenda DAQ — Guía de despliegue en producción
+# Agenda IC — Guía de despliegue en producción
 
-Guía paso a paso para poner Agenda DAQ en el VPS de producción, en el subdominio
+Guía paso a paso para poner Agenda IC en el VPS de producción, en el subdominio
 `agenda.imperiocomercial.com.ar`. Pensada para seguirse de punta a punta sin
 conocimiento previo del proyecto. Nada de esto se ejecutó desde acá: son los
 pasos a correr vos mismo en el panel y por SSH.
 
 Contexto importante (ver también `CLAUDE.md`): el VPS sirve **todos** los
 dominios desde el mismo `public_html` y no se puede asignar un document root
-distinto por dominio. Por eso Agenda DAQ vive en `public_html/agenda_daq/` y el
+distinto por dominio. Por eso Agenda IC vive en `public_html/agenda_daq/` y el
 subdominio se enruta por `.htaccess` (paso 2), y por eso sus carpetas privadas
 (`app/`, `cron/`, `sql/`, `vendor/`, `storage/`, `docs/`, `.env`, `composer.*`,
 `.git`) quedan bloqueadas por el `.htaccess` propio del proyecto, que ya viaja
@@ -65,7 +65,7 @@ Puntos clave:
 
 Después de guardar el `.htaccess` compartido, probá:
 
-- `https://agenda.imperiocomercial.com.ar/` → el login de Agenda DAQ (o un 404
+- `https://agenda.imperiocomercial.com.ar/` → el login de Agenda IC (o un 404
   si todavía no clonaste el repo: eso también confirma que el *routing* ya
   funciona).
 - `https://agenda.imperiocomercial.com.ar/sw.js` y
@@ -163,13 +163,23 @@ VAPID_SUBJECT=mailto:danqueve@gmail.com
 ```
 
 Importar el schema (ya incluye todas las tablas y columnas de las Fases 1 a
-5 — en una instalación nueva **no** hace falta tocar `sql/migrations/`, esa
+5, incluida `compromisos` — en una instalación nueva **no** hace falta tocar `sql/migrations/`, esa
 carpeta es solo para cuando este mismo despliegue ya esté en producción y una
 fase futura agregue un cambio incremental):
 
 ```bash
 mysql -u c2881399_agenda -p c2881399_agenda < sql/schema.sql
 ```
+
+Si la instalación ya existe, ejecutar la migración de compromisos con el PHP
+8.x explícito para la conexión que usa el servidor:
+
+```bash
+mysql -u c2881399_agenda -p c2881399_agenda < sql/migrations/005_compromisos.sql
+```
+
+La tabla `compromisos` usa `ON DELETE CASCADE` hacia `contactos`: al eliminar
+un contacto también se eliminan sus compromisos de pago.
 
 Crear tu usuario de la app (pide usuario y contraseña por consola, con el PHP 8.x explícito):
 
@@ -245,6 +255,10 @@ gunzip -c storage/backups/c2881399_agenda_2026-01-15_033000.sql.gz | mysql -u c2
       prueba": la notificación llega al dispositivo.
 - [ ] Los otros sitios del VPS (los que comparten `public_html`) siguen
       funcionando igual que antes del paso 2.
+- [ ] Crear un compromiso, resolverlo como pagado/parcial/incumplido y
+      comprobar que aparece en Hoy, Calendario, Pagos y la ficha.
+- [ ] Probar el cron con el binario PHP 8.x explícito y verificar
+      `storage/logs/push.log`.
 
 ## 9. Flujo de actualización (cada vez que haya una fase nueva)
 

@@ -1,6 +1,6 @@
 function panelModule() {
     return {
-        panel: { anillo: { agendados_hoy: 0, hechos_hoy: 0 }, vencidos: [], hoy: [], proximos: {}, sin_fecha: [], semana: [], contadores: {} },
+        panel: { anillo: { agendados_hoy: 0, hechos_hoy: 0 }, vencidos: [], hoy: [], proximos: {}, sin_fecha: [], compromisos: [], semana: [], contadores: {} },
         cargandoPanel: false,
         errorPanel: '',
         filtroRecontactos: '',
@@ -8,7 +8,7 @@ function panelModule() {
         mesVisible: '',
         semanaInicio: '',
         diaSeleccionado: '',
-        agenda: { por_dia: {}, puntos: {} },
+        agenda: { por_dia: {}, puntos: {}, pagos_por_dia: {} },
         cargandoAgenda: false,
         eventoAbierto: null,
         reprogramandoEvento: false,

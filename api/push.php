@@ -79,7 +79,7 @@ if ($accion === 'prueba') {
         json_response(['ok' => false, 'error' => 'Activá las notificaciones en este dispositivo primero.'], 422);
     }
     [$enviados, $expirados] = push_enviar_a_dispositivos($dispositivos, [
-        'title' => 'Agenda DAQ', 'body' => 'Las notificaciones están funcionando.', 'url' => APP_URL . '/', 'tag' => 'agenda-prueba',
+        'title' => 'Agenda IC', 'body' => 'Las notificaciones están funcionando.', 'url' => APP_URL . '/', 'tag' => 'agenda-prueba',
     ]);
     push_eliminar_endpoints($db, $expirados);
     json_response(['ok' => true, 'data' => ['enviados' => $enviados]]);

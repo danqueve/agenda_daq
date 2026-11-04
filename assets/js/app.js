@@ -5,6 +5,7 @@ function appShell() {
         ...panelModule(),
         ...ajustesModule(),
         ...notasModule(),
+        ...pagosModule(),
         activo: 'hoy',
         badgeHoy: 0,
         fechaHoy: '',
@@ -18,7 +19,9 @@ function appShell() {
             { id: 'hoy', etiqueta: 'Hoy', icono: 'calendar-check' },
             { id: 'contactos', etiqueta: 'Contactos', icono: 'users' },
             { id: 'agenda', etiqueta: 'Calendario', icono: 'calendar-days' },
-            { id: 'notas', etiqueta: 'Notas', icono: 'sticky-note' },
+            { id: 'pagos', etiqueta: 'Pagos', icono: 'hand-coins' },
+            // En el celular Notas no entra en la barra: se abre desde Ajustes.
+            { id: 'notas', etiqueta: 'Notas', icono: 'sticky-note', soloEscritorio: true },
         ],
 
         init() {
@@ -34,6 +37,7 @@ function appShell() {
             this.iniciarPanel();
             this.iniciarAjustes();
             this.iniciarNotas();
+            this.iniciarPagos();
             const contactoNotificado = new URLSearchParams(window.location.search).get('contacto');
             if (contactoNotificado && /^\d+$/.test(contactoNotificado)) {
                 window.setTimeout(() => this.abrirFicha(Number(contactoNotificado)), 250);
@@ -43,6 +47,7 @@ function appShell() {
                 if (tab === 'hoy') this.cargarPanel();
                 if (tab === 'agenda') this.cargarAgendaMes();
                 if (tab === 'notas') this.cargarNotas();
+                if (tab === 'pagos') this.cargarPagos(true);
             });
             this.$nextTick(() => {
                 if (window.lucide) {

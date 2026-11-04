@@ -79,6 +79,56 @@ function api_date(?string $value): ?string
     return $date->format('Y-m-d H:i:s');
 }
 
+/**
+ * Normaliza un monto positivo a DECIMAL(12,2), sin pasar por floats.
+ * Acepta punto o coma decimal y redondea los excedentes a dos decimales.
+ */
+function api_monto(mixed $value): ?string
+{
+    $texto = trim((string) $value);
+    if ($texto === '' || !preg_match('/^\d+(?:[.,]\d+)?$/', $texto)) {
+        return null;
+    }
+
+    [$enteros, $decimales] = array_pad(preg_split('/[.,]/', $texto), 2, '');
+    $enteros = ltrim($enteros, '0') ?: '0';
+    $decimales = str_pad($decimales, 3, '0');
+    $centavos = (int) substr($decimales, 0, 2);
+    if ((int) $decimales[2] >= 5) {
+        $centavos++;
+    }
+    if ($centavos === 100) {
+        $enteros = (string) ((int) $enteros + 1);
+        $centavos = 0;
+    }
+
+    if (strlen($enteros) > 10 || ($enteros === '0' && $centavos === 0)) {
+        return null;
+    }
+
+    return $enteros . '.' . str_pad((string) $centavos, 2, '0', STR_PAD_LEFT);
+}
+
+/**
+ * Convierte un monto normalizado a centavos enteros para comparaciones exactas.
+ */
+function api_centavos(mixed $value): int
+{
+    $monto = api_monto($value);
+    if ($monto === null) {
+        return 0;
+    }
+
+    [$enteros, $decimales] = explode('.', $monto);
+    return ((int) $enteros * 100) + (int) $decimales;
+}
+
+/** Centavos enteros a "1500.50", el formato que entiende DECIMAL(12,2). */
+function centavos_a_decimal(int $centavos): string
+{
+    return intdiv($centavos, 100) . '.' . str_pad((string) ($centavos % 100), 2, '0', STR_PAD_LEFT);
+}
+
 /** @return list<int> */
 function api_ids(mixed $ids): array
 {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Instructivo · Agenda DAQ</title>
+<title>Instructivo · Agenda IC</title>
 <style>
 @font-face { font-family: "Public Sans"; font-weight: 400; src: url("../../assets/vendor/fonts/publicsans-400.woff2") format("woff2"); }
 @font-face { font-family: "Public Sans"; font-weight: 600; src: url("../../assets/vendor/fonts/publicsans-600.woff2") format("woff2"); }
@@ -106,7 +106,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
         <span class="portada__icono">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
         </span>
-        Agenda DAQ
+        Agenda IC
     </div>
     <h1>Instructivo de uso</h1>
     <p class="portada__sub">Cómo cargar consultas, agendar recontactos y seguir a cada cliente desde la computadora o el celular.</p>
@@ -116,15 +116,16 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
         <span class="chip" style="background:var(--pastel-indigo);color:var(--indigo-texto)">Próximos</span>
         <span class="chip" style="background:var(--pastel-green);color:var(--green-texto)">Concretados</span>
     </div>
-    <p class="portada__meta">Imperio Comercial · agenda.imperiocomercial.com.ar · Versión 21 · Octubre 2026</p>
+    <p class="portada__meta">Imperio Comercial · agenda.imperiocomercial.com.ar · Versión 24 · Noviembre 2026</p>
 </div>
 
 <nav class="indice">
     <h2>Contenido</h2>
     <ol>
-        <li><a href="#que-es">Qué es Agenda DAQ</a></li>
+        <li><a href="#que-es">Qué es Agenda IC</a></li>
         <li><a href="#ingresar">Ingresar e instalar la app</a></li>
         <li><a href="#hoy">La pantalla Hoy</a></li>
+        <li><a href="#pagos">Pagos y compromisos</a></li>
         <li><a href="#nueva">Cargar una nueva consulta</a></li>
         <li><a href="#contactos">Contactos</a></li>
         <li><a href="#ficha">La ficha del contacto</a></li>
@@ -141,8 +142,8 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 
 <section id="que-es">
     <p class="seccion-num">1</p>
-    <h2>Qué es Agenda DAQ</h2>
-    <p class="intro">Agenda DAQ es la agenda de consultas de Imperio Comercial. Sirve para anotar a cada cliente que pregunta por un producto y para no olvidarse de volver a contactarlo en el momento justo.</p>
+    <h2>Qué es Agenda IC</h2>
+    <p class="intro">Agenda IC es la agenda de consultas de Imperio Comercial. Sirve para anotar a cada cliente que pregunta por un producto y para no olvidarse de volver a contactarlo en el momento justo.</p>
     <p>El circuito es siempre el mismo:</p>
     <ol class="paso">
         <li><strong>Cargás la consulta</strong>: nombre, celular, qué busca y cuándo volver a llamarlo.</li>
@@ -197,8 +198,29 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
     <p>Cada tarjeta indica también quién la cargó (<em>Cargó: …</em>). El número rojo sobre <span class="ui">Hoy</span>, en el menú, es la suma de vencidos y pendientes del día.</p>
 </section>
 
-<section id="nueva">
+<section id="pagos">
     <p class="seccion-num">4</p>
+    <h2>Pagos y compromisos</h2>
+    <p class="intro">Registrá las promesas de pago de clientes que deben dinero y sabé qué cobrar hoy, qué está vencido y qué ya se cobró.</p>
+    <h3>Cargar un compromiso</h3>
+    <ol class="paso">
+        <li>Entrá en <span class="ui">Pagos</span> o abrí la ficha del contacto y tocá <span class="ui">Pago</span>.</li>
+        <li>Elegí un contacto existente. Si es un deudor nuevo, seleccioná <span class="ui">Nuevo contacto</span> y completá nombre y celular.</li>
+        <li>Ingresá el <strong>Monto</strong>, el <strong>Concepto</strong> y la <strong>Fecha</strong>. Si elegís solo un día, queda agendado a las 9:00.</li>
+        <li>Tocá <span class="ui">Guardar</span>. El compromiso aparece en Pagos, Hoy, Calendario y la ficha del contacto.</li>
+    </ol>
+    <h3>Registrar qué pasó</h3>
+    <ul>
+        <li><span class="ui">Pagó</span>: marca el compromiso como pagado.</li>
+        <li><span class="ui">Pago parcial</span>: registra lo recibido y permite agendar el saldo.</li>
+        <li><span class="ui">No pagó</span>: marca el compromiso como incumplido y permite reprogramarlo.</li>
+        <li><span class="ui">Deshacer</span> vuelve un compromiso resuelto a pendiente, siempre que el nuevo saldo o reprogramación todavía no haya sido registrado.</li>
+    </ul>
+    <p>Los vencidos se muestran en rosa, los de hoy en durazno, los futuros en lavanda, los pagados o parciales en menta y los incumplidos en gris. La app manda un push el día del cobro y el resumen diario también incluye los pagos pendientes.</p>
+</section>
+
+<section id="nueva">
+    <p class="seccion-num">5</p>
     <h2>Cargar una nueva consulta</h2>
     <p class="intro">Cada vez que un cliente pregunta por algo, tocá <span class="ui">Nueva consulta</span> (arriba a la derecha en Hoy y en Contactos).</p>
     <figure>
@@ -217,7 +239,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 </section>
 
 <section id="contactos">
-    <p class="seccion-num">5</p>
+    <p class="seccion-num">6</p>
     <h2>Contactos</h2>
     <p class="intro">La lista completa de clientes, con un buscador y filtros por estado.</p>
     <figure>
@@ -233,7 +255,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 </section>
 
 <section id="ficha">
-    <p class="seccion-num">6</p>
+    <p class="seccion-num">7</p>
     <h2>La ficha del contacto</h2>
     <p class="intro">Todo lo que sabés de un cliente en un solo lugar. Se abre tocando su nombre en cualquier pantalla.</p>
     <figure>
@@ -242,16 +264,16 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
     </figure>
     <ul>
         <li><strong>Arriba:</strong> nombre, estado, celular, desde cuándo es cliente, quién lo cargó y sus etiquetas.</li>
-        <li><strong>Acciones:</strong> <span class="ui">Llamar</span>, <span class="ui">WhatsApp</span>, <span class="ui">Recontacto</span> (registrar cómo te fue) y <span class="ui">Nota</span> (dejar un comentario en el historial).</li>
+        <li><strong>Acciones:</strong> <span class="ui">Llamar</span>, <span class="ui">WhatsApp</span>, <span class="ui">Recontacto</span>, <span class="ui">Nota</span> y <span class="ui">Pago</span> (cargar un compromiso).</li>
         <li><strong>Próximo recontacto:</strong> cuándo toca volver a hablarle, con <span class="ui">Posponer</span> (lo pasa a mañana a las 9:00) y <span class="ui">Hecho</span> (registrar el recontacto). Se pone rosa si la fecha ya pasó.</li>
         <li><strong>Historial:</strong> cada consulta, llamada, mensaje y nota, con su fecha.</li>
         <li><strong>Estado:</strong> Nuevo, En seguimiento, Concretó o Cerrado. Al elegir <em>Concretó</em> o <em>Cerrado</em> se abre el registro para cerrarlo con el motivo; si el cliente estaba cerrado, elegir <em>Nuevo</em> o <em>En seguimiento</em> lo reabre.</li>
-        <li><span class="ui">Editar</span> (arriba a la derecha) cambia los datos; <span class="ui">Eliminar contacto</span> (al final) lo borra junto con su historial, previa confirmación.</li>
+        <li><span class="ui">Editar</span> (arriba a la derecha) cambia los datos; <span class="ui">Eliminar contacto</span> (al final) borra el contacto, su historial y sus compromisos de pago, previa confirmación.</li>
     </ul>
 </section>
 
 <section id="recontacto">
-    <p class="seccion-num">7</p>
+    <p class="seccion-num">8</p>
     <h2>Registrar un recontacto</h2>
     <p class="intro">Después de hablar con un cliente, registrá cómo te fue. Así el historial queda completo y el anillo del día avanza.</p>
     <figure>
@@ -273,7 +295,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 </section>
 
 <section id="calendario">
-    <p class="seccion-num">8</p>
+    <p class="seccion-num">9</p>
     <h2>Calendario</h2>
     <p class="intro">Todos los recontactos del mes en una grilla, con el detalle del día al costado.</p>
     <figure>
@@ -300,7 +322,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 </section>
 
 <section id="notas">
-    <p class="seccion-num">9</p>
+    <p class="seccion-num">10</p>
     <h2>Notas</h2>
     <p class="intro">Un anotador para lo que no es de un cliente puntual (promos, requisitos, ideas) o para recordatorios sueltos.</p>
     <figure>
@@ -330,7 +352,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 </section>
 
 <section id="ajustes">
-    <p class="seccion-num">10</p>
+    <p class="seccion-num">11</p>
     <h2>Ajustes</h2>
     <p class="intro">En la computadora se entra tocando tu nombre, abajo a la izquierda; en el celular, desde la pestaña <span class="ui">Ajustes</span>.</p>
     <figure>
@@ -342,7 +364,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
         <tbody>
             <tr><td><strong>Instalar</strong></td><td>Instala la app en el dispositivo (aparece solo si todavía no está instalada).</td></tr>
             <tr><td><strong>Notificaciones</strong></td><td>Activa los avisos en este dispositivo. Hay que aceptar el permiso que pide el navegador.</td></tr>
-            <tr><td><strong>Resumen diario</strong></td><td>La hora a la que llega cada mañana un aviso con los recontactos del día y los vencidos. Tocalo para cambiarla, ver los dispositivos activos o mandar una notificación de prueba.</td></tr>
+            <tr><td><strong>Resumen diario</strong></td><td>La hora a la que llega cada mañana un aviso con los recontactos, los vencidos y los pagos a cobrar. Tocalo para cambiarla, ver los dispositivos activos o mandar una notificación de prueba.</td></tr>
             <tr><td><strong>Etiquetas</strong></td><td>Crear, renombrar, cambiar de color o borrar las etiquetas que usás para clasificar contactos.</td></tr>
             <tr><td><strong>Equipo</strong></td><td>Solo administradores: alta y baja de usuarios (ver la sección siguiente).</td></tr>
             <tr><td><strong>Cambiar contraseña</strong></td><td>Pide la actual y la nueva dos veces. Al cambiarla se cierran las sesiones guardadas en otros dispositivos.</td></tr>
@@ -353,7 +375,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 </section>
 
 <section id="equipo">
-    <p class="seccion-num">11</p>
+    <p class="seccion-num">12</p>
     <h2>Usuarios y roles</h2>
     <p class="intro">Varias personas pueden usar la agenda, cada una con su usuario. Todos ven y trabajan sobre los mismos contactos, y cada carga queda firmada con el nombre de quien la hizo.</p>
     <table>
@@ -374,9 +396,9 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 </section>
 
 <section id="celular">
-    <p class="seccion-num">12</p>
+    <p class="seccion-num">13</p>
     <h2>Usarla en el celular</h2>
-    <p class="intro">En el celular el menú pasa abajo, con cinco pestañas: Hoy, Contactos, Calendario, Notas y Ajustes. Todo lo demás funciona igual.</p>
+    <p class="intro">En el celular el menú pasa abajo, con cinco pestañas: Hoy, Contactos, Calendario, Pagos y Ajustes. Notas se abre desde Ajustes. Todo lo demás funciona igual.</p>
     <div class="par-movil">
         <figure><img src="img/12-movil-hoy.png" alt="Hoy en el celular"><figcaption>Hoy en el celular.</figcaption></figure>
         <figure><img src="img/13-movil-ficha.png" alt="Ficha en el celular"><figcaption>Ficha de un contacto.</figcaption></figure>
@@ -389,13 +411,13 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 </section>
 
 <section id="colores">
-    <p class="seccion-num">13</p>
+    <p class="seccion-num">14</p>
     <h2>Qué significa cada color</h2>
     <p class="intro">Los colores son siempre los mismos en toda la app, y siempre van acompañados de una palabra.</p>
     <table>
         <thead><tr><th>Color</th><th>Significa</th></tr></thead>
         <tbody>
-            <tr><td><span class="muestra" style="background:var(--pastel-red)"></span>Rosa</td><td>Vencido: la fecha de recontacto ya pasó. También eliminar.</td></tr>
+            <tr><td><span class="muestra" style="background:var(--pastel-red)"></span>Rosa</td><td>Vencido: la fecha de recontacto o de cobro ya pasó.</td></tr>
             <tr><td><span class="muestra" style="background:var(--pastel-orange)"></span>Durazno</td><td>Para hoy, o en seguimiento. También posponer.</td></tr>
             <tr><td><span class="muestra" style="background:var(--pastel-indigo)"></span>Lavanda</td><td>Próximos días, o reprogramado.</td></tr>
             <tr><td><span class="muestra" style="background:var(--pastel-green)"></span>Menta</td><td>Concretó, hecho o guardado.</td></tr>
@@ -406,7 +428,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 </section>
 
 <section id="preguntas">
-    <p class="seccion-num">14</p>
+    <p class="seccion-num">15</p>
     <h2>Preguntas frecuentes</h2>
     <h3>No me llegan las notificaciones.</h3>
     <p>Revisá en <span class="ui">Ajustes</span> que <em>Notificaciones</em> esté activado en ese dispositivo y que el navegador tenga permiso. En iPhone, la app tiene que estar instalada desde Safari (<em>Compartir › Agregar a inicio</em>). En <span class="ui">Resumen diario</span> podés mandar una notificación de prueba.</p>
@@ -416,6 +438,10 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
     <p>Registrá el recontacto y elegí <span class="ui">Cerrar</span> con el motivo, o cambiale el estado a <em>Concretó</em> o <em>Cerrado</em> desde la ficha. Ya no aparece en Hoy, pero sigue en Contactos.</p>
     <h3>Me equivoqué de fecha al reagendar.</h3>
     <p>Abrí la ficha y volvé a registrar o posponer; también podés reprogramarlo desde el Calendario.</p>
+    <h3>¿Cómo registro un pago parcial?</h3>
+    <p>Abrí el compromiso desde <span class="ui">Pagos</span>, <span class="ui">Hoy</span>, <span class="ui">Calendario</span> o la ficha. Elegí <span class="ui">Pago parcial</span>, ingresá lo recibido y, si querés, agendá el saldo para otra fecha.</p>
+    <h3>¿Qué pasa si elimino un contacto?</h3>
+    <p>Se eliminan también su historial, etiquetas, avisos y compromisos de pago. La acción pide confirmación y no se puede deshacer.</p>
     <h3>Olvidé mi contraseña.</h3>
     <p>La app no tiene recuperación de contraseña. Pedile a un administrador que elimine tu usuario y te cree uno nuevo desde <span class="ui">Ajustes › Equipo</span>; lo que ya cargaste conserva tu nombre.</p>
 </section>

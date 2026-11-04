@@ -1,4 +1,4 @@
-# Agenda DAQ — Prompts por fases para Claude Code
+# Agenda IC — Prompts por fases para Claude Code
 
 Proyecto: agenda personal de consultas y recontactos, con diseño de app iOS
 Repo: `https://github.com/danqueve/agenda_daq.git`
@@ -28,7 +28,7 @@ Desarrollo: WAMP64 local → GitHub → VPS producción (`git pull origin main`)
 ## 0. CLAUDE.md (guardar en la raíz del repo)
 
 ```markdown
-# Agenda DAQ — contexto del proyecto
+# Agenda IC — contexto del proyecto
 
 Repo: https://github.com/danqueve/agenda_daq.git (rama main)
 Base de datos: c2881399_agenda
@@ -98,7 +98,7 @@ agenda_daq/
 ## 0B. docs/DESIGN.md (sistema de diseño iOS)
 
 ```markdown
-# Agenda DAQ — Sistema de diseño
+# Agenda IC — Sistema de diseño
 
 ## Idea
 Se tiene que sentir como una app nativa de iOS (tipo Recordatorios / Contactos / Salud de Apple):
@@ -185,7 +185,7 @@ Encabezados de grupo en Footnote, color --label-2, en minúscula normal (como iO
    Segmented: Reagendar | Cerrar. Si reagenda: pills de fecha. Si cierra: Concretó / No interesa / Sin respuesta.
 7. Ajustes: lista agrupada estilo app Ajustes de iOS (íconos en cuadraditos de color):
    Notificaciones, Instalar app, Etiquetas, Cambiar contraseña, Cerrar sesión en todos los dispositivos.
-8. Login: pantalla centrada con ícono de la app, "Agenda DAQ", campos en grupo inset y botón grande --tint.
+8. Login: pantalla centrada con ícono de la app, "Agenda IC", campos en grupo inset y botón grande --tint.
 
 ## Movimiento
 - Transiciones de pantalla: push lateral (como navegación iOS) 300ms, curva cubic-bezier(.32,.72,0,1).
@@ -207,7 +207,7 @@ probado en 375px (iPhone), 768px (iPad) y 1280px (PC).
 ## Fase 1 — Base del proyecto, base de datos, login y sistema de diseño
 
 ```
-Lee CLAUDE.md y docs/DESIGN.md. Vamos con la Fase 1 de Agenda DAQ.
+Lee CLAUDE.md y docs/DESIGN.md. Vamos con la Fase 1 de Agenda IC.
 Si el skill frontend-design está disponible, usalo con DESIGN.md como brief.
 
 OBJETIVO: esqueleto del proyecto, esquema completo de base de datos, autenticación de un usuario
@@ -386,7 +386,7 @@ CRITERIOS DE ACEPTACIÓN:
 Lee CLAUDE.md y docs/DESIGN.md. Fase 4: convertir la app en PWA instalable en Android, iPhone/iPad y PC,
 y armar la pestaña Ajustes.
 
-1. manifest.webmanifest: name "Agenda DAQ", short_name "Agenda", start_url "./" y scope "./"
+1. manifest.webmanifest: name "Agenda IC", short_name "Agenda", start_url "./" y scope "./"
    (relativos, ver CLAUDE.md), display standalone, theme_color y background_color de tokens.css,
    íconos 192, 512 y maskable + apple-touch-icon 180. Ícono: diseño simple estilo iOS
    (fondo --tint con un símbolo blanco de agenda/teléfono), generado a partir de un SVG.

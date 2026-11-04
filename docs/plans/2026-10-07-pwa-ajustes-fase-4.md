@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Hacer instalable Agenda DAQ y ofrecer la pantalla Ajustes para instalación, etiquetas y seguridad de sesión.
+**Goal:** Hacer instalable Agenda IC y ofrecer la pantalla Ajustes para instalación, etiquetas y seguridad de sesión.
 
 **Architecture:** El shell registra un service worker raíz que precachea recursos estáticos y usa network-first para APIs. El manifest y los íconos residen en rutas relativas; el módulo de ajustes detecta la plataforma, gestiona `beforeinstallprompt` y consume endpoints autenticados para etiquetas, contraseña y tokens persistentes.
 

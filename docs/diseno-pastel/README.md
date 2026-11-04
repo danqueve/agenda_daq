@@ -1,4 +1,4 @@
-# Diseño pastel · Agenda DAQ (toda la app)
+# Diseño pastel · Agenda IC (toda la app)
 
 Esta carpeta es la fuente visual del diseño pastel para **toda** la app y sustituye a las capturas. Claude Code lee el HTML real con los valores exactos de cada pantalla, así no tiene que adivinarlos a partir de una imagen.
 

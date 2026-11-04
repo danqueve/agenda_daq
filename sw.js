@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'agenda-daq-v21';
+const CACHE_VERSION = 'agenda-daq-v24';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const SHELL_ASSETS = [
@@ -15,6 +15,7 @@ const SHELL_ASSETS = [
     './assets/js/panel.js',
     './assets/js/ajustes.js',
     './assets/js/notas.js',
+    './assets/js/pagos.js',
     './assets/js/pwa.js',
     './assets/vendor/alpine.min.js',
     './assets/vendor/lucide/lucide.min.js',
@@ -96,7 +97,7 @@ self.addEventListener('push', (event) => {
         renotify: false,
         data: { url: payload.url || './' },
     };
-    event.waitUntil(self.registration.showNotification(payload.title || 'Agenda DAQ', options));
+    event.waitUntil(self.registration.showNotification(payload.title || 'Agenda IC', options));
 });
 
 self.addEventListener('notificationclick', (event) => {
