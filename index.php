@@ -762,7 +762,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 </div>
                                 <p class="group__header footnote">fecha del pago</p>
                                 <div class="group form-group">
-                                    <label class="cell form-cell"><span class="cell__label">Fecha</span><input type="date" x-model="formularioContacto.pago.dia" :required="formularioContacto.conPago" aria-label="Fecha del pago"></label>
+                                    <label class="cell form-cell"><span class="cell__label">Fecha</span><input type="date" x-model="formularioContacto.pago.dia" @click="abrirSelectorFecha($event.target)" :required="formularioContacto.conPago" aria-label="Fecha del pago"></label>
                                 </div>
                                 <div class="pills date-pills">
                                     <button class="pill" type="button" :aria-selected="formularioContacto.pago.dia === diaPagoConsulta(1)" @click="formularioContacto.pago.dia = diaPagoConsulta(1)">Mañana</button>
