@@ -23,6 +23,8 @@ Los avisos son el panel "Hoy" y notificaciones push. NO hay envío de emails.
 Desde Nueva consulta se buscan clientes de SAS Imperio (celular, DNI, apellido/nombre) leyendo
 `ic_clientes` de su base MySQL con un usuario de SOLO LECTURA (`SAS_DB_*` en `.env`, `app/sas.php`,
 `api/sas_clientes.php`). Nunca se escribe en SAS. El contacto guarda `dni` y `sas_cliente_id`.
+Producción: base `c2881399_credit`, usuario `c2881399_agendasas` (SELECT sobre `ic_clientes`; clave solo
+en `.env`). `c2881399_sasro` es de otro proyecto: no tocarlo. Ver `docs/DEPLOY.md` §5b.
 
 ## Diseño
 La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML exactas +
@@ -30,12 +32,14 @@ La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML e
 
 ## Restricción de hosting (importante)
 En el VPS de producción todos los dominios sirven el mismo public_html y no se puede
-asignar document root por dominio. La app vive en `public_html/agenda_daq/` y el
+asignar document root por dominio. La app vive en `public_html/agenda/` (el repo se llama `agenda_daq`, la carpeta en el VPS `agenda`) y el
 subdominio se enruta con `RewriteCond %{HTTP_HOST}` en el .htaccess compartido.
 Por eso las carpetas privadas quedan dentro del árbol web y DEBEN bloquearse por .htaccess:
 `app/`, `cron/`, `sql/`, `vendor/`, `storage/`, `docs/`, `.env`, `composer.*`, `.git`.
 
 El PHP CLI por defecto del VPS es 5.6: los cron y composer deben usar el binario de PHP 8.x explícito.
+El VPS no es cPanel EasyApache (`/opt/cpanel/ea-php8*` no existe): la ruta de PHP 8 se toma del crontab
+(`crontab -l -u c2881399 | grep php`).
 
 ## Estructura
 agenda_daq/

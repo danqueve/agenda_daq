@@ -7,7 +7,7 @@ pasos a correr vos mismo en el panel y por SSH.
 
 Contexto importante (ver también `CLAUDE.md`): el VPS sirve **todos** los
 dominios desde el mismo `public_html` y no se puede asignar un document root
-distinto por dominio. Por eso Agenda IC vive en `public_html/agenda_daq/` y el
+distinto por dominio. Por eso Agenda IC vive en `public_html/agenda/` y el
 subdominio se enruta por `.htaccess` (paso 2), y por eso sus carpetas privadas
 (`app/`, `cron/`, `sql/`, `vendor/`, `storage/`, `docs/`, `.env`, `composer.*`,
 `.git`) quedan bloqueadas por el `.htaccess` propio del proyecto, que ya viaja
@@ -16,7 +16,7 @@ en el repo.
 **Antes de seguir, confirmá que el vhost de `public_html` tenga
 `AllowOverride All`** (o al menos `AllowOverride All` para `Options` y
 `FileInfo`/`AuthConfig`). Si está en `AllowOverride None` o restringido, el
-`.htaccess` del paso 2 **y** el `.htaccess` propio de `agenda_daq/` se ignoran
+`.htaccess` del paso 2 **y** el `.htaccess` propio de `agenda/` se ignoran
 en silencio: el subdominio no enruta, y peor, las carpetas privadas (`.env`,
 `app/`, `sql/`, etc.) quedan accesibles desde el navegador sin ningún aviso de
 error. Este VPS ya tuvo una caída por esto mismo con otro proyecto — no es un
@@ -28,7 +28,7 @@ riesgo teórico.
 
 1. En el panel de hosting, dar de alta el subdominio `agenda.imperiocomercial.com.ar`.
    No hace falta (ni conviene) crearle un document root propio: va a resolver
-   contra `public_html/agenda_daq/` por el bloque de `.htaccess` del paso 2.
+   contra `public_html/agenda/` por el bloque de `.htaccess` del paso 2.
 2. Emitir certificado SSL para ese subdominio (Let's Encrypt o el que use el
    panel). **Es obligatorio**: sin HTTPS no funcionan ni la instalación como
    PWA ni las notificaciones push (Service Workers y Web Push solo corren en
@@ -46,8 +46,8 @@ de en qué posición va:
 
 ```apache
 RewriteCond %{HTTP_HOST} ^agenda\.imperiocomercial\.com\.ar$ [NC]
-RewriteCond %{REQUEST_URI} !^/agenda_daq/
-RewriteRule ^(.*)$ /agenda_daq/$1 [L]
+RewriteCond %{REQUEST_URI} !^/agenda/
+RewriteRule ^(.*)$ /agenda/$1 [L]
 ```
 
 Puntos clave:
@@ -56,8 +56,8 @@ Puntos clave:
   de reescritura de los otros sitios (si una regla general matchea primero y
   corta con `[L]`, esta nunca se evalúa). Si ya hay bloques parecidos para
   otros subdominios, este puede ir junto a ellos.
-- La segunda condición (`!^/agenda_daq/`) evita un bucle de redirección: sin
-  ella, una vez reescrito a `/agenda_daq/...` la regla se volvería a aplicar
+- La segunda condición (`!^/agenda/`) evita un bucle de redirección: sin
+  ella, una vez reescrito a `/agenda/...` la regla se volvería a aplicar
   sobre esa misma URL.
 - No toca ningún otro `Directory`/`Location` del `.htaccess` compartido, así
   que no debería romper otros sitios — pero verificalo igual después (punto
@@ -69,7 +69,7 @@ Después de guardar el `.htaccess` compartido, probá:
   si todavía no clonaste el repo: eso también confirma que el *routing* ya
   funciona).
 - `https://agenda.imperiocomercial.com.ar/sw.js` y
-  `.../manifest.webmanifest` → deben servir los archivos de `agenda_daq/`, no
+  `.../manifest.webmanifest` → deben servir los archivos de `agenda/`, no
   un 404 ni el contenido de otro sitio.
 - Los demás dominios/subdominios de este VPS siguen respondiendo igual que
   antes de tocar el `.htaccess`.
@@ -95,8 +95,8 @@ Por SSH, parado en `public_html`:
 
 ```bash
 cd public_html
-git clone https://github.com/danqueve/agenda_daq.git
-# queda en public_html/agenda_daq
+git clone https://github.com/danqueve/agenda_daq.git agenda
+# queda en public_html/agenda (el repo se llama agenda_daq, la carpeta "agenda")
 ```
 
 Si el repo es privado, `git clone` por HTTPS va a pedir usuario/token. Para no
@@ -111,7 +111,7 @@ depender de eso en cada `git pull`, lo más prolijo es una **deploy key SSH**:
        User git
        IdentityFile ~/.ssh/agenda_daq_deploy
    ```
-4. Clonar con `git clone github-agenda-daq:danqueve/agenda_daq.git` (o, si ya
+4. Clonar con `git clone github-agenda-daq:danqueve/agenda_daq.git agenda` (o, si ya
    clonaste por HTTPS, `git remote set-url origin github-agenda-daq:danqueve/agenda_daq.git`).
 
 ### Composer con el binario de PHP 8.x correcto
@@ -124,13 +124,20 @@ tenga el panel y usarlo explícitamente:
 # Buscar binarios de PHP 8.x disponibles (los nombres varían según el panel):
 ls /opt/cpanel/ea-php8*/root/usr/bin/php 2>/dev/null   # cPanel/WHM (EasyApache)
 ls /usr/local/php8*/bin/php 2>/dev/null                # DirectAdmin / CloudLinux
+ls /opt/alt/php8*/usr/bin/php 2>/dev/null               # CloudLinux (alt-php)
+ls /opt/plesk/php/8*/bin/php 2>/dev/null                # Plesk
 whereis php8.3 php8.3-cli 2>/dev/null
+# Si ya hay cron de la agenda, la ruta de PHP 8 es la que usa:
+crontab -l -u c2881399 | grep -i php
 ```
+
+En este VPS **no** existe `/opt/cpanel/ea-php8*`: tomá la ruta del crontab o de
+las otras ubicaciones.
 
 Con la ruta encontrada (ejemplo: `/opt/cpanel/ea-php83/root/usr/bin/php`):
 
 ```bash
-cd public_html/agenda_daq
+cd public_html/agenda
 /opt/cpanel/ea-php83/root/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader
 ```
 
@@ -142,7 +149,7 @@ punto 6.
 ## 5. Configuración, esquema y claves
 
 ```bash
-cd public_html/agenda_daq
+cd public_html/agenda
 cp .env.example .env
 ```
 
@@ -196,21 +203,59 @@ Generar las claves VAPID para push y pegarlas en `.env` (`VAPID_PUBLIC` y `VAPID
 ## 5b. Integración opcional con SAS Imperio (solo lectura)
 
 Permite buscar clientes de SAS Imperio por celular, DNI o apellido/nombre desde
-**Nueva consulta**. Requiere que la base de SAS esté en el mismo servidor MySQL.
-La Agenda solo lee `ic_clientes`; nunca escribe en SAS.
+**Nueva consulta** y **Pagos → Nuevo compromiso**. La base de SAS está en el
+mismo servidor MySQL. La Agenda solo lee `ic_clientes`; nunca escribe en SAS.
 
-1. Crear un usuario MySQL de solo lectura (reemplazar `<base_sas>` y la clave):
+Datos de producción:
 
-   ```sql
-   CREATE USER 'agenda_sas_ro'@'localhost' IDENTIFIED BY '<clave-larga>';
-   GRANT SELECT ON `<base_sas>`.`ic_clientes` TO 'agenda_sas_ro'@'localhost';
-   FLUSH PRIVILEGES;
+| Dato | Valor |
+|---|---|
+| Base de SAS | `c2881399_credit` (en `public_html/creditos/config/conexion.local.php`) |
+| Usuario de solo lectura | `c2881399_agendasas` (SELECT sobre `ic_clientes`) |
+| Clave | solo en el `.env` de la agenda |
+
+`c2881399_sasro` es de **otro proyecto**: no usarlo ni cambiarle la clave.
+
+1. Como root por SSH, `mysql` entra sin clave. Crear el usuario con una clave al azar:
+
+   ```bash
+   CLAVE=$(openssl rand -hex 20); echo "$CLAVE"
+   mysql -e "CREATE USER 'c2881399_agendasas'@'localhost' IDENTIFIED BY '$CLAVE'; GRANT SELECT ON \`c2881399_credit\`.\`ic_clientes\` TO 'c2881399_agendasas'@'localhost'; FLUSH PRIVILEGES;"
    ```
 
-2. Completar en `.env`: `SAS_DB_HOST`, `SAS_DB_NAME`, `SAS_DB_USER`, `SAS_DB_PASS`.
+   Se crea por SQL porque el panel solo da permisos sobre la base entera, no
+   sobre una tabla; por eso este usuario no aparece en el panel.
+
+2. Probar: la lectura debe funcionar y la escritura debe dar `ERROR 1142 ... command denied`.
+
+   ```bash
+   mysql -u c2881399_agendasas -p"$CLAVE" c2881399_credit -e "SELECT COUNT(*) FROM ic_clientes;"
+   mysql -u c2881399_agendasas -p"$CLAVE" c2881399_credit -e "UPDATE ic_clientes SET nombres = nombres WHERE id = 0;"
+   ```
+
+3. Completar en `public_html/agenda/.env` (y `chown c2881399:c2881399 .env` si se editó como root):
+
+   ```
+   SAS_DB_HOST=localhost
+   SAS_DB_NAME=c2881399_credit
+   SAS_DB_USER=c2881399_agendasas
+   SAS_DB_PASS=<la clave>
+   ```
+
    Si `SAS_DB_NAME` queda vacío, el buscador no aparece.
-3. Ejecutar `sql/migrations/006_contactos_sas.sql` una sola vez (agrega `dni` y
+
+4. Ejecutar `sql/migrations/006_contactos_sas.sql` una sola vez (agrega `dni` y
    `sas_cliente_id` a `contactos`).
+
+5. Probar la conexión con PHP 8 (ver "Composer con el binario de PHP 8.x correcto"):
+
+   ```bash
+   cd public_html/agenda
+   /ruta/al/php8 -r 'require "app/sas.php"; $p = SasDb::get(); echo $p ? "Conectado\n" : "NO conecta\n"; if ($p) print_r(sas_buscar_clientes($p, "Perez"));'
+   ```
+
+   Si la app muestra "No se pudo consultar SAS Imperio", el log de errores de
+   PHP tiene la línea `SAS Imperio: no se pudo conectar: …` con el motivo.
 
 ## 6. Permisos de carpetas de escritura
 
@@ -231,10 +276,10 @@ del punto 4, y la ruta del proyecto si no es exactamente esta):
 
 ```cron
 # Recordatorios push, cada 10 minutos
-*/10 * * * * /ruta/al/php8 /home/usuario/public_html/agenda_daq/cron/push_recordatorios.php >> /dev/null 2>&1
+*/10 * * * * /ruta/al/php8 /home/usuario/public_html/agenda/cron/push_recordatorios.php >> /dev/null 2>&1
 
 # Backup diario de la base de datos, 3:30 AM hora de Argentina
-30 3 * * * /ruta/al/php8 /home/usuario/public_html/agenda_daq/cron/backup.php >> /dev/null 2>&1
+30 3 * * * /ruta/al/php8 /home/usuario/public_html/agenda/cron/backup.php >> /dev/null 2>&1
 ```
 
 No hace falta redirigir la salida a un log propio: ambos scripts ya escriben
@@ -282,7 +327,7 @@ gunzip -c storage/backups/c2881399_agenda_2026-01-15_033000.sql.gz | mysql -u c2
 ## 9. Flujo de actualización (cada vez que haya una fase nueva)
 
 ```bash
-cd public_html/agenda_daq
+cd public_html/agenda
 git pull origin main
 
 # Solo si composer.lock cambió en este pull:
