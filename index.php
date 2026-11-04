@@ -811,11 +811,30 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 <button type="button" class="cell" @click="elegirContactoCompromiso(contacto)"><span class="avatar" :style="`background:${colorAvatar(contacto.nombre)}`" x-text="iniciales(contacto.nombre)"></span><span class="cell__content"><span class="cell__title" x-text="contacto.nombre"></span><span class="cell__subtitle" x-text="contacto.celular"></span></span></button>
                             </template>
                         </div>
+                        <template x-if="sasHabilitado && !compromisoContactoNuevo && compromisoBusqueda.trim().length >= 3">
+                            <div>
+                                <p class="group__header footnote">en SAS Imperio</p>
+                                <div class="group form-group">
+                                    <template x-for="cliente in compromisoSasResultados" :key="`sas-${cliente.id}`">
+                                        <button type="button" class="cell" @click="elegirClienteSasCompromiso(cliente)">
+                                            <span class="avatar" :style="`background:${colorAvatar(cliente.nombre)}`" x-text="iniciales(cliente.nombre)"></span>
+                                            <span class="cell__content"><span class="cell__title" x-text="cliente.nombre"></span><span class="cell__subtitle" x-text="[cliente.dni && `DNI ${cliente.dni}`, cliente.telefono, cliente.localidad].filter(Boolean).join(' · ')"></span></span>
+                                            <span class="chip-estado" x-show="cliente.estado && cliente.estado !== 'ACTIVO'" x-text="cliente.estado === 'MOROSO' ? 'Moroso' : 'Inactivo'"></span>
+                                        </button>
+                                    </template>
+                                    <p class="group__footer footnote" x-show="compromisoSasBuscando">Buscando…</p>
+                                    <p class="group__footer footnote" x-show="compromisoSasMensaje" x-text="compromisoSasMensaje"></p>
+                                </div>
+                            </div>
+                        </template>
+                        <div class="group form-group" x-show="compromisoContactoNuevo && compromisoForm.sas_cliente_id">
+                            <div class="cell"><span class="cell__content"><span class="cell__title">Cliente SAS Imperio</span><span class="cell__subtitle" x-text="compromisoForm.dni ? `DNI ${compromisoForm.dni}` : 'Datos completados desde SAS'"></span></span><button type="button" class="btn-texto" @click="quitarClienteSasCompromiso()">Quitar</button></div>
+                        </div>
                         <div class="group form-group" x-show="compromisoContactoNuevo">
                             <label class="cell form-cell"><span class="cell__label">Nombre</span><input x-model.trim="compromisoForm.nombre" maxlength="120" autocomplete="name" placeholder="Nombre y apellido"></label>
                             <label class="cell form-cell"><span class="cell__label">Celular</span><input x-model.trim="compromisoForm.celular" inputmode="tel" autocomplete="tel" maxlength="30" placeholder="381 456 7890"></label>
                         </div>
-                        <button type="button" class="btn-texto" @click="compromisoContactoNuevo = !compromisoContactoNuevo" x-text="compromisoContactoNuevo ? 'Buscar un contacto existente' : 'Es un contacto nuevo'"></button>
+                        <button type="button" class="btn-texto" @click="compromisoContactoNuevo = !compromisoContactoNuevo; quitarClienteSasCompromiso()" x-text="compromisoContactoNuevo ? 'Buscar un contacto existente' : 'Es un contacto nuevo'"></button>
                     </div>
 
                     <p class="group__header footnote">pago</p>

@@ -41,19 +41,30 @@ function compromiso_contacto_para(PDO $db, array $nuevo): int
         json_response(['ok' => false, 'error' => 'Ingresá un celular argentino válido.'], 422);
     }
 
+    // Vínculo opcional con SAS Imperio (cuando se eligió un cliente de SAS).
+    $dni = preg_replace('/\D+/', '', api_string($nuevo, 'dni', 20)) ?: null;
+    $dni = $dni === null ? null : substr($dni, 0, 15);
+    $sasId = api_integer($nuevo['sas_cliente_id'] ?? null) ?: null;
+
     $buscar = $db->prepare('SELECT id FROM contactos WHERE celular_norm = :celular_norm LIMIT 1');
     $buscar->execute(['celular_norm' => $celularNorm]);
     $existente = (int) $buscar->fetchColumn();
     if ($existente !== 0) {
+        if ($dni !== null || $sasId !== null) {
+            $db->prepare(
+                'UPDATE contactos SET dni = COALESCE(dni, :dni), sas_cliente_id = COALESCE(sas_cliente_id, :sas_id) WHERE id = :id'
+            )->execute(['dni' => $dni, 'sas_id' => $sasId, 'id' => $existente]);
+        }
         return $existente;
     }
 
     $insert = $db->prepare(
-        "INSERT INTO contactos (nombre, celular, celular_norm, origen, estado, motivo_cierre, creado_por_usuario_id, creado_por_nombre)
-         VALUES (:nombre, :celular, :celular_norm, 'otro', 'cerrada', 'concreto', :usuario_id, :usuario_nombre)"
+        "INSERT INTO contactos (nombre, celular, celular_norm, dni, sas_cliente_id, origen, estado, motivo_cierre, creado_por_usuario_id, creado_por_nombre)
+         VALUES (:nombre, :celular, :celular_norm, :dni, :sas_id, 'otro', 'cerrada', 'concreto', :usuario_id, :usuario_nombre)"
     );
     $insert->execute([
         'nombre' => $nombre, 'celular' => $celular, 'celular_norm' => $celularNorm,
+        'dni' => $dni, 'sas_id' => $sasId,
         'usuario_id' => usuario_actual_id(), 'usuario_nombre' => usuario_actual_nombre(),
     ]);
     $contactoId = (int) $db->lastInsertId();
