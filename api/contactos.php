@@ -128,11 +128,11 @@ function contacto_crear_o_agregar(PDO $db, array $body): never
                 "UPDATE contactos
                  SET proximo_contacto = COALESCE(:proximo_contacto, proximo_contacto),
                      dni = COALESCE(dni, :dni), sas_cliente_id = COALESCE(sas_cliente_id, :sas_id),
-                     estado = CASE WHEN :proximo_contacto IS NOT NULL AND estado <> 'cerrada' THEN 'seguimiento' ELSE estado END
+                     estado = CASE WHEN :proximo_estado IS NOT NULL AND estado <> 'cerrada' THEN 'seguimiento' ELSE estado END
                  WHERE id = :id"
             );
             $update->execute([
-                'id' => $contactoId, 'proximo_contacto' => $values['proximo'],
+                'id' => $contactoId, 'proximo_contacto' => $values['proximo'], 'proximo_estado' => $values['proximo'],
                 'dni' => $values['dni'], 'sas_id' => $values['sasId'],
             ]);
         } else {
