@@ -760,11 +760,15 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <label class="cell form-cell"><span class="cell__label">Monto</span><input type="number" step="0.01" min="0.01" inputmode="decimal" x-model="formularioContacto.pago.monto" :required="formularioContacto.conPago" placeholder="$ 0"></label>
                                     <label class="cell form-cell"><span class="cell__label">Concepto</span><input x-model.trim="formularioContacto.pago.concepto" maxlength="150" placeholder="Ej. seña, cuota 1"></label>
                                 </div>
-                                <div class="pills date-pills">
-                                    <button class="pill" type="button" :aria-selected="pagosEsManana(formularioContacto.pago.fecha_compromiso)" @click="asignarFechaPagoConsulta(1)">Mañana</button>
-                                    <label class="pill pill--input" :aria-selected="Boolean(formularioContacto.pago.fecha_compromiso) && !pagosEsManana(formularioContacto.pago.fecha_compromiso)">Elegir… <input type="date" @click="abrirSelectorFecha($event.target)" @change="elegirFechaPagoConsulta($event.target.value)" aria-label="Elegir fecha del pago"></label>
+                                <p class="group__header footnote">fecha del pago</p>
+                                <div class="group form-group">
+                                    <label class="cell form-cell"><span class="cell__label">Fecha</span><input type="date" x-model="formularioContacto.pago.dia" :required="formularioContacto.conPago" aria-label="Fecha del pago"></label>
                                 </div>
-                                <p class="group__footer footnote" x-show="formularioContacto.pago.fecha_compromiso" x-text="`Pago: ${fechaLarga(formularioContacto.pago.fecha_compromiso)}`"></p>
+                                <div class="pills date-pills">
+                                    <button class="pill" type="button" :aria-selected="formularioContacto.pago.dia === diaPagoConsulta(1)" @click="formularioContacto.pago.dia = diaPagoConsulta(1)">Mañana</button>
+                                    <button class="pill" type="button" :aria-selected="formularioContacto.pago.dia === diaPagoConsulta(7)" @click="formularioContacto.pago.dia = diaPagoConsulta(7)">En 1 semana</button>
+                                </div>
+                                <p class="group__footer footnote" x-show="formularioContacto.pago.dia" x-text="`Pago: ${fechaLarga(formularioContacto.pago.dia + 'T09:00')}`"></p>
                             </div>
                         </div>
                     </template>

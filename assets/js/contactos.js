@@ -33,7 +33,7 @@ function contactosModule() {
                 id: null,
                 nombre: '', celular: '', dni: '', sas_cliente_id: null, consulta: '', producto_interes: '', origen: 'otro',
                 localidad: '', provincia: '', proximo_contacto: '', etiquetas: [], masDatos: false,
-                conPago: false, pago: { monto: '', concepto: '', fecha_compromiso: '' },
+                conPago: false, pago: { monto: '', concepto: '', dia: '' },
             };
         },
 
@@ -81,17 +81,12 @@ function contactosModule() {
             this.formularioContacto.sas_cliente_id = null;
         },
 
-        // Compromiso de pago dentro de "Nueva consulta": mismos atajos de fecha
-        // (Mañana / Elegir… a las 9:00) que el sheet de Pagos.
-        asignarFechaPagoConsulta(dias) {
+        // Compromiso de pago dentro de "Nueva consulta": el día se elige en un
+        // campo de fecha visible (YYYY-MM-DD) y al guardar se le suma las 9:00.
+        diaPagoConsulta(dias) {
             const date = new Date();
             date.setDate(date.getDate() + dias);
-            date.setHours(9, 0, 0, 0);
-            this.formularioContacto.pago.fecha_compromiso = this.fechaInput(date);
-        },
-
-        elegirFechaPagoConsulta(valor) {
-            this.formularioContacto.pago.fecha_compromiso = this.pagosDiaA9(valor);
+            return this.fechaInput(date).slice(0, 10);
         },
 
         async api(url, options = {}) {
@@ -283,11 +278,11 @@ function contactosModule() {
                     this.mostrarHud('Ingresá un monto de pago mayor a cero', 'circle-alert');
                     return;
                 }
-                if (!pago.fecha_compromiso) {
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(pago.dia || '')) {
                     this.mostrarHud('Elegí la fecha del pago', 'circle-alert');
                     return;
                 }
-                form.compromiso = { ...pago };
+                form.compromiso = { monto: pago.monto, concepto: pago.concepto, fecha_compromiso: `${pago.dia}T09:00` };
             }
             this.guardandoContacto = true;
             try {
