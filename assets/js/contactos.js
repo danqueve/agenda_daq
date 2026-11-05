@@ -229,6 +229,29 @@ function contactosModule() {
             this.formularioContacto.proximo_contacto = this.fechaInput(date);
         },
 
+        // Pills de "Recontactar" en Nueva consulta: cada una queda marcada
+        // solo si la fecha elegida coincide con ella (antes "Mañana" se
+        // marcaba con cualquier fecha). Tocar la pill marcada la desmarca.
+        fechaRapidaValor(dias) {
+            const date = new Date();
+            date.setDate(date.getDate() + dias);
+            date.setHours(9, 0, 0, 0);
+            return this.fechaInput(date);
+        },
+
+        fechaRapidaElegida(dias) {
+            return this.formularioContacto.proximo_contacto === this.fechaRapidaValor(dias);
+        },
+
+        alternarFechaRapida(dias) {
+            this.formularioContacto.proximo_contacto = this.fechaRapidaElegida(dias) ? '' : this.fechaRapidaValor(dias);
+        },
+
+        fechaRecontactoElegidaAMano() {
+            const valor = this.formularioContacto.proximo_contacto;
+            return Boolean(valor) && ![1, 3, 7].some((dias) => valor === this.fechaRapidaValor(dias));
+        },
+
         // El input type="date" del pill "Elegir…" solo da año/mes/día: se le
         // suma una hora fija (9:00) para que el valor guardado mantenga el
         // mismo formato que el resto del formulario (fecha y hora).

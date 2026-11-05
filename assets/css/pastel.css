@@ -464,6 +464,94 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .segmented { background: var(--bg-card-2); border: 1px solid var(--separator); border-radius: var(--radio-chico); padding: 3px; }
 .segmented__option[aria-selected="true"] { background: var(--bg-card); color: var(--label); font-weight: 600; box-shadow: var(--sombra-sm); }
 
+/* ---------------------------------------------------------------------
+   6b. Hoja Nueva consulta / Editar contacto (.form-contacto)
+   Referencia: 01b-nueva-consulta.html, más el bloque de SAS Imperio y el
+   "Próximo paso" (recontactar o agendar pago), que llegaron después.
+   --------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+    .sheet--formulario { width: min(520px, calc(100vw - var(--sidebar-width) - 48px)); }
+}
+.form-contacto .sheet__header { position: sticky; top: 0; z-index: 2; padding: 4px 20px; }
+.form-contacto .sheet__title { font-size: 15px; }
+.form-contacto__cuerpo { display: flex; flex-direction: column; gap: 20px; padding: 20px 20px 28px; }
+.form-contacto__seccion { display: flex; flex-direction: column; gap: 10px; }
+.form-contacto__panel { display: flex; flex-direction: column; gap: 10px; }
+
+/* Encabezados de sección: texto suelto sobre el fondo de la hoja, sin la
+   barra blanca que components.css le da a .group__header. */
+.form-contacto .group__header {
+    min-height: 0; margin: 0 4px; padding: 0; background: transparent;
+    font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600;
+    letter-spacing: .04em; text-transform: uppercase; color: var(--label-2);
+}
+.form-contacto .group { margin: 0; }
+.form-contacto .form-cell { min-height: 48px; padding: 0 16px; }
+.form-contacto .form-cell input,
+.form-contacto .form-cell select { text-align: left; color: var(--label); font-size: 16px; }
+.form-contacto .form-cell input::placeholder { color: var(--label-3); }
+.form-contacto .form-cell select { margin: 0; padding: 0; }
+/* Divisor explícito entre filas: el ::after de .cell queda en .5px y en
+   algunas pantallas no se ve. */
+.form-contacto .group > .cell::after { display: none; }
+.form-contacto .group > .cell + .cell { border-top: 1px solid var(--separator); }
+.form-contacto__ayuda { margin: 0 4px; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+
+/* Buscador de SAS Imperio */
+.sas-busqueda {
+    display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 16px;
+    border: 1px solid var(--separator); border-radius: var(--radio-grupo);
+    background: var(--bg-card); color: var(--label-2); cursor: text;
+}
+.sas-busqueda:focus-within { border: 2px solid var(--tint); padding: 0 15px; box-shadow: 0 0 0 4px var(--halo-foco); }
+.sas-busqueda svg { width: 18px; height: 18px; flex: none; }
+.sas-busqueda input {
+    flex: 1; min-width: 0; border: 0; outline: 0; background: transparent;
+    font: inherit; font-size: 16px; color: var(--label);
+}
+.sas-busqueda input::placeholder { color: var(--label-3); }
+.sas-busqueda input::-webkit-search-cancel-button { cursor: pointer; }
+.sas-busqueda__estado { flex: none; font-size: var(--fs-footnote); color: var(--label-2); }
+.sas-resultados { margin: 0; }
+.sas-resultados .cell { min-height: 56px; }
+.sas-resultados .chip-estado { background: var(--pastel-red); color: var(--red-texto); }
+
+/* Cliente de SAS vinculado */
+.sas-vinculado {
+    display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 16px;
+    border: 1px solid var(--pastel-green-borde); border-radius: var(--radio-grupo);
+    background: var(--pastel-green); color: var(--pastel-label);
+}
+.sas-vinculado .avatar { width: 40px; height: 40px; }
+.sas-vinculado__texto { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.sas-vinculado__nombre { font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sas-vinculado__dato { font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--green-texto); }
+.sas-vinculado .btn-texto { flex: none; min-height: 44px; padding: 0 4px; color: var(--green-texto); font-weight: 600; }
+
+/* Próximo paso */
+.form-contacto__paso { margin: 0; }
+.form-contacto__paso .segmented__option { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; }
+.form-contacto__paso .segmented__option svg { width: 16px; height: 16px; flex: none; }
+.form-contacto__paso .segmented__option[aria-selected="true"] { color: var(--tint-texto); }
+.form-contacto .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.form-contacto .pill { display: inline-flex; align-items: center; font-weight: 500; }
+.form-contacto .pill[aria-selected="true"] { font-weight: 700; }
+
+/* Más datos */
+.form-contacto .disclosure { min-height: 44px; margin: 0; padding: 0 4px; font-size: 15px; }
+.disclosure__icono { display: flex; transition: transform .3s var(--curva-ios); }
+.disclosure__icono svg { width: 18px; height: 18px; }
+.disclosure__icono.is-abierto { transform: rotate(180deg); }
+.form-contacto__mas { display: flex; flex-direction: column; gap: 10px; }
+.form-contacto .tag-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.form-contacto .tag-create { margin: 0; }
+.form-contacto .tag-create input { min-height: 44px; border: 1px solid var(--separator); background: var(--bg-card); font-size: 16px; }
+
+@media (max-width: 1023px) {
+    .form-contacto .sheet__header { min-height: 52px; padding: 0 16px; }
+    .form-contacto__cuerpo { padding: 16px 16px calc(24px + env(safe-area-inset-bottom)); gap: 18px; }
+}
+
 /* Alertas (eliminar, duplicado) */
 .alert-sheet__icon { color: var(--tint); }
 .alert-sheet__icon--danger { color: var(--red); }
