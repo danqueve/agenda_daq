@@ -263,6 +263,15 @@ function panelModule() {
             return restan === 1 ? 'Te queda 1 recontacto' : `Te quedan ${restan} recontactos`;
         },
 
+        resumenDiaCalendario() {
+            const recontactos = this.contactosDiaSeleccionado().length;
+            const pagos = this.pagosDia(this.diaSeleccionado).length;
+            const partes = [];
+            if (recontactos) partes.push(recontactos === 1 ? '1 recontacto' : `${recontactos} recontactos`);
+            if (pagos) partes.push(pagos === 1 ? '1 pago' : `${pagos} pagos`);
+            return partes.length ? partes.join(' · ') : 'Sin eventos';
+        },
+
         tituloDia(day) {
             return new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(this.desdeIso(day));
         },

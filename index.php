@@ -295,10 +295,29 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
 
                             <template x-if="vistaCalendario === 'semana'">
                                 <div>
-                                    <div class="week-strip"><div class="week-strip__days"><template x-for="dia in diasSemana()" :key="dia.iso"><button type="button" class="week-strip__day" :class="{'week-strip__day--selected': diaSeleccionado === dia.iso, 'week-strip__day--today': dia.esHoy}" @click="seleccionarDia(dia.iso)"><span class="caption" x-text="dia.letra"></span><strong x-text="dia.numero"></strong><span class="week-strip__dot" x-show="eventosDia(dia.iso).length" :class="{'week-strip__dot--selected': diaSeleccionado === dia.iso}"></span></button></template></div></div>
+                                    <div class="week-strip"><div class="week-strip__days"><template x-for="dia in diasSemana()" :key="dia.iso"><button type="button" class="week-strip__day" :class="{'week-strip__day--selected': diaSeleccionado === dia.iso, 'week-strip__day--today': dia.esHoy}" @click="seleccionarDia(dia.iso)"><span class="caption" x-text="dia.letra"></span><strong x-text="dia.numero"></strong><span class="week-strip__dot" x-show="eventosDia(dia.iso).length || pagosDia(dia.iso).length" :class="{'week-strip__dot--selected': diaSeleccionado === dia.iso}"></span></button></template></div></div>
                                     <p class="group__header footnote" x-text="tituloDiaSeleccionado()"></p>
                                     <div class="cal-item-lista" x-show="contactosDiaSeleccionado().length"><template x-for="contacto in contactosDiaSeleccionado()" :key="`a-${contacto.id}`"><button type="button" class="cal-item" :class="`cal-item--${contacto.tipo_evento}`" @click="abrirEventoCalendario(contacto)"><span class="cal-item__hora tabular" x-text="fechaCorta(contacto.fecha_evento)"></span><span class="cal-item__texto"><span class="cal-item__nombre" x-text="contacto.nombre"></span><span class="cal-item__motivo" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></span><span class="cal-item__autor" x-text="`Cargó: ${contacto.creado_por_nombre || 'Sin registrar'}`"></span></span><i data-lucide="chevron-right"></i></button></template></div>
-                                    <div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length"><i data-lucide="calendar-days"></i><p class="body-text">Sin recontactos agendados</p></div>
+                                    <div class="calendario-pagos" x-show="pagosDia(diaSeleccionado).length">
+                                        <p class="calendario-panel__dia">Pagos a cobrar</p>
+                                        <template x-for="pago in pagosDia(diaSeleccionado)" :key="`sw-${pago.id}`">
+                                            <div class="compromiso-item" :class="clasePagoItem(pago)">
+                                                <div class="compromiso-item__fila">
+                                                    <strong class="compromiso-item__monto tabular" x-text="montoPagoTexto(pago)"></strong>
+                                                    <span class="chip-estado chip-estado--estado" x-text="etiquetaPago(pago)"></span>
+                                                </div>
+                                                <p class="compromiso-item__detalle" x-text="[pago.contacto_nombre, pago.concepto].filter(Boolean).join(' · ')"></p>
+                                                <p class="compromiso-item__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
+                                                <div class="compromiso-item__acciones">
+                                                    <a class="boton-blanco boton-blanco--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
+                                                    <a class="boton-blanco boton-blanco--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
+                                                    <button type="button" class="boton-blanco boton-blanco--hecho" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)"><i data-lucide="hand-coins"></i>Registrar pago</button>
+                                                    <button type="button" class="boton-blanco" x-show="pago.estado !== 'pendiente'" @click="abrirFicha(pago.contacto_id)">Abrir ficha</button>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length && !pagosDia(diaSeleccionado).length"><i data-lucide="calendar-days"></i><p class="body-text">Sin eventos agendados</p></div>
                                 </div>
                             </template>
 
@@ -306,7 +325,26 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 <div>
                                     <p class="group__header footnote" x-text="tituloDiaSeleccionado()"></p>
                                     <div class="cal-item-lista" x-show="contactosDiaSeleccionado().length"><template x-for="contacto in contactosDiaSeleccionado()" :key="`a-${contacto.id}`"><button type="button" class="cal-item" :class="`cal-item--${contacto.tipo_evento}`" @click="abrirEventoCalendario(contacto)"><span class="cal-item__hora tabular" x-text="fechaCorta(contacto.fecha_evento)"></span><span class="cal-item__texto"><span class="cal-item__nombre" x-text="contacto.nombre"></span><span class="cal-item__motivo" x-text="[contacto.producto_interes, contacto.consulta].filter(Boolean).join(' · ') || 'Sin detalle'"></span><span class="cal-item__autor" x-text="`Cargó: ${contacto.creado_por_nombre || 'Sin registrar'}`"></span></span><i data-lucide="chevron-right"></i></button></template></div>
-                                    <div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length"><i data-lucide="calendar-days"></i><p class="body-text">Sin recontactos agendados</p></div>
+                                    <div class="calendario-pagos" x-show="pagosDia(diaSeleccionado).length">
+                                        <p class="calendario-panel__dia">Pagos a cobrar</p>
+                                        <template x-for="pago in pagosDia(diaSeleccionado)" :key="`dv-${pago.id}`">
+                                            <div class="compromiso-item" :class="clasePagoItem(pago)">
+                                                <div class="compromiso-item__fila">
+                                                    <strong class="compromiso-item__monto tabular" x-text="montoPagoTexto(pago)"></strong>
+                                                    <span class="chip-estado chip-estado--estado" x-text="etiquetaPago(pago)"></span>
+                                                </div>
+                                                <p class="compromiso-item__detalle" x-text="[pago.contacto_nombre, pago.concepto].filter(Boolean).join(' · ')"></p>
+                                                <p class="compromiso-item__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
+                                                <div class="compromiso-item__acciones">
+                                                    <a class="boton-blanco boton-blanco--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
+                                                    <a class="boton-blanco boton-blanco--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
+                                                    <button type="button" class="boton-blanco boton-blanco--hecho" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)"><i data-lucide="hand-coins"></i>Registrar pago</button>
+                                                    <button type="button" class="boton-blanco" x-show="pago.estado !== 'pendiente'" @click="abrirFicha(pago.contacto_id)">Abrir ficha</button>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length && !pagosDia(diaSeleccionado).length"><i data-lucide="calendar-days"></i><p class="body-text">Sin eventos agendados</p></div>
                                 </div>
                             </template>
                         </div>
@@ -358,7 +396,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
 
                             <div class="calendario-panel__resumen">
                                 <p class="calendario-panel__dia" x-text="new Intl.DateTimeFormat('es-AR', {weekday:'long'}).format(desdeIso(diaSeleccionado))"></p>
-                                <p class="calendario-panel__titulo" x-text="contactosDiaSeleccionado().length === 1 ? '1 recontacto pendiente' : `${contactosDiaSeleccionado().length} recontactos pendientes`"></p>
+                                <p class="calendario-panel__titulo" x-text="resumenDiaCalendario()"></p>
                             </div>
                             <div class="calendario-panel__lista">
                                 <template x-for="evento in contactosDiaSeleccionado()" :key="`p-${evento.id}-${evento.fecha_evento}`">
