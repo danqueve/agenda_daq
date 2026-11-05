@@ -13,7 +13,7 @@ function compromiso_buscar(PDO $db, int $id): ?array
     $stmt = $db->prepare(
         'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . ' AS situacion,
                 k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm,
-                k.estado AS contacto_estado
+                k.estado AS contacto_estado, k.cobrador_nombre
          FROM compromisos c INNER JOIN contactos k ON k.id = c.contacto_id
          WHERE c.id = :id'
     );
@@ -45,26 +45,27 @@ function compromiso_contacto_para(PDO $db, array $nuevo): int
     $dni = preg_replace('/\D+/', '', api_string($nuevo, 'dni', 20)) ?: null;
     $dni = $dni === null ? null : substr($dni, 0, 15);
     $sasId = api_integer($nuevo['sas_cliente_id'] ?? null) ?: null;
+    $cobrador = api_nullable_string($nuevo, 'cobrador_nombre', 100);
 
     $buscar = $db->prepare('SELECT id FROM contactos WHERE celular_norm = :celular_norm LIMIT 1');
     $buscar->execute(['celular_norm' => $celularNorm]);
     $existente = (int) $buscar->fetchColumn();
     if ($existente !== 0) {
-        if ($dni !== null || $sasId !== null) {
+        if ($dni !== null || $sasId !== null || $cobrador !== null) {
             $db->prepare(
-                'UPDATE contactos SET dni = COALESCE(dni, :dni), sas_cliente_id = COALESCE(sas_cliente_id, :sas_id) WHERE id = :id'
-            )->execute(['dni' => $dni, 'sas_id' => $sasId, 'id' => $existente]);
+                'UPDATE contactos SET dni = COALESCE(dni, :dni), sas_cliente_id = COALESCE(sas_cliente_id, :sas_id), cobrador_nombre = COALESCE(:cobrador, cobrador_nombre) WHERE id = :id'
+            )->execute(['dni' => $dni, 'sas_id' => $sasId, 'cobrador' => $cobrador, 'id' => $existente]);
         }
         return $existente;
     }
 
     $insert = $db->prepare(
-        "INSERT INTO contactos (nombre, celular, celular_norm, dni, sas_cliente_id, origen, estado, motivo_cierre, creado_por_usuario_id, creado_por_nombre)
-         VALUES (:nombre, :celular, :celular_norm, :dni, :sas_id, 'otro', 'cerrada', 'concreto', :usuario_id, :usuario_nombre)"
+        "INSERT INTO contactos (nombre, celular, celular_norm, dni, sas_cliente_id, cobrador_nombre, origen, estado, motivo_cierre, creado_por_usuario_id, creado_por_nombre)
+         VALUES (:nombre, :celular, :celular_norm, :dni, :sas_id, :cobrador, 'otro', 'cerrada', 'concreto', :usuario_id, :usuario_nombre)"
     );
     $insert->execute([
         'nombre' => $nombre, 'celular' => $celular, 'celular_norm' => $celularNorm,
-        'dni' => $dni, 'sas_id' => $sasId,
+        'dni' => $dni, 'sas_id' => $sasId, 'cobrador' => $cobrador,
         'usuario_id' => usuario_actual_id(), 'usuario_nombre' => usuario_actual_nombre(),
     ]);
     $contactoId = (int) $db->lastInsertId();
@@ -300,7 +301,7 @@ function compromisos_listar(PDO $db): never
     $stmt = $db->prepare(
         'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . ' AS situacion,
                 k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm,
-                k.estado AS contacto_estado' . $from . "
+                k.estado AS contacto_estado, k.cobrador_nombre' . $from . "
          ORDER BY c.estado = 'pendiente' DESC,
                   IF(c.estado = 'pendiente', c.fecha_compromiso, NULL) ASC,
                   c.fecha_resolucion DESC, c.id DESC

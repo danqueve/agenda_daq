@@ -89,8 +89,11 @@ function sas_buscar_clientes(PDO $sas, string $texto): array
     }
 
     $stmt = $sas->prepare(
-        'SELECT c.id, c.nombres, c.apellidos, c.dni, c.telefono, c.telefono_alt, c.localidad, c.estado
-         FROM ic_clientes c WHERE ' . implode(' AND ', $where) . '
+        'SELECT c.id, c.nombres, c.apellidos, c.dni, c.telefono, c.telefono_alt, c.localidad, c.estado,
+                u.nombre AS cobrador_nombre, u.apellido AS cobrador_apellido
+         FROM ic_clientes c
+         LEFT JOIN ic_usuarios u ON u.id = c.cobrador_id
+         WHERE ' . implode(' AND ', $where) . '
          ORDER BY c.apellidos, c.nombres LIMIT 8'
     );
     $stmt->execute($params);
@@ -99,6 +102,7 @@ function sas_buscar_clientes(PDO $sas, string $texto): array
     foreach ($stmt->fetchAll() as $fila) {
         $telefono = trim((string) ($fila['telefono'] ?? '')) ?: trim((string) ($fila['telefono_alt'] ?? ''));
         $norm = $telefono === '' ? '' : normalizar_celular($telefono);
+        $cobrador = trim(((string) ($fila['cobrador_nombre'] ?? '')) . ' ' . ((string) ($fila['cobrador_apellido'] ?? '')));
         $items[] = [
             'id' => (int) $fila['id'],
             'nombre' => trim(((string) $fila['nombres']) . ' ' . ((string) $fila['apellidos'])),
@@ -107,6 +111,7 @@ function sas_buscar_clientes(PDO $sas, string $texto): array
             'celular_norm' => preg_match('/^549\d{10}$/', $norm) ? $norm : '',
             'localidad' => (string) ($fila['localidad'] ?? ''),
             'estado' => (string) ($fila['estado'] ?? ''),
+            'cobrador' => $cobrador !== '' ? $cobrador : null,
         ];
     }
 

@@ -86,7 +86,8 @@ foreach ($items as $item) {
 $stmtPagos = $db->prepare(
     'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . " AS situacion,
             c.fecha_compromiso AS fecha_evento,
-            k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm
+            k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm,
+            k.cobrador_nombre
      FROM compromisos c INNER JOIN contactos k ON k.id = c.contacto_id
      WHERE c.fecha_compromiso >= :desde AND c.fecha_compromiso < DATE_ADD(:hasta, INTERVAL 1 DAY)
      ORDER BY c.fecha_compromiso ASC, c.id ASC"

@@ -157,7 +157,7 @@ function pagosModule() {
         // ---------- Nuevo / Editar compromiso ----------
 
         compromisoFormVacio() {
-            return { id: null, monto: '', concepto: '', fecha_compromiso: '', nota: '', nombre: '', celular: '', dni: '', sas_cliente_id: null };
+            return { id: null, monto: '', concepto: '', fecha_compromiso: '', nota: '', nombre: '', celular: '', dni: '', sas_cliente_id: null, cobrador_nombre: null };
         },
 
         abrirCompromisoNuevo(contacto = null) {
@@ -242,6 +242,7 @@ function pagosModule() {
             Object.assign(this.compromisoForm, {
                 nombre: cliente.nombre, celular: cliente.telefono || '',
                 dni: cliente.dni || '', sas_cliente_id: cliente.id,
+                cobrador_nombre: cliente.cobrador || null,
             });
             this.compromisoBusqueda = '';
             this.compromisoResultados = [];
@@ -252,6 +253,7 @@ function pagosModule() {
         quitarClienteSasCompromiso() {
             this.compromisoForm.dni = '';
             this.compromisoForm.sas_cliente_id = null;
+            this.compromisoForm.cobrador_nombre = null;
         },
 
         elegirContactoCompromiso(contacto) {
@@ -303,7 +305,7 @@ function pagosModule() {
                 if (this.compromisoContacto) {
                     payload.contacto_id = this.compromisoContacto.id;
                 } else if (this.compromisoContactoNuevo && form.nombre.trim() && form.celular.trim()) {
-                    payload.nuevo_contacto = { nombre: form.nombre.trim(), celular: form.celular.trim(), dni: form.dni, sas_cliente_id: form.sas_cliente_id };
+                    payload.nuevo_contacto = { nombre: form.nombre.trim(), celular: form.celular.trim(), dni: form.dni, sas_cliente_id: form.sas_cliente_id, cobrador_nombre: form.cobrador_nombre };
                 } else {
                     this.mostrarHud('Elegí quién paga o cargá un contacto nuevo', 'circle-alert');
                     return;

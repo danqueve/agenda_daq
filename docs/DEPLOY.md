@@ -212,7 +212,7 @@ Datos de producción:
 | Dato | Valor |
 |---|---|
 | Base de SAS | `c2881399_credit` (en `public_html/creditos/config/conexion.local.php`) |
-| Usuario de solo lectura | `c2881399_agendasas` (SELECT sobre `ic_clientes`) |
+| Usuario de solo lectura | `c2881399_agendasas` (SELECT sobre `ic_clientes` e `ic_usuarios`) |
 | Clave | solo en el `.env` de la agenda |
 
 `c2881399_sasro` es de **otro proyecto**: no usarlo ni cambiarle la clave.
@@ -221,7 +221,7 @@ Datos de producción:
 
    ```bash
    CLAVE=$(openssl rand -hex 20); echo "$CLAVE"
-   mysql -e "CREATE USER 'c2881399_agendasas'@'localhost' IDENTIFIED BY '$CLAVE'; GRANT SELECT ON \`c2881399_credit\`.\`ic_clientes\` TO 'c2881399_agendasas'@'localhost'; FLUSH PRIVILEGES;"
+   mysql -e "CREATE USER 'c2881399_agendasas'@'localhost' IDENTIFIED BY '$CLAVE'; GRANT SELECT ON \`c2881399_credit\`.\`ic_clientes\` TO 'c2881399_agendasas'@'localhost'; GRANT SELECT ON \`c2881399_credit\`.\`ic_usuarios\` TO 'c2881399_agendasas'@'localhost'; FLUSH PRIVILEGES;"
    ```
 
    Se crea por SQL porque el panel solo da permisos sobre la base entera, no

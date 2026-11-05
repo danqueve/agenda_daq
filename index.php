@@ -140,6 +140,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <p class="card-pastel__monto tabular" x-text="formatoMonto(pago.monto)"></p>
                                     <p class="card-pastel__fecha tabular"><i data-lucide="calendar-days"></i><span x-text="fechaPago(pago)"></span></p>
                                     <p class="card-pastel__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
+                                    <p class="card-pastel__autor" x-show="pago.cobrador_nombre" x-text="`Cobrador: ${pago.cobrador_nombre}`"></p>
                                     <div class="card-pastel__acciones">
                                         <a class="quick-action-card quick-action-card--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
                                         <a class="quick-action-card quick-action-card--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
@@ -308,6 +309,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                                 </div>
                                                 <p class="compromiso-item__detalle" x-text="[pago.contacto_nombre, pago.concepto].filter(Boolean).join(' · ')"></p>
                                                 <p class="compromiso-item__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
+                                                <p class="compromiso-item__autor" x-show="pago.cobrador_nombre" x-text="`Cobrador: ${pago.cobrador_nombre}`"></p>
                                                 <div class="compromiso-item__acciones">
                                                     <a class="boton-blanco boton-blanco--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
                                                     <a class="boton-blanco boton-blanco--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
@@ -335,6 +337,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                                 </div>
                                                 <p class="compromiso-item__detalle" x-text="[pago.contacto_nombre, pago.concepto].filter(Boolean).join(' · ')"></p>
                                                 <p class="compromiso-item__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
+                                                <p class="compromiso-item__autor" x-show="pago.cobrador_nombre" x-text="`Cobrador: ${pago.cobrador_nombre}`"></p>
                                                 <div class="compromiso-item__acciones">
                                                     <a class="boton-blanco boton-blanco--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
                                                     <a class="boton-blanco boton-blanco--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
@@ -418,6 +421,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                         </div>
                                         <p class="compromiso-item__detalle" x-text="[pago.contacto_nombre, pago.concepto].filter(Boolean).join(' · ')"></p>
                                         <p class="compromiso-item__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
+                                        <p class="compromiso-item__autor" x-show="pago.cobrador_nombre" x-text="`Cobrador: ${pago.cobrador_nombre}`"></p>
                                         <div class="compromiso-item__acciones">
                                             <a class="boton-blanco boton-blanco--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
                                             <a class="boton-blanco boton-blanco--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
@@ -640,6 +644,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 <p class="card-pastel__monto tabular" x-text="montoPagoTexto(pago)"></p>
                                 <p class="card-pastel__fecha tabular"><i data-lucide="calendar-days"></i><span x-text="fechaPago(pago)"></span></p>
                                 <p class="card-pastel__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
+                                <p class="card-pastel__autor" x-show="pago.cobrador_nombre" x-text="`Cobrador: ${pago.cobrador_nombre}`"></p>
                                 <div class="card-pastel__acciones">
                                     <a class="quick-action-card quick-action-card--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
                                     <a class="quick-action-card quick-action-card--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
@@ -775,7 +780,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <template x-for="cliente in sasResultados" :key="cliente.id">
                                         <button type="button" class="cell cell--avatar-offset" @click="elegirClienteSas(cliente)">
                                             <span class="avatar" :style="`background:${colorAvatar(cliente.nombre)}`" x-text="iniciales(cliente.nombre)"></span>
-                                            <span class="cell__content"><span class="cell__title" x-text="cliente.nombre"></span><span class="cell__subtitle tabular" x-text="[cliente.dni && `DNI ${cliente.dni}`, cliente.telefono, cliente.localidad].filter(Boolean).join(' · ')"></span></span>
+                                            <span class="cell__content"><span class="cell__title" x-text="cliente.nombre"></span><span class="cell__subtitle tabular" x-text="[cliente.dni && `DNI ${cliente.dni}`, cliente.telefono, cliente.localidad, cliente.cobrador && `Cobrador: ${cliente.cobrador}`].filter(Boolean).join(' · ')"></span></span>
                                             <span class="chip-estado" x-show="cliente.estado && cliente.estado !== 'ACTIVO'" x-text="cliente.estado === 'MOROSO' ? 'Moroso' : 'Inactivo'"></span>
                                         </button>
                                     </template>
@@ -890,7 +895,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <template x-for="cliente in compromisoSasResultados" :key="`sas-${cliente.id}`">
                                         <button type="button" class="cell" @click="elegirClienteSasCompromiso(cliente)">
                                             <span class="avatar" :style="`background:${colorAvatar(cliente.nombre)}`" x-text="iniciales(cliente.nombre)"></span>
-                                            <span class="cell__content"><span class="cell__title" x-text="cliente.nombre"></span><span class="cell__subtitle" x-text="[cliente.dni && `DNI ${cliente.dni}`, cliente.telefono, cliente.localidad].filter(Boolean).join(' · ')"></span></span>
+                                            <span class="cell__content"><span class="cell__title" x-text="cliente.nombre"></span><span class="cell__subtitle" x-text="[cliente.dni && `DNI ${cliente.dni}`, cliente.telefono, cliente.localidad, cliente.cobrador && `Cobrador: ${cliente.cobrador}`].filter(Boolean).join(' · ')"></span></span>
                                             <span class="chip-estado" x-show="cliente.estado && cliente.estado !== 'ACTIVO'" x-text="cliente.estado === 'MOROSO' ? 'Moroso' : 'Inactivo'"></span>
                                         </button>
                                     </template>
@@ -937,6 +942,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                 <header class="sheet__header"><button class="btn-texto" type="button" @click="cerrarPagoResolver()">Cancelar</button><h2 class="sheet__title">Registrar pago</h2><button class="btn-texto btn-texto--negrita" type="submit" :disabled="guardandoPagoResolver || !pagoResolverValido()" x-text="guardandoPagoResolver ? 'Guardando…' : 'Guardar'"></button></header>
                 <div class="sheet__body">
                     <p class="sheet-contact-name" x-text="pagoResolver ? `${pagoResolver.contacto_nombre} · ${formatoMonto(pagoResolver.monto)}` : ''"></p>
+                    <p class="sheet-contact-sub" x-show="pagoResolver?.cobrador_nombre" x-text="`Cobrador: ${pagoResolver?.cobrador_nombre}`"></p>
                     <div class="resultado-grid resultado-grid--tres" role="tablist" aria-label="Qué pasó con el pago">
                         <template x-for="opcion in [{id: 'pagado', texto: 'Pagó'}, {id: 'parcial', texto: 'Pago parcial'}, {id: 'incumplido', texto: 'No pagó'}]" :key="opcion.id">
                             <button type="button" class="resultado-opcion" :class="`resultado-opcion--${opcion.id}`" role="tab" :aria-selected="pagoResolverForm.resultado === opcion.id" @click="seleccionarResultadoPago(opcion.id)" x-text="opcion.texto"></button>
@@ -1085,6 +1091,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                             <div class="group">
                                 <div class="cell" x-show="contactoActual?.producto_interes"><span class="cell__label">Producto</span><span class="cell__value" x-text="contactoActual?.producto_interes"></span></div>
                                 <div class="cell" x-show="contactoActual?.localidad"><span class="cell__label">Localidad</span><span class="cell__value" x-text="contactoActual?.localidad"></span></div>
+                                <div class="cell" x-show="contactoActual?.cobrador_nombre"><span class="cell__label">Cobrador</span><span class="cell__value" x-text="contactoActual?.cobrador_nombre"></span></div>
                                 <div class="cell"><span class="cell__label">Origen</span><span class="cell__value"><span class="origen-chip" :class="`origen-chip--${origenVisual(contactoActual?.origen).clase}`"><i :data-lucide="origenVisual(contactoActual?.origen).icono"></i><span x-text="origenVisual(contactoActual?.origen).etiqueta"></span></span></span></div>
                             </div>
 

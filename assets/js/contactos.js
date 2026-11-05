@@ -31,7 +31,7 @@ function contactosModule() {
         nuevoFormulario() {
             return {
                 id: null,
-                nombre: '', celular: '', dni: '', sas_cliente_id: null, consulta: '', producto_interes: '', origen: 'otro',
+                nombre: '', celular: '', dni: '', sas_cliente_id: null, cobrador_nombre: null, consulta: '', producto_interes: '', origen: 'otro',
                 localidad: '', provincia: '', proximo_contacto: '', etiquetas: [], masDatos: false,
                 conPago: false, pago: { monto: '', concepto: '', dia: '' },
             };
@@ -66,6 +66,7 @@ function contactosModule() {
             form.celular = cliente.telefono || form.celular;
             form.dni = cliente.dni || '';
             form.sas_cliente_id = cliente.id;
+            form.cobrador_nombre = cliente.cobrador || null;
             if (cliente.localidad) {
                 form.localidad = cliente.localidad;
                 form.masDatos = true;
@@ -79,6 +80,7 @@ function contactosModule() {
         quitarClienteSas() {
             this.formularioContacto.dni = '';
             this.formularioContacto.sas_cliente_id = null;
+            this.formularioContacto.cobrador_nombre = null;
         },
 
         // Compromiso de pago dentro de "Nueva consulta": el día se elige en un

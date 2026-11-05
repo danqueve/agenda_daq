@@ -76,6 +76,7 @@ function contacto_validar(array $body): array
     $dni = preg_replace('/\D+/', '', api_string($body, 'dni', 20)) ?: null;
     $dni = $dni === null ? null : substr($dni, 0, 15);
     $sasId = api_integer($body['sas_cliente_id'] ?? null) ?: null;
+    $cobrador = api_nullable_string($body, 'cobrador_nombre', 100);
     $proximo = api_date(isset($body['proximo_contacto']) ? (string) $body['proximo_contacto'] : null);
     $origenes = ['whatsapp', 'instagram', 'facebook', 'llamada', 'local', 'referido', 'otro'];
     $provincias = ['Tucumán', 'Santiago del Estero', 'Catamarca', 'Otra'];
@@ -91,7 +92,7 @@ function contacto_validar(array $body): array
         json_response(['ok' => false, 'error' => 'Revisá el origen o la provincia elegidos.'], 422);
     }
 
-    return compact('nombre', 'celular', 'celularNorm', 'consulta', 'producto', 'origen', 'localidad', 'provincia', 'proximo', 'dni', 'sasId');
+    return compact('nombre', 'celular', 'celularNorm', 'consulta', 'producto', 'origen', 'localidad', 'provincia', 'proximo', 'dni', 'sasId', 'cobrador');
 }
 
 function contacto_crear_o_agregar(PDO $db, array $body): never
@@ -128,26 +129,26 @@ function contacto_crear_o_agregar(PDO $db, array $body): never
                 "UPDATE contactos
                  SET proximo_contacto = COALESCE(:proximo_contacto, proximo_contacto),
                      dni = COALESCE(dni, :dni), sas_cliente_id = COALESCE(sas_cliente_id, :sas_id),
+                     cobrador_nombre = COALESCE(:cobrador, cobrador_nombre),
                      estado = CASE WHEN :proximo_estado IS NOT NULL AND estado <> 'cerrada' THEN 'seguimiento' ELSE estado END
                  WHERE id = :id"
             );
             $update->execute([
                 'id' => $contactoId, 'proximo_contacto' => $values['proximo'], 'proximo_estado' => $values['proximo'],
-                'dni' => $values['dni'], 'sas_id' => $values['sasId'],
+                'dni' => $values['dni'], 'sas_id' => $values['sasId'], 'cobrador' => $values['cobrador'],
             ]);
         } else {
             $insert = $db->prepare(
                 'INSERT INTO contactos
-                    (nombre, celular, celular_norm, dni, sas_cliente_id, producto_interes, origen, localidad, provincia, estado, proximo_contacto, creado_por_usuario_id, creado_por_nombre)
+                    (nombre, celular, celular_norm, dni, sas_cliente_id, cobrador_nombre, producto_interes, origen, localidad, provincia, estado, proximo_contacto, creado_por_usuario_id, creado_por_nombre)
                  VALUES
-                    (:nombre, :celular, :celular_norm, :dni, :sas_id, :producto, :origen, :localidad, :provincia, :estado, :proximo_contacto, :creado_por_usuario_id, :creado_por_nombre)'
+                    (:nombre, :celular, :celular_norm, :dni, :sas_id, :cobrador, :producto, :origen, :localidad, :provincia, :estado, :proximo_contacto, :creado_por_usuario_id, :creado_por_nombre)'
             );
             $insert->execute([
                 'nombre' => $values['nombre'], 'celular' => $values['celular'], 'celular_norm' => $values['celularNorm'],
-                'dni' => $values['dni'], 'sas_id' => $values['sasId'],
+                'dni' => $values['dni'], 'sas_id' => $values['sasId'], 'cobrador' => $values['cobrador'],
                 'producto' => $values['producto'], 'origen' => $values['origen'], 'localidad' => $values['localidad'],
-                'provincia' => $values['provincia'], // Con compromiso entra en seguimiento aunque no tenga recontacto,
-                // para no aparecer como "Sin fecha" en Hoy.
+                'provincia' => $values['provincia'],
                 'estado' => ($values['proximo'] === null && $compromiso === null) ? 'pendiente' : 'seguimiento',
                 'proximo_contacto' => $values['proximo'],
                 'creado_por_usuario_id' => $creadoPorUsuarioId,

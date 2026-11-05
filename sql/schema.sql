@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS contactos (
     celular_norm VARCHAR(15) NOT NULL,
     dni VARCHAR(15) DEFAULT NULL,
     sas_cliente_id INT UNSIGNED DEFAULT NULL,
+    cobrador_nombre VARCHAR(100) DEFAULT NULL,
     producto_interes VARCHAR(120) DEFAULT NULL,
     origen ENUM('whatsapp','instagram','facebook','llamada','local','referido','otro') NOT NULL DEFAULT 'otro',
     localidad VARCHAR(100) DEFAULT NULL,

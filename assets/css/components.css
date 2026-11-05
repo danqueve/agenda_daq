@@ -667,6 +667,12 @@ button.cell:active,
     font-size: var(--fs-subhead);
     text-align: center;
 }
+.sheet-contact-sub {
+    margin: -10px 0 14px;
+    color: var(--label-3);
+    font-size: var(--fs-footnote);
+    text-align: center;
+}
 
 .note-field {
     display: flex;
