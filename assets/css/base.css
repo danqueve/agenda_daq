@@ -99,13 +99,11 @@ img, svg {
 }
 
 /* Tipografía utilitaria */
-.large-title { font-size: var(--fs-large-title); line-height: var(--lh-large-title); font-weight: var(--fw-large-title); }
-.title2      { font-size: var(--fs-title2);      line-height: var(--lh-title2);      font-weight: var(--fw-title2); }
-.headline    { font-size: var(--fs-headline);    line-height: var(--lh-headline);    font-weight: var(--fw-headline); }
-.body-text   { font-size: var(--fs-body);        line-height: var(--lh-body);        font-weight: var(--fw-body); }
-.subhead     { font-size: var(--fs-subhead);      line-height: var(--lh-subhead);      font-weight: var(--fw-subhead); color: var(--label-2); }
-.footnote    { font-size: var(--fs-footnote);     line-height: var(--lh-footnote);     font-weight: var(--fw-footnote); color: var(--label-2); }
-.caption     { font-size: var(--fs-caption);      line-height: var(--lh-caption);      font-weight: var(--fw-caption); }
+.title2    { font-size: var(--fs-title2);   line-height: var(--lh-title2);   font-weight: var(--fw-title2); }
+.body-text { font-size: var(--fs-body);     line-height: var(--lh-body);     font-weight: var(--fw-body); }
+.subhead   { font-size: var(--fs-subhead);  line-height: var(--lh-subhead);  font-weight: var(--fw-subhead); color: var(--label-2); }
+.footnote  { font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: var(--fw-footnote); color: var(--label-2); }
+.caption   { font-size: var(--fs-caption);  line-height: var(--lh-caption);  font-weight: var(--fw-caption); }
 
 /* Foco visible para navegación con teclado (no afecta el foco por mouse/touch) */
 :focus-visible {
