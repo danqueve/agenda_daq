@@ -25,6 +25,17 @@ const COMPROMISO_ATRASO_SQL = "CASE
         ELSE GREATEST(DATEDIFF(DATE(c.fecha_resolucion), DATE(c.fecha_compromiso)), 0)
     END";
 
+/**
+ * Fechas del mes que ya llegaron (del día 1 a hoy): la base del cumplimiento del mes. Requiere el alias `c`.
+ */
+const COMPROMISO_MES_LLEGADO_SQL = "DATE(c.fecha_compromiso) BETWEEN DATE_FORMAT(CURDATE(), '%Y-%m-01') AND CURDATE()";
+
+/**
+ * Lo prometido por un compromiso, sin contar dos veces lo que se movió a otra fecha: un parcial con el saldo ya
+ * agendado entra solo por lo que se pagó (el saldo cuenta en el compromiso nuevo). Requiere el alias `c`.
+ */
+const COMPROMISO_PROMETIDO_SQL = "IF(c.estado = 'parcial' AND EXISTS (SELECT 1 FROM compromisos h WHERE h.origen_id = c.id), c.monto_pagado, c.monto)";
+
 /** Columnas que el frontend necesita de cada compromiso (alias `c`). */
 const COMPROMISO_COLUMNAS_SQL = 'c.id, c.contacto_id, c.monto, c.concepto, c.fecha_compromiso, c.estado, c.monto_pagado,
         c.fecha_resolucion, c.nota, c.origen_id, c.creado_por_nombre, c.resuelto_por_nombre, c.creado_en,
@@ -161,4 +172,89 @@ function compromiso_opcional_validar(mixed $datos): ?array
         'concepto' => api_string($datos, 'concepto', 150),
         'nota' => api_nullable_string($datos, 'nota', 2000),
     ];
+}
+
+/**
+ * Totales por situación sobre los compromisos que cumplen $where (alias `c`).
+ *
+ * @param list<string> $where
+ * @param array<string, mixed> $params
+ * @return array<string, mixed>
+ */
+function compromisos_resumen(PDO $db, array $where, array $params): array
+{
+    $condiciones = $where === [] ? '' : ' WHERE ' . implode(' AND ', $where);
+    $stmt = $db->prepare(
+        "SELECT
+            COALESCE(SUM(c.estado = 'pendiente'), 0) AS pendientes,
+            COALESCE(SUM(IF(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE(), c.monto, 0)), 0) AS vencidos_monto,
+            COALESCE(SUM(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE()), 0) AS vencidos_cantidad,
+            COALESCE(SUM(IF(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) = CURDATE(), c.monto, 0)), 0) AS hoy_monto,
+            COALESCE(SUM(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) = CURDATE()), 0) AS hoy_cantidad,
+            COALESCE(SUM(IF(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) > CURDATE() AND DATE(c.fecha_compromiso) <= DATE_ADD(CURDATE(), INTERVAL 7 DAY), c.monto, 0)), 0) AS proximos_monto,
+            COALESCE(SUM(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) > CURDATE() AND DATE(c.fecha_compromiso) <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)), 0) AS proximos_cantidad,
+            COALESCE(SUM(IF(c.estado IN ('pagado','parcial') AND c.fecha_resolucion >= DATE_FORMAT(CURDATE(), '%Y-%m-01'), c.monto_pagado, 0)), 0) AS cobrado_mes
+         FROM compromisos c{$condiciones}"
+    );
+    $stmt->execute($params);
+    $r = $stmt->fetch();
+
+    return [
+        'pendientes' => (int) $r['pendientes'],
+        'vencidos' => ['monto' => $r['vencidos_monto'], 'cantidad' => (int) $r['vencidos_cantidad']],
+        'hoy' => ['monto' => $r['hoy_monto'], 'cantidad' => (int) $r['hoy_cantidad']],
+        'proximos' => ['monto' => $r['proximos_monto'], 'cantidad' => (int) $r['proximos_cantidad']],
+        'cobrado_mes' => $r['cobrado_mes'],
+    ];
+}
+
+/**
+ * Una fila por quien cargó compromisos. Cumplimiento del mes: del $ prometido
+ * para fechas del mes que ya llegaron (día 1 a hoy), el % que se cobró.
+ * Lo prometido no cuenta dos veces lo que se movió a otra fecha: un compromiso
+ * 'reprogramado' no entra (cuenta el nuevo, en su fecha) y un pago parcial con el
+ * saldo ya agendado entra solo por lo que se pagó (el saldo cuenta en el nuevo).
+ *
+ * @return list<array<string, mixed>>
+ */
+function compromisos_por_usuario(PDO $db): array
+{
+    $mes = COMPROMISO_MES_LLEGADO_SQL;
+    $prometido = COMPROMISO_PROMETIDO_SQL;
+    $filas = $db->query(
+        "SELECT c.creado_por_usuario_id AS usuario_id,
+                COALESCE(MAX(u.nombre), NULLIF(MAX(c.creado_por_nombre), ''), 'Sin registrar') AS nombre,
+                COUNT(*) AS total,
+                SUM(c.estado = 'pendiente') AS pendientes_cantidad,
+                COALESCE(SUM(IF(c.estado = 'pendiente', c.monto, 0)), 0) AS pendientes_monto,
+                SUM(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE()) AS vencidos_cantidad,
+                COALESCE(SUM(IF(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE(), c.monto, 0)), 0) AS vencidos_monto,
+                COALESCE(SUM(IF(c.estado IN ('pagado','parcial') AND c.fecha_resolucion >= DATE_FORMAT(CURDATE(), '%Y-%m-01'), c.monto_pagado, 0)), 0) AS cobrado_mes,
+                COALESCE(SUM(IF({$mes} AND c.estado <> 'reprogramado', {$prometido}, 0)), 0) AS prometido_mes,
+                COALESCE(SUM(IF({$mes} AND c.estado IN ('pagado','parcial'), c.monto_pagado, 0)), 0) AS cobrado_prometido_mes,
+                MAX(c.creado_por_nombre) AS nombre_copiado
+         FROM compromisos c LEFT JOIN usuarios u ON u.id = c.creado_por_usuario_id
+         GROUP BY c.creado_por_usuario_id, IF(c.creado_por_usuario_id IS NULL, c.creado_por_nombre, NULL)
+         ORDER BY nombre ASC"
+    )->fetchAll();
+
+    $salida = [];
+    foreach ($filas as $f) {
+        $prometido = api_centavos($f['prometido_mes']);
+        $cobrado = api_centavos($f['cobrado_prometido_mes']);
+        $usuarioId = $f['usuario_id'] === null ? null : (int) $f['usuario_id'];
+        $salida[] = [
+            'usuario_id' => $usuarioId,
+            // Valor que se manda tal cual en ?creado_por= para filtrar por esta fila.
+            'filtro' => $usuarioId !== null ? (string) $usuarioId : 'ex:' . $f['nombre_copiado'],
+            'nombre' => $f['nombre'],
+            'total' => (int) $f['total'],
+            'pendientes' => ['cantidad' => (int) $f['pendientes_cantidad'], 'monto' => $f['pendientes_monto']],
+            'vencidos' => ['cantidad' => (int) $f['vencidos_cantidad'], 'monto' => $f['vencidos_monto']],
+            'cobrado_mes' => $f['cobrado_mes'],
+            'cumplimiento_mes' => $prometido > 0 ? (int) round($cobrado * 100 / $prometido) : null,
+        ];
+    }
+
+    return $salida;
 }
