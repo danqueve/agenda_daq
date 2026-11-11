@@ -71,15 +71,6 @@ function panelModule() {
             return dias;
         },
 
-        semanasDelMes() {
-            const dias = this.diasDelMes();
-            const semanas = [];
-            for (let i = 0; i < dias.length; i += 7) {
-                semanas.push(dias.slice(i, i + 7));
-            }
-            return semanas;
-        },
-
         moverMes(direction) {
             const primero = this.desdeIso(this.mesVisible);
             primero.setMonth(primero.getMonth() + direction);
@@ -210,10 +201,6 @@ function panelModule() {
 
         offsetAnillo() {
             return 289.03 * (1 - this.progresoAnillo());
-        },
-
-        proximosOrdenados() {
-            return Object.entries(this.panel.proximos || {}).sort(([a], [b]) => a.localeCompare(b));
         },
 
         // Junta vencidos/hoy/próximos/sin fecha en una sola lista para la

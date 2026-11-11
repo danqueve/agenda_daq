@@ -382,10 +382,6 @@ function contactosModule() {
             return helpers.formatoFecha(helpers.desdeSql(value), { day: 'numeric', month: 'long' });
         },
 
-        etiquetaOrigen(origen) {
-            return ({ whatsapp: 'WhatsApp', instagram: 'Instagram', facebook: 'Facebook', llamada: 'Llamada', local: 'Local', referido: 'Referido', otro: 'Otro' })[origen] || 'Otro';
-        },
-
         origenVisual(origen) {
             return ({
                 whatsapp: { etiqueta: 'WhatsApp', icono: 'message-circle', clase: 'whatsapp' },
