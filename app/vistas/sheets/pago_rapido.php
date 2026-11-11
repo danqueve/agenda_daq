@@ -3,8 +3,7 @@
 declare(strict_types=1);
 
 /**
- * Hoja compacta de las acciones rápidas de un compromiso (Parcial, Reprogramar y Más) y el aviso
- * con "Deshacer" que queda después de registrar. La lógica está en assets/js/pagos_rapido.js.
+ * Hoja compacta de las acciones rápidas de un compromiso (Parcial, Reprogramar y Más). Lógica en assets/js/pagos_rapido.js.
  */
 ?>
         <div class="sheet-backdrop" x-show="sheetPagoRapido" x-transition.opacity @keydown.escape.window="sheetPagoRapido && cerrarPagoRapido()" @click.self="cerrarPagoRapido()" x-cloak>
@@ -54,10 +53,4 @@ declare(strict_types=1);
                     </div>
                 </div>
             </section>
-        </div>
-
-        <div class="toast-accion" role="status" aria-live="polite" x-show="toastAccion.visible" x-transition.opacity x-cloak @mouseenter="pausarToastAccion()" @mouseleave="reanudarToastAccion()" @focusin="pausarToastAccion()" @focusout="reanudarToastAccion()">
-            <i data-lucide="circle-check"></i>
-            <span class="toast-accion__texto" x-text="toastAccion.texto"></span>
-            <button type="button" class="toast-accion__boton" @click="ejecutarToastAccion()" x-text="toastAccion.etiqueta"></button>
         </div>
