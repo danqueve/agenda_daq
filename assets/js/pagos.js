@@ -1,13 +1,23 @@
 function pagosModule() {
+    const resumenVacio = () => ({
+        pendientes: 0,
+        vencidos: { monto: '0.00', cantidad: 0 },
+        hoy: { monto: '0.00', cantidad: 0 },
+        proximos: { monto: '0.00', cantidad: 0 },
+        cobrado_mes: '0.00',
+    });
+
     return {
         pagos: [],
-        resumenPagos: {
-            pendientes: 0,
-            vencidos: { monto: '0.00', cantidad: 0 },
-            hoy: { monto: '0.00', cantidad: 0 },
-            proximos: { monto: '0.00', cantidad: 0 },
-            cobrado_mes: '0.00',
-        },
+        // Global (sin filtros): alimenta el badge y el subtítulo.
+        resumenPagos: resumenVacio(),
+        // Con rango de fechas y "Cargó" aplicados; lo muestran las tarjetas cuando hay filtro.
+        resumenPagosFiltrado: resumenVacio(),
+        pagosResumenFiltrado: false,
+        // Cantidad, importe y cobrado de TODO lo que cumple los filtros (no solo la página).
+        totalesPagos: { cantidad: 0, monto: '0.00', pagado: '0.00' },
+        pagosPorDia: {},
+        pagosPorUsuario: [],
         filtroPagos: 'pendientes',
         busquedaPagos: '',
         paginaPagos: 1,
@@ -15,6 +25,26 @@ function pagosModule() {
         cargandoPagos: false,
         errorPagos: '',
         badgePagos: 0,
+        pagosSolicitud: 0,
+
+        // Vistas (Agenda, Tabla, Tarjetas), fechas, "Cargó" y orden de la tabla
+        vistaPagos: 'agenda',
+        pagosAncho: true,
+        rangosPagos: [
+            { id: 'semana', texto: 'Esta semana' },
+            { id: 'quince', texto: 'Próximos 15 días' },
+            { id: 'mes', texto: 'Este mes' },
+            { id: 'mespasado', texto: 'Mes pasado' },
+            { id: 'elegir', texto: 'Elegir…' },
+        ],
+        pagosRango: '',
+        pagosDesde: '',
+        pagosHasta: '',
+        errorRangoPagos: '',
+        pagosCreadoPor: '',
+        ordenPagos: 'fecha',
+        dirPagos: 'asc',
+        pagosUsuariosAbierto: false,
 
         // Hoja "Nuevo / Editar compromiso"
         sheetCompromiso: false,
@@ -34,11 +64,47 @@ function pagosModule() {
         pagosVolverAFicha: false,
 
         iniciarPagos() {
+            try {
+                const vista = localStorage.getItem('agenda.pagos.vista');
+                if (['agenda', 'tabla', 'tarjetas'].includes(vista)) this.vistaPagos = vista;
+            } catch (error) {
+                // Sin almacenamiento (ventana privada, etc.): queda la vista por defecto.
+            }
+            // La tabla necesita ancho; al cruzar los 900 px cambia la vista que se muestra.
+            const ancha = window.matchMedia('(min-width: 900px)');
+            this.pagosAncho = ancha.matches;
+            ancha.addEventListener('change', (evento) => {
+                this.pagosAncho = evento.matches;
+                if (this.vistaPagos === 'tabla') this.cargarPagos(true);
+            });
             this.cargarPagos(true);
         },
 
+        // Los mismos parámetros arman el listado de la pantalla y el enlace del CSV.
+        consultaPagos() {
+            const query = new URLSearchParams({ estado: this.filtroPagos });
+            if (this.busquedaPagos.trim()) query.set('q', this.busquedaPagos.trim());
+            if (this.rangoPagosValido()) {
+                if (this.pagosDesde) query.set('desde', this.pagosDesde);
+                if (this.pagosHasta) query.set('hasta', this.pagosHasta);
+            }
+            if (this.pagosCreadoPor) query.set('creado_por', this.pagosCreadoPor);
+            const vista = this.vistaPagosEfectiva();
+            if (vista === 'agenda') {
+                // Agrupada por día: siempre por fecha; lo ya resuelto, lo más reciente primero.
+                query.set('orden', 'fecha');
+                query.set('dir', ['pagados', 'incumplidos'].includes(this.filtroPagos) ? 'desc' : 'asc');
+            } else if (vista === 'tabla') {
+                query.set('orden', this.ordenPagos);
+                query.set('dir', this.dirPagos);
+            }
+            return query;
+        },
+
         async cargarPagos(reiniciar = false) {
-            if (this.cargandoPagos) return;
+            if (this.cargandoPagos && !reiniciar) return;
+            // Una carga nueva reemplaza a la que esté en curso: la respuesta vieja se descarta.
+            const solicitud = ++this.pagosSolicitud;
             if (reiniciar) {
                 this.paginaPagos = 1;
                 this.pagos = [];
@@ -46,26 +112,288 @@ function pagosModule() {
             this.cargandoPagos = true;
             this.errorPagos = '';
             try {
-                const query = new URLSearchParams({ estado: this.filtroPagos, pagina: String(this.paginaPagos) });
-                if (this.busquedaPagos.trim()) query.set('q', this.busquedaPagos.trim());
+                const query = this.consultaPagos();
+                query.set('pagina', String(this.paginaPagos));
                 const result = await this.api(`api/compromisos.php?${query}`);
+                if (solicitud !== this.pagosSolicitud) return;
                 const data = result.data;
                 this.pagos = this.paginaPagos === 1 ? data.items : [...this.pagos, ...data.items];
                 this.hayMasPagos = data.hay_mas;
                 this.resumenPagos = data.resumen;
+                this.resumenPagosFiltrado = data.resumen_filtrado;
+                this.pagosResumenFiltrado = data.filtros_activos;
+                this.totalesPagos = data.totales;
+                this.pagosPorDia = Object.fromEntries(data.por_dia.map((dia) => [dia.dia, dia]));
+                this.pagosPorUsuario = data.por_usuario;
                 this.badgePagos = data.resumen.vencidos.cantidad + data.resumen.hoy.cantidad;
                 this.paginaPagos += 1;
                 this.refrescarIconos();
             } catch (error) {
-                this.errorPagos = error.message;
+                if (solicitud === this.pagosSolicitud) this.errorPagos = error.message;
             } finally {
-                this.cargandoPagos = false;
+                if (solicitud === this.pagosSolicitud) this.cargandoPagos = false;
             }
         },
 
         filtrarPagos(filtro) {
             this.filtroPagos = filtro;
             this.cargarPagos(true);
+        },
+
+        resumenVisiblePagos() {
+            return this.pagosResumenFiltrado ? this.resumenPagosFiltrado : this.resumenPagos;
+        },
+
+        // ---------- Vistas, fechas, "Cargó" y orden ----------
+
+        elegirVistaPagos(vista) {
+            if (vista === this.vistaPagos) return;
+            this.vistaPagos = vista;
+            try {
+                localStorage.setItem('agenda.pagos.vista', vista);
+            } catch (error) {
+                // Sin almacenamiento: la vista vale solo para esta sesión.
+            }
+            this.cargarPagos(true);
+        },
+
+        // En pantallas angostas la tabla no entra: se muestra la agenda.
+        vistaPagosEfectiva() {
+            return this.vistaPagos === 'tabla' && !this.pagosAncho ? 'agenda' : this.vistaPagos;
+        },
+
+        rangoPagosValido() {
+            return !(this.pagosDesde && this.pagosHasta && this.pagosHasta < this.pagosDesde);
+        },
+
+        // [desde, hasta] de cada atajo de fechas, en hora local (la semana arranca el lunes).
+        limitesRangoPagos(id) {
+            const hoy = new Date();
+            const dia = (fecha) => this.fechaIso(fecha);
+            if (id === 'semana') {
+                const lunes = this.desdeIso(this.inicioSemana(hoy));
+                const domingo = new Date(lunes);
+                domingo.setDate(lunes.getDate() + 6);
+                return [dia(lunes), dia(domingo)];
+            }
+            if (id === 'quince') {
+                const fin = new Date(hoy);
+                fin.setDate(hoy.getDate() + 14);
+                return [dia(hoy), dia(fin)];
+            }
+            if (id === 'mes') {
+                return [dia(new Date(hoy.getFullYear(), hoy.getMonth(), 1)), dia(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0))];
+            }
+            if (id === 'mespasado') {
+                return [dia(new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1)), dia(new Date(hoy.getFullYear(), hoy.getMonth(), 0))];
+            }
+            return ['', ''];
+        },
+
+        // Tocar de nuevo el atajo activo lo quita.
+        elegirRangoPagos(id) {
+            this.errorRangoPagos = '';
+            if (this.pagosRango === id) {
+                this.limpiarRangoPagos();
+                return;
+            }
+            this.pagosRango = id;
+            // "Elegir…" conserva las fechas del atajo anterior como punto de partida.
+            if (id === 'elegir') return;
+            [this.pagosDesde, this.pagosHasta] = this.limitesRangoPagos(id);
+            this.cargarPagos(true);
+        },
+
+        limpiarRangoPagos() {
+            const habia = Boolean(this.pagosDesde || this.pagosHasta);
+            this.pagosRango = '';
+            this.pagosDesde = '';
+            this.pagosHasta = '';
+            this.errorRangoPagos = '';
+            if (habia) this.cargarPagos(true);
+        },
+
+        // Se llama al cambiar una de las dos fechas de "Elegir…".
+        aplicarRangoPagos() {
+            if (!this.rangoPagosValido()) {
+                this.errorRangoPagos = 'La fecha «hasta» es anterior a «desde».';
+                return;
+            }
+            this.errorRangoPagos = '';
+            this.cargarPagos(true);
+        },
+
+        // "Yo" ya es una opción propia: el resto de la lista no lo repite.
+        otrosUsuariosPagos() {
+            return this.pagosPorUsuario.filter((u) => u.usuario_id === null || Number(u.usuario_id) !== Number(this.usuarioActual.id));
+        },
+
+        valorFiltroUsuarioPagos(usuario) {
+            const propio = usuario.usuario_id !== null && Number(usuario.usuario_id) === Number(this.usuarioActual.id);
+            return propio ? 'yo' : usuario.filtro;
+        },
+
+        usuarioPagosActivo(usuario) {
+            return this.pagosCreadoPor === this.valorFiltroUsuarioPagos(usuario);
+        },
+
+        // Tocar un usuario del resumen filtra por él; tocarlo otra vez quita el filtro.
+        filtrarPorUsuarioPagos(usuario) {
+            const valor = this.valorFiltroUsuarioPagos(usuario);
+            this.pagosCreadoPor = this.pagosCreadoPor === valor ? '' : valor;
+            this.cargarPagos(true);
+        },
+
+        nombreCreadoPorPagos() {
+            if (this.pagosCreadoPor === 'yo') return 'yo';
+            const usuario = this.pagosPorUsuario.find((u) => u.filtro === this.pagosCreadoPor);
+            return usuario ? usuario.nombre : this.pagosCreadoPor.replace(/^ex:/, '');
+        },
+
+        fechaCortaPago(iso) {
+            if (!iso) return '';
+            const [anio, mes, dia] = iso.split('-');
+            return anio === String(new Date().getFullYear()) ? `${dia}/${mes}` : `${dia}/${mes}/${anio}`;
+        },
+
+        textoRangoPagos() {
+            const atajo = this.rangosPagos.find((r) => r.id === this.pagosRango && r.id !== 'elegir');
+            const desde = this.fechaCortaPago(this.pagosDesde);
+            const hasta = this.fechaCortaPago(this.pagosHasta);
+            const fechas = desde && hasta ? `${desde} al ${hasta}` : (desde ? `desde ${desde}` : `hasta ${hasta}`);
+            return atajo ? `${atajo.texto} (${fechas})` : `Fechas: ${fechas}`;
+        },
+
+        // Filtros activos (menos el estado, que ya se ve en sus pastillas).
+        chipsPagos() {
+            const chips = [];
+            if (this.pagosDesde || this.pagosHasta) chips.push({ clave: 'rango', texto: this.textoRangoPagos() });
+            if (this.pagosCreadoPor) chips.push({ clave: 'creado', texto: `Cargó: ${this.nombreCreadoPorPagos()}` });
+            if (this.busquedaPagos.trim()) chips.push({ clave: 'texto', texto: `Búsqueda: «${this.busquedaPagos.trim()}»` });
+            return chips;
+        },
+
+        quitarFiltroPago(clave) {
+            if (clave === 'rango') {
+                this.limpiarRangoPagos();
+                return;
+            }
+            if (clave === 'creado') this.pagosCreadoPor = '';
+            if (clave === 'texto') this.busquedaPagos = '';
+            this.cargarPagos(true);
+        },
+
+        limpiarFiltrosPagos() {
+            this.pagosRango = '';
+            this.pagosDesde = '';
+            this.pagosHasta = '';
+            this.errorRangoPagos = '';
+            this.pagosCreadoPor = '';
+            this.busquedaPagos = '';
+            this.cargarPagos(true);
+        },
+
+        ordenarPagosPor(columna) {
+            if (this.ordenPagos === columna) {
+                this.dirPagos = this.dirPagos === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.ordenPagos = columna;
+                // Importes y atrasos: lo más grande primero; el resto, de la A a la Z / lo más antiguo.
+                this.dirPagos = ['monto', 'atraso'].includes(columna) ? 'desc' : 'asc';
+            }
+            this.cargarPagos(true);
+        },
+
+        ariaOrdenPagos(columna) {
+            if (this.ordenPagos !== columna) return 'none';
+            return this.dirPagos === 'asc' ? 'ascending' : 'descending';
+        },
+
+        // CSV de lo que se está viendo: mismos filtros y orden.
+        urlCsvPagos() {
+            return `api/compromisos.php?${this.consultaPagos()}&formato=csv`;
+        },
+
+        // ---------- Agenda: compromisos agrupados por día ----------
+
+        // La cantidad y el total de cada día vienen del servidor (todo el filtro), así que el
+        // subtotal es exacto aunque el día quede partido entre dos páginas.
+        gruposPagos() {
+            const hoy = this.fechaIso(new Date());
+            const grupos = new Map();
+            for (const pago of this.pagos) {
+                const dia = pago.fecha_compromiso.slice(0, 10);
+                if (!grupos.has(dia)) {
+                    const total = this.pagosPorDia[dia];
+                    let tipo = 'resuelto';
+                    if (dia === hoy) tipo = 'hoy';
+                    else if (dia > hoy) tipo = 'proximo';
+                    else if (total && Number(total.pendiente) > 0) tipo = 'vencido';
+                    grupos.set(dia, {
+                        dia, tipo, titulo: this.tituloDiaPago(dia, hoy),
+                        cantidad: total ? Number(total.cantidad) : 0, monto: total ? total.monto : 0, items: [],
+                    });
+                }
+                grupos.get(dia).items.push(pago);
+            }
+            for (const grupo of grupos.values()) {
+                if (!grupo.cantidad) {
+                    grupo.cantidad = grupo.items.length;
+                    grupo.monto = grupo.items.reduce((suma, pago) => suma + Number(pago.monto), 0);
+                }
+            }
+            return [...grupos.values()];
+        },
+
+        tituloDiaPago(dia, hoy) {
+            const fecha = this.desdeIso(dia);
+            const texto = new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'short' })
+                .format(fecha).replace(',', '').replace('.', '');
+            const titulo = texto.charAt(0).toUpperCase() + texto.slice(1);
+            const vecino = (dias) => {
+                const otro = new Date();
+                otro.setDate(otro.getDate() + dias);
+                return this.fechaIso(otro);
+            };
+            if (dia === hoy) return `Hoy · ${titulo}`;
+            if (dia === vecino(1)) return `Mañana · ${titulo}`;
+            if (dia === vecino(-1)) return `Ayer · ${titulo}`;
+            return titulo;
+        },
+
+        detallePagoFila(pago) {
+            return [pago.concepto || 'Sin concepto', pago.creado_por_nombre ? `Cargó: ${pago.creado_por_nombre}` : ''].filter(Boolean).join(' · ');
+        },
+
+        // "Vencido · 2 días" (pendiente o incumplido) o "Pagado · 2 días tarde" (cobrado después de la fecha).
+        estadoAtrasoPago(pago) {
+            const etiqueta = this.etiquetaPago(pago);
+            const dias = Number(pago.dias_atraso) || 0;
+            if (dias <= 0) return etiqueta;
+            const texto = `${dias} ${dias === 1 ? 'día' : 'días'}`;
+            return ['pagado', 'parcial'].includes(pago.estado) ? `${etiqueta} · ${texto} tarde` : `${etiqueta} · ${texto}`;
+        },
+
+        // ---------- Tabla ----------
+
+        fechaTablaPago(pago) {
+            const fecha = new Date(pago.fecha_compromiso.replace(' ', 'T'));
+            const dia = new Intl.DateTimeFormat('es-AR', { weekday: 'short' }).format(fecha).replace('.', '');
+            const pad = (valor) => String(valor).padStart(2, '0');
+            return `${dia} ${pad(fecha.getDate())}/${pad(fecha.getMonth() + 1)}`;
+        },
+
+        atrasoTablaPago(pago) {
+            const dias = Number(pago.dias_atraso) || 0;
+            return dias > 0 ? `${dias} d` : '—';
+        },
+
+        // Importes para espacios chicos: $950 · $45 mil · $1,2 M.
+        formatoMontoCompacto(valor) {
+            const numero = Math.round(Math.abs(Number(valor || 0)));
+            if (numero < 1000) return `$${numero}`;
+            const escala = (divisor) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: numero / divisor >= 100 ? 0 : 1 }).format(numero / divisor);
+            return numero < 999500 ? `$${escala(1000)} mil` : `$${escala(1000000)} M`;
         },
 
         // Dinero en pesos argentinos, sin decimales cuando son ",00".
@@ -127,23 +455,52 @@ function pagosModule() {
                 .reduce((total, [, items]) => total + items.length, 0);
         },
 
-        // Lo que se dibuja en cada día de la grilla: recontactos y pagos juntos,
-        // por hora. Cada uno lleva su clave, porque un contacto puede tener ambos.
-        eventosCelda(iso) {
-            const recontactos = this.eventosDia(iso).map((e) => ({ ...e, kind: 'recontacto', clave: `e-${e.id}-${e.fecha_evento}` }));
-            const pagos = this.pagosDia(iso).map((p) => ({ ...p, kind: 'pago', clave: `pg-${p.id}` }));
-            return [...recontactos, ...pagos].sort((a, b) => a.fecha_evento.localeCompare(b.fecha_evento));
+        // Lo que hay para cobrar un día: solo pendientes. "vencido" si el día ya pasó.
+        cobroDia(iso) {
+            const pendientes = this.pagosDia(iso).filter((pago) => pago.estado === 'pendiente');
+            return {
+                cantidad: pendientes.length,
+                monto: pendientes.reduce((suma, pago) => suma + Number(pago.monto), 0),
+                vencido: pendientes.length > 0 && iso < this.fechaIso(new Date()),
+            };
         },
 
-        textoCeldaCalendario(evento) {
-            if (evento.kind === 'pago') return `${this.formatoMonto(evento.monto)} ${evento.contacto_nombre}`;
-            return `${this.fechaCorta(evento.fecha_evento)} ${evento.nombre}`;
+        // Intensidad de 1 a 4 según el lugar del día entre los días con cobros del mes visible
+        // (cuartiles); 0 si no hay nada para cobrar o el día es de relleno de otro mes.
+        nivelCobroDia(iso) {
+            const prefijo = this.mesVisible.slice(0, 7);
+            if (!iso.startsWith(prefijo)) return 0;
+            const monto = this.cobroDia(iso).monto;
+            if (monto <= 0) return 0;
+            const montos = Object.keys(this.agenda.pagos_por_dia || {})
+                .filter((dia) => dia.startsWith(prefijo))
+                .map((dia) => this.cobroDia(dia).monto)
+                .filter((valor) => valor > 0);
+            const hastaEste = montos.filter((valor) => valor <= monto).length;
+            return Math.min(4, Math.max(1, Math.ceil((hastaEste * 4) / montos.length)));
         },
 
-        // Pendiente: abre "Registrar pago". Ya resuelto: abre la ficha (ahí se puede deshacer).
-        abrirPagoCalendario(pago) {
-            if (pago.estado === 'pendiente') this.abrirPagoResolver(pago);
-            else this.abrirFicha(pago.contacto_id);
+        // Clases de la celda. Tiene que ser un objeto: Alpine no admite objetos dentro de un array en :class.
+        claseCeldaCalendario(dia) {
+            const nivel = this.nivelCobroDia(dia.iso);
+            return {
+                'calendario-dia--fuera': !dia.esMesActual,
+                'calendario-dia--hoy': dia.esHoy,
+                'calendario-dia--seleccionado': this.diaSeleccionado === dia.iso,
+                [`calendario-dia--cobro-${nivel}`]: nivel > 0,
+            };
+        },
+
+        // Lectura de pantalla de la celda: el color solo no alcanza.
+        etiquetaCeldaCalendario(dia) {
+            const partes = [new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(this.desdeIso(dia.iso))];
+            const cobro = this.cobroDia(dia.iso);
+            if (cobro.cantidad) {
+                partes.push(`${this.formatoMonto(cobro.monto)} a cobrar en ${cobro.cantidad === 1 ? '1 pago' : `${cobro.cantidad} pagos`}${cobro.vencido ? ' vencidos' : ''}`);
+            }
+            const recontactos = this.eventosDia(dia.iso).length;
+            if (recontactos) partes.push(recontactos === 1 ? '1 recontacto' : `${recontactos} recontactos`);
+            return partes.join(', ');
         },
 
         // Clase de cada compromiso dentro de la ficha del contacto.
@@ -382,10 +739,6 @@ function pagosModule() {
         // ---------- Refresco y vuelta a la ficha ----------
 
         async pagosRefrescar(contactoId) {
-            // cargarPagos() sale sin hacer nada si ya hay una carga en curso.
-            for (let intento = 0; intento < 20 && this.cargandoPagos; intento += 1) {
-                await new Promise((resolve) => setTimeout(resolve, 100));
-            }
             await Promise.all([this.cargarPagos(true), this.cargarPanel(), this.cargarAgendaMes(), this.cargarContactos(true)]);
             if (contactoId && this.contactoActual && Number(this.contactoActual.id) === Number(contactoId)) {
                 const result = await this.api(`api/contactos.php?id=${contactoId}`);

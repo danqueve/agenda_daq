@@ -263,7 +263,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                 <div class="screen__body">
                     <div class="calendario-toolbar">
                         <div class="segmented" role="tablist" aria-label="Vista del calendario" style="margin-bottom:0; max-width:260px">
-                            <button type="button" class="segmented__option" role="tab" :aria-selected="vistaCalendario === 'mes'" @click="vistaCalendario = 'mes'">Mes</button>
+                            <button type="button" class="segmented__option" role="tab" :aria-selected="vistaCalendario === 'mes'" @click="vistaCalendario = 'mes'; refrescarIconos()">Mes</button>
                             <button type="button" class="segmented__option" role="tab" :aria-selected="vistaCalendario === 'semana'" @click="vistaCalendario = 'semana'">Semana</button>
                             <button type="button" class="segmented__option" role="tab" :aria-selected="vistaCalendario === 'dia'" @click="vistaCalendario = 'dia'">Día</button>
                         </div>
@@ -280,13 +280,18 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 <div class="calendario-grid">
                                     <template x-for="letra in ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']" :key="letra"><div class="calendario-grid__encabezado" x-text="letra"></div></template>
                                     <template x-for="dia in diasDelMes()" :key="dia.iso">
-                                        <button type="button" class="calendario-dia" :class="{'calendario-dia--fuera': !dia.esMesActual, 'calendario-dia--hoy': dia.esHoy, 'calendario-dia--seleccionado': diaSeleccionado === dia.iso}" @click="seleccionarDia(dia.iso)">
+                                        <button type="button" class="calendario-dia" :class="claseCeldaCalendario(dia)" :aria-label="etiquetaCeldaCalendario(dia)" @click="seleccionarDia(dia.iso)">
                                             <span class="calendario-dia__numero" x-text="dia.numero"></span>
                                             <div class="calendario-dia__eventos">
-                                                <template x-for="evento in eventosCelda(dia.iso).slice(0, 2)" :key="evento.clave">
-                                                    <span class="calendario-evento" :class="[`calendario-evento--${evento.tipo_evento}`, {'calendario-evento--pago': evento.kind === 'pago', 'calendario-evento--tachado': evento.kind !== 'pago' && resultadoEventoAbierto && eventoAbierto?.id === evento.id}]" @click.stop="evento.kind === 'pago' ? abrirPagoCalendario(evento) : abrirEventoCalendario(evento)" x-text="textoCeldaCalendario(evento)"></span>
+                                                <template x-if="cobroDia(dia.iso).cantidad">
+                                                    <span class="calendario-dia__cobro" :class="{'calendario-dia__cobro--vencido': cobroDia(dia.iso).vencido}">
+                                                        <strong class="calendario-dia__monto tabular" x-text="formatoMontoCompacto(cobroDia(dia.iso).monto)"></strong>
+                                                        <span class="calendario-dia__cantidad" x-text="cobroDia(dia.iso).cantidad === 1 ? '1 pago' : `${cobroDia(dia.iso).cantidad} pagos`"></span>
+                                                    </span>
                                                 </template>
-                                                <span class="calendario-mas" x-show="eventosCelda(dia.iso).length > 2" x-text="`+${eventosCelda(dia.iso).length - 2} más`"></span>
+                                                <template x-if="eventosDia(dia.iso).length">
+                                                    <span class="calendario-dia__recontactos"><i data-lucide="phone"></i><span class="tabular" x-text="eventosDia(dia.iso).length"></span></span>
+                                                </template>
                                             </div>
                                         </button>
                                     </template>
@@ -395,6 +400,12 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 <span class="calendario-leyenda__item"><span class="calendario-leyenda__punto calendario-leyenda__punto--proximo"></span>Próximo</span>
                                 <span class="calendario-leyenda__item"><span class="calendario-leyenda__punto calendario-leyenda__punto--hecho"></span>Hecho</span>
                                 <span class="calendario-leyenda__item"><span class="calendario-leyenda__punto calendario-leyenda__punto--incumplido"></span>Incumplido</span>
+                            </div>
+
+                            <div class="calendario-leyenda calendario-leyenda--cobro" x-show="vistaCalendario === 'mes'">
+                                <span class="calendario-leyenda__titulo">A cobrar por día</span>
+                                <span class="calendario-leyenda__item">Menos<span class="calendario-leyenda__escala" aria-hidden="true"><span class="calendario-leyenda__nivel calendario-leyenda__nivel--1"></span><span class="calendario-leyenda__nivel calendario-leyenda__nivel--2"></span><span class="calendario-leyenda__nivel calendario-leyenda__nivel--3"></span><span class="calendario-leyenda__nivel calendario-leyenda__nivel--4"></span></span>Más</span>
+                                <span class="calendario-leyenda__item"><strong class="calendario-leyenda__rojo">$ en rojo</strong>pagos vencidos</span>
                             </div>
 
                             <div class="sheet-backdrop cal-evento-sheet" x-show="eventoAbierto" x-transition.opacity @keydown.escape.window="cerrarEventoCalendario()" @click.self="cerrarEventoCalendario()" x-cloak>
@@ -574,10 +585,20 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                     <p class="error-inline" x-show="errorPagos" x-text="errorPagos"></p>
 
                     <div class="stat-card-grid stat-card-grid--montos">
-                        <div class="stat-card stat-card--vencido"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Vencidos</span><span class="stat-card__icono"><i data-lucide="alert-circle"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenPagos.vencidos.monto)"></strong><p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenPagos.vencidos.cantidad)"></p></div>
-                        <div class="stat-card stat-card--hoy"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Para hoy</span><span class="stat-card__icono"><i data-lucide="clock"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenPagos.hoy.monto)"></strong><p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenPagos.hoy.cantidad)"></p></div>
-                        <div class="stat-card stat-card--proximo"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Próximos 7 días</span><span class="stat-card__icono"><i data-lucide="calendar-days"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenPagos.proximos.monto)"></strong><p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenPagos.proximos.cantidad)"></p></div>
-                        <div class="stat-card stat-card--concreto"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Cobrado</span><span class="stat-card__icono"><i data-lucide="check"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenPagos.cobrado_mes)"></strong><p class="stat-card__ayuda">Este mes</p></div>
+                        <div class="stat-card stat-card--vencido"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Vencidos</span><span class="stat-card__icono"><i data-lucide="alert-circle"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().vencidos.monto)"></strong><p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenVisiblePagos().vencidos.cantidad)"></p></div>
+                        <div class="stat-card stat-card--hoy"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Para hoy</span><span class="stat-card__icono"><i data-lucide="clock"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().hoy.monto)"></strong><p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenVisiblePagos().hoy.cantidad)"></p></div>
+                        <div class="stat-card stat-card--proximo"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Próximos 7 días</span><span class="stat-card__icono"><i data-lucide="calendar-days"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().proximos.monto)"></strong><p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenVisiblePagos().proximos.cantidad)"></p></div>
+                        <div class="stat-card stat-card--concreto"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Cobrado</span><span class="stat-card__icono"><i data-lucide="check"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().cobrado_mes)"></strong><p class="stat-card__ayuda">Este mes</p></div>
+                    </div>
+                    <p class="pagos-nota" x-show="pagosResumenFiltrado" x-cloak><i data-lucide="filter"></i><span>Estos totales cuentan solo lo que cumple el filtro de fechas y de quién lo cargó.</span><button class="btn-texto" type="button" @click="limpiarFiltrosPagos()">Quitar filtros</button></p>
+
+                    <div class="pagos-barra">
+                        <div class="segmented pagos-vistas" role="tablist" aria-label="Vista de los pagos">
+                            <button type="button" class="segmented__option" role="tab" :aria-selected="vistaPagosEfectiva() === 'agenda'" @click="elegirVistaPagos('agenda')"><i data-lucide="list"></i>Agenda</button>
+                            <button type="button" class="segmented__option pagos-vistas__tabla" role="tab" :aria-selected="vistaPagosEfectiva() === 'tabla'" @click="elegirVistaPagos('tabla')"><i data-lucide="table-2"></i>Tabla</button>
+                            <button type="button" class="segmented__option" role="tab" :aria-selected="vistaPagosEfectiva() === 'tarjetas'" @click="elegirVistaPagos('tarjetas')"><i data-lucide="layout-grid"></i>Tarjetas</button>
+                        </div>
+                        <a class="pagos-csv" :href="urlCsvPagos()" download><i data-lucide="download"></i>Exportar CSV</a>
                     </div>
 
                     <div class="filtro-pills pagos-filtros" role="tablist" aria-label="Estado de los compromisos">
@@ -586,37 +607,173 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                         </template>
                     </div>
 
-                    <section class="card-pastel-grid" aria-label="Compromisos de pago">
-                        <template x-for="pago in pagos" :key="`pago-${pago.id}`">
-                            <article class="card-pastel" :class="clasePago(pago)">
-                                <div class="card-pastel__head">
-                                    <button type="button" class="card-pastel__persona" @click="abrirFicha(pago.contacto_id)">
-                                        <span class="avatar" :style="`background:${colorAvatar(pago.contacto_nombre)}`" x-text="iniciales(pago.contacto_nombre)"></span>
-                                        <span class="card-pastel__cuerpo">
-                                            <span class="card-pastel__nombre" x-text="pago.contacto_nombre"></span>
-                                            <span class="card-pastel__detalle" x-text="pago.concepto || 'Sin concepto'"></span>
-                                        </span>
-                                    </button>
-                                    <span class="chip-estado chip-estado--estado" x-text="etiquetaPago(pago)"></span>
-                                </div>
-                                <p class="card-pastel__monto tabular" x-text="montoPagoTexto(pago)"></p>
-                                <p class="card-pastel__fecha tabular"><i data-lucide="calendar-days"></i><span x-text="fechaPago(pago)"></span></p>
-                                <p class="card-pastel__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
-                                <div class="card-pastel__acciones">
-                                    <a class="quick-action-card quick-action-card--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
-                                    <a class="quick-action-card quick-action-card--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
-                                    <button type="button" class="quick-action-card quick-action-card--cobrar" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)"><i data-lucide="hand-coins"></i>Registrar</button>
-                                    <button type="button" class="quick-action-card quick-action-card--deshacer" x-show="pago.estado !== 'pendiente'" @click="reabrirCompromiso(pago)"><i data-lucide="rotate-ccw"></i>Deshacer</button>
-                                </div>
-                            </article>
+                    <div class="pagos-filtros-extra">
+                        <div class="filtro-pills" role="group" aria-label="Fecha del pago">
+                            <template x-for="rango in rangosPagos" :key="rango.id">
+                                <button class="filtro-pill" type="button" :aria-pressed="pagosRango === rango.id" @click="elegirRangoPagos(rango.id)" x-text="rango.texto"></button>
+                            </template>
+                        </div>
+                        <label class="pagos-campo">
+                            <span class="pagos-campo__rotulo">Cargó</span>
+                            <select x-model="pagosCreadoPor" @change="cargarPagos(true)">
+                                <option value="">Todos</option>
+                                <option value="yo">Yo</option>
+                                <template x-for="usuario in otrosUsuariosPagos()" :key="usuario.filtro">
+                                    <option :value="usuario.filtro" x-text="usuario.usuario_id === null ? `${usuario.nombre} (cuenta eliminada)` : usuario.nombre"></option>
+                                </template>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="pagos-rango" x-show="pagosRango === 'elegir'" x-cloak>
+                        <label class="pagos-campo"><span class="pagos-campo__rotulo">Desde</span><input type="date" x-model="pagosDesde" @click="abrirSelectorFecha($event.target)" @change="aplicarRangoPagos()"></label>
+                        <label class="pagos-campo"><span class="pagos-campo__rotulo">Hasta</span><input type="date" x-model="pagosHasta" @click="abrirSelectorFecha($event.target)" @change="aplicarRangoPagos()"></label>
+                        <p class="error-inline" role="alert" x-show="errorRangoPagos" x-text="errorRangoPagos"></p>
+                    </div>
+                    <div class="pagos-chips" role="group" aria-label="Filtros activos" x-show="chipsPagos().length" x-cloak>
+                        <template x-for="chip in chipsPagos()" :key="chip.clave">
+                            <button class="chip-filtro" type="button" @click="quitarFiltroPago(chip.clave)" :aria-label="`Quitar filtro: ${chip.texto}`"><span x-text="chip.texto"></span><i data-lucide="x"></i></button>
                         </template>
+                        <button class="btn-texto" type="button" x-show="chipsPagos().length > 1" @click="limpiarFiltrosPagos()">Limpiar todo</button>
+                    </div>
+
+                    <section class="pagos-usuarios" x-show="pagosPorUsuario.length" x-cloak>
+                        <button class="pagos-usuarios__cabecera" type="button" :aria-expanded="pagosUsuariosAbierto" aria-controls="pagos-usuarios-cuerpo" @click="pagosUsuariosAbierto = !pagosUsuariosAbierto">
+                            <i data-lucide="users"></i>
+                            <span class="pagos-usuarios__titulo">Por usuario</span>
+                            <span class="pagos-usuarios__cuenta tabular" x-text="pagosPorUsuario.length"></span>
+                            <i data-lucide="chevron-down" class="pagos-usuarios__flecha"></i>
+                        </button>
+                        <div class="pagos-usuarios__cuerpo" id="pagos-usuarios-cuerpo" x-show="pagosUsuariosAbierto" x-cloak>
+                            <p class="pagos-usuarios__ayuda">Tocá un usuario para ver solo lo que cargó. Cumplimiento: lo cobrado sobre lo prometido para fechas de este mes que ya llegaron.</p>
+                            <template x-for="usuario in pagosPorUsuario" :key="usuario.filtro">
+                                <button class="pagos-usuario" type="button" :aria-pressed="usuarioPagosActivo(usuario)" @click="filtrarPorUsuarioPagos(usuario)">
+                                    <span class="pagos-usuario__nombre"><span x-text="usuario.nombre"></span><small x-show="usuario.usuario_id === null">cuenta eliminada</small></span>
+                                    <span class="pagos-usuario__dato"><span class="pagos-usuario__rotulo">Pendientes</span><strong class="tabular" x-text="formatoMontoCompacto(usuario.pendientes.monto)" :title="formatoMonto(usuario.pendientes.monto)"></strong><span class="pagos-usuario__sub" x-text="cantidadPagosTexto(usuario.pendientes.cantidad)"></span></span>
+                                    <span class="pagos-usuario__dato" :class="{'pagos-usuario__dato--alerta': usuario.vencidos.cantidad > 0}"><span class="pagos-usuario__rotulo">Vencido</span><strong class="tabular" x-text="formatoMontoCompacto(usuario.vencidos.monto)" :title="formatoMonto(usuario.vencidos.monto)"></strong><span class="pagos-usuario__sub" x-text="cantidadPagosTexto(usuario.vencidos.cantidad)"></span></span>
+                                    <span class="pagos-usuario__dato"><span class="pagos-usuario__rotulo">Cobrado en el mes</span><strong class="tabular" x-text="formatoMontoCompacto(usuario.cobrado_mes)" :title="formatoMonto(usuario.cobrado_mes)"></strong></span>
+                                    <span class="pagos-usuario__dato"><span class="pagos-usuario__rotulo">Cumplimiento</span><strong class="tabular" x-text="usuario.cumplimiento_mes === null ? 'Sin datos' : `${usuario.cumplimiento_mes}%`"></strong><span class="pagos-barra-fina" aria-hidden="true"><span :style="`--valor:${Math.min(usuario.cumplimiento_mes || 0, 100)}%`"></span></span></span>
+                                </button>
+                            </template>
+                        </div>
                     </section>
+
+                    <template x-if="vistaPagosEfectiva() === 'agenda'">
+                        <div class="pagos-agenda">
+                            <template x-for="grupo in gruposPagos()" :key="grupo.dia">
+                                <section class="pagos-dia" :class="`pagos-dia--${grupo.tipo}`">
+                                    <header class="pagos-dia__cabecera">
+                                        <h2 class="pagos-dia__titulo" x-text="grupo.titulo"></h2>
+                                        <p class="pagos-dia__resumen tabular"><span x-text="cantidadPagosTexto(grupo.cantidad)"></span><strong x-text="formatoMontoCompacto(grupo.monto)" :title="formatoMonto(grupo.monto)"></strong></p>
+                                    </header>
+                                    <div class="pagos-dia__lista">
+                                        <template x-for="pago in grupo.items" :key="`pf-${pago.id}`">
+                                            <article class="pago-fila" :class="`pago-fila--${pago.situacion}`">
+                                                <button type="button" class="pago-fila__persona" @click="abrirFicha(pago.contacto_id)">
+                                                    <span class="pago-fila__nombre" x-text="pago.contacto_nombre"></span>
+                                                    <span class="pago-fila__detalle" x-text="detallePagoFila(pago)"></span>
+                                                </button>
+                                                <strong class="pago-fila__monto tabular" x-text="montoPagoTexto(pago)"></strong>
+                                                <span class="chip-estado chip-estado--estado pago-fila__estado" x-text="estadoAtrasoPago(pago)"></span>
+                                                <div class="pago-fila__acciones">
+                                                <a class="pago-icono pago-icono--llamar" :href="`tel:+${pago.contacto_celular_norm}`" :title="`Llamar a ${pago.contacto_nombre}`" :aria-label="`Llamar a ${pago.contacto_nombre}`"><i data-lucide="phone"></i></a>
+                                                <a class="pago-icono pago-icono--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`" :title="`WhatsApp a ${pago.contacto_nombre}`" :aria-label="`WhatsApp a ${pago.contacto_nombre}`"><i data-lucide="message-circle"></i></a>
+                                                <button type="button" class="pago-icono pago-icono--cobrar" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)" :title="`Registrar pago de ${pago.contacto_nombre}`" :aria-label="`Registrar pago de ${pago.contacto_nombre}`"><i data-lucide="hand-coins"></i></button>
+                                                <button type="button" class="pago-icono pago-icono--deshacer" x-show="pago.estado !== 'pendiente'" @click="reabrirCompromiso(pago)" :title="`Deshacer el registro de ${pago.contacto_nombre}`" :aria-label="`Deshacer el registro de ${pago.contacto_nombre}`"><i data-lucide="rotate-ccw"></i></button>
+                                                </div>
+                                            </article>
+                                        </template>
+                                    </div>
+                                </section>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template x-if="vistaPagosEfectiva() === 'tabla'">
+                        <div class="pagos-tabla-envoltorio" role="region" aria-label="Tabla de compromisos de pago" tabindex="0">
+                            <table class="pagos-tabla">
+                                <caption class="sr-only">Compromisos de pago. Se pueden ordenar las columnas Fecha, Cliente, Monto, Atraso y Cargó.</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" :aria-sort="ariaOrdenPagos('fecha')"><button type="button" class="pagos-tabla__orden" @click="ordenarPagosPor('fecha')">Fecha</button></th>
+                                        <th scope="col" :aria-sort="ariaOrdenPagos('cliente')"><button type="button" class="pagos-tabla__orden" @click="ordenarPagosPor('cliente')">Cliente</button></th>
+                                        <th scope="col">Concepto</th>
+                                        <th scope="col" class="pagos-tabla__num" :aria-sort="ariaOrdenPagos('monto')"><button type="button" class="pagos-tabla__orden" @click="ordenarPagosPor('monto')">Monto</button></th>
+                                        <th scope="col">Estado</th>
+                                        <th scope="col" class="pagos-tabla__num" :aria-sort="ariaOrdenPagos('atraso')"><button type="button" class="pagos-tabla__orden" @click="ordenarPagosPor('atraso')">Atraso</button></th>
+                                        <th scope="col" :aria-sort="ariaOrdenPagos('creado_por')"><button type="button" class="pagos-tabla__orden" @click="ordenarPagosPor('creado_por')">Cargó</button></th>
+                                        <th scope="col">Resolvió</th>
+                                        <th scope="col"><span class="sr-only">Acciones</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="pago in pagos" :key="`pt-${pago.id}`">
+                                        <tr :class="`pagos-tabla__fila--${pago.situacion}`">
+                                            <td class="tabular" x-text="fechaTablaPago(pago)"></td>
+                                            <td><button type="button" class="pagos-tabla__cliente" @click="abrirFicha(pago.contacto_id)" x-text="pago.contacto_nombre"></button></td>
+                                            <td x-text="pago.concepto || '—'"></td>
+                                            <td class="pagos-tabla__num tabular" x-text="montoPagoTexto(pago)"></td>
+                                            <td><span class="chip-estado chip-estado--estado" x-text="etiquetaPago(pago)"></span></td>
+                                            <td class="pagos-tabla__num tabular" x-text="atrasoTablaPago(pago)"></td>
+                                            <td x-text="pago.creado_por_nombre || 'Sin registrar'"></td>
+                                            <td x-text="pago.resuelto_por_nombre || '—'"></td>
+                                            <td>
+                                                <div class="pago-fila__acciones">
+                                                <a class="pago-icono pago-icono--llamar" :href="`tel:+${pago.contacto_celular_norm}`" :title="`Llamar a ${pago.contacto_nombre}`" :aria-label="`Llamar a ${pago.contacto_nombre}`"><i data-lucide="phone"></i></a>
+                                                <a class="pago-icono pago-icono--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`" :title="`WhatsApp a ${pago.contacto_nombre}`" :aria-label="`WhatsApp a ${pago.contacto_nombre}`"><i data-lucide="message-circle"></i></a>
+                                                <button type="button" class="pago-icono pago-icono--cobrar" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)" :title="`Registrar pago de ${pago.contacto_nombre}`" :aria-label="`Registrar pago de ${pago.contacto_nombre}`"><i data-lucide="hand-coins"></i></button>
+                                                <button type="button" class="pago-icono pago-icono--deshacer" x-show="pago.estado !== 'pendiente'" @click="reabrirCompromiso(pago)" :title="`Deshacer el registro de ${pago.contacto_nombre}`" :aria-label="`Deshacer el registro de ${pago.contacto_nombre}`"><i data-lucide="rotate-ccw"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th scope="row" colspan="3" x-text="`Total · ${cantidadPagosTexto(totalesPagos.cantidad)}`"></th>
+                                        <td class="pagos-tabla__num tabular" x-text="formatoMonto(totalesPagos.monto)"></td>
+                                        <td colspan="2" class="tabular" x-text="Number(totalesPagos.pagado) > 0 ? `Cobrado ${formatoMonto(totalesPagos.pagado)}` : ''"></td>
+                                        <td colspan="3"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </template>
+
+                    <template x-if="vistaPagosEfectiva() === 'tarjetas'">
+                        <section class="card-pastel-grid pagos-tarjetas" aria-label="Compromisos de pago">
+                            <template x-for="pago in pagos" :key="`pago-${pago.id}`">
+                                <article class="card-pastel" :class="clasePago(pago)">
+                                    <div class="card-pastel__head">
+                                        <button type="button" class="card-pastel__persona" @click="abrirFicha(pago.contacto_id)">
+                                            <span class="avatar" :style="`background:${colorAvatar(pago.contacto_nombre)}`" x-text="iniciales(pago.contacto_nombre)"></span>
+                                            <span class="card-pastel__cuerpo">
+                                                <span class="card-pastel__nombre" x-text="pago.contacto_nombre"></span>
+                                                <span class="card-pastel__detalle" x-text="pago.concepto || 'Sin concepto'"></span>
+                                            </span>
+                                        </button>
+                                        <span class="chip-estado chip-estado--estado" x-text="etiquetaPago(pago)"></span>
+                                    </div>
+                                    <p class="card-pastel__monto tabular" x-text="montoPagoTexto(pago)"></p>
+                                    <p class="card-pastel__fecha tabular"><i data-lucide="calendar-days"></i><span x-text="fechaPago(pago)"></span></p>
+                                    <p class="card-pastel__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
+                                    <div class="card-pastel__acciones">
+                                        <a class="quick-action-card quick-action-card--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
+                                        <a class="quick-action-card quick-action-card--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
+                                        <button type="button" class="quick-action-card quick-action-card--cobrar" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)"><i data-lucide="hand-coins"></i>Registrar</button>
+                                        <button type="button" class="quick-action-card quick-action-card--deshacer" x-show="pago.estado !== 'pendiente'" @click="reabrirCompromiso(pago)"><i data-lucide="rotate-ccw"></i>Deshacer</button>
+                                    </div>
+                                </article>
+                            </template>
+                        </section>
+                    </template>
 
                     <div class="empty-state" x-show="!cargandoPagos && !pagos.length && !errorPagos">
                         <i data-lucide="hand-coins"></i>
-                        <p class="body-text" x-text="busquedaPagos || filtroPagos !== 'pendientes' ? 'No encontramos compromisos con esos filtros' : 'Todavía no hay compromisos de pago'"></p>
-                        <button class="empty-state__boton" type="button" @click="abrirCompromisoNuevo()" x-show="!busquedaPagos && filtroPagos === 'pendientes'">Cargar compromiso</button>
+                        <p class="body-text" x-text="chipsPagos().length || filtroPagos !== 'pendientes' ? 'No encontramos compromisos con esos filtros' : 'Todavía no hay compromisos de pago'"></p>
+                        <button class="empty-state__boton" type="button" @click="limpiarFiltrosPagos()" x-show="chipsPagos().length">Quitar filtros</button>
+                        <button class="empty-state__boton" type="button" @click="abrirCompromisoNuevo()" x-show="!chipsPagos().length && filtroPagos === 'pendientes'">Cargar compromiso</button>
                     </div>
+                    <p class="pagos-conteo tabular" x-show="pagos.length && totalesPagos.cantidad > pagos.length" x-text="`Mostrando ${pagos.length} de ${totalesPagos.cantidad}`"></p>
                     <button class="btn-texto contacts-load-more" type="button" x-show="hayMasPagos" @click="cargarPagos()" :disabled="cargandoPagos" x-text="cargandoPagos ? 'Cargando…' : 'Cargar más compromisos'"></button>
                 </div>
             </section>

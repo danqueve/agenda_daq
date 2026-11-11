@@ -14,6 +14,17 @@ const COMPROMISO_SITUACION_SQL = "CASE
         ELSE 'proximo'
     END";
 
+/**
+ * Días de atraso, por día: un pendiente cuenta hasta hoy; uno ya registrado, los
+ * que pasaron entre la fecha prometida y el registro. Nunca es negativo.
+ * Requiere el alias `c`.
+ */
+const COMPROMISO_ATRASO_SQL = "CASE
+        WHEN c.estado = 'pendiente' THEN GREATEST(DATEDIFF(CURDATE(), DATE(c.fecha_compromiso)), 0)
+        WHEN c.fecha_resolucion IS NULL THEN 0
+        ELSE GREATEST(DATEDIFF(DATE(c.fecha_resolucion), DATE(c.fecha_compromiso)), 0)
+    END";
+
 /** Columnas que el frontend necesita de cada compromiso (alias `c`). */
 const COMPROMISO_COLUMNAS_SQL = 'c.id, c.contacto_id, c.monto, c.concepto, c.fecha_compromiso, c.estado, c.monto_pagado,
         c.fecha_resolucion, c.nota, c.origen_id, c.creado_por_nombre, c.resuelto_por_nombre, c.creado_en';

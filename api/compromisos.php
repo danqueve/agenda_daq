@@ -6,6 +6,17 @@ require_once __DIR__ . '/../app/api.php';
 require_once __DIR__ . '/../app/compromisos.php';
 
 const COMPROMISOS_POR_PAGINA = 30;
+const COMPROMISOS_CSV_MAXIMO = 5000;
+
+// Orden permitido para el listado: el valor recibido solo elige una clave de
+// este array, nunca se concatena al SQL.
+const COMPROMISOS_ORDEN = [
+    'fecha' => 'c.fecha_compromiso',
+    'monto' => 'c.monto',
+    'cliente' => 'k.nombre',
+    'atraso' => 'dias_atraso',
+    'creado_por' => 'c.creado_por_nombre',
+];
 
 /** @return array<string, mixed>|null */
 function compromiso_buscar(PDO $db, int $id): ?array
@@ -246,6 +257,193 @@ function compromiso_reabrir(PDO $db, int $id, array $actual): never
     json_response(['ok' => true, 'data' => compromiso_buscar($db, $id)]);
 }
 
+/** Fecha YYYY-MM-DD del query string, o null si no vino. 422 si no es una fecha real. */
+function compromiso_fecha_filtro(string $clave): ?string
+{
+    $valor = api_string($_GET, $clave, 10);
+    if ($valor === '') {
+        return null;
+    }
+    $fecha = DateTimeImmutable::createFromFormat('!Y-m-d', $valor);
+    $errores = DateTimeImmutable::getLastErrors();
+    if (!$fecha || ($errores !== false && ($errores['warning_count'] || $errores['error_count']))) {
+        json_response(['ok' => false, 'error' => "La fecha «{$clave}» no es válida."], 422);
+    }
+
+    return $fecha->format('Y-m-d');
+}
+
+/**
+ * Filtros que también acotan los totales: rango de fechas y quién lo cargó.
+ *
+ * @return array{0: list<string>, 1: array<string, mixed>}
+ */
+function compromisos_filtros_base(): array
+{
+    $where = [];
+    $params = [];
+
+    $desde = compromiso_fecha_filtro('desde');
+    $hasta = compromiso_fecha_filtro('hasta');
+    if ($desde !== null && $hasta !== null && $hasta < $desde) {
+        json_response(['ok' => false, 'error' => 'El rango no es válido: «hasta» es anterior a «desde».'], 422);
+    }
+    if ($desde !== null) {
+        $where[] = 'DATE(c.fecha_compromiso) >= :f_desde';
+        $params['f_desde'] = $desde;
+    }
+    if ($hasta !== null) {
+        $where[] = 'DATE(c.fecha_compromiso) <= :f_hasta';
+        $params['f_hasta'] = $hasta;
+    }
+
+    // "yo", un id de usuario, o "ex:<nombre>" para quien cargó con una cuenta ya borrada.
+    $creadoPor = api_string($_GET, 'creado_por', 110);
+    if ($creadoPor !== '') {
+        if ($creadoPor === 'yo') {
+            $where[] = 'c.creado_por_usuario_id = :f_usuario';
+            $params['f_usuario'] = usuario_actual_id() ?? 0;
+        } elseif (ctype_digit($creadoPor)) {
+            $where[] = 'c.creado_por_usuario_id = :f_usuario';
+            $params['f_usuario'] = (int) $creadoPor;
+        } elseif (str_starts_with($creadoPor, 'ex:') && mb_strlen($creadoPor) > 3) {
+            $where[] = '(c.creado_por_usuario_id IS NULL AND c.creado_por_nombre = :f_ex)';
+            $params['f_ex'] = mb_substr($creadoPor, 3, 100);
+        } else {
+            json_response(['ok' => false, 'error' => 'El filtro «creado_por» no es válido.'], 422);
+        }
+    }
+
+    return [$where, $params];
+}
+
+/**
+ * Totales por situación sobre los compromisos que cumplen $where (alias `c`).
+ *
+ * @param list<string> $where
+ * @param array<string, mixed> $params
+ * @return array<string, mixed>
+ */
+function compromisos_resumen(PDO $db, array $where, array $params): array
+{
+    $condiciones = $where === [] ? '' : ' WHERE ' . implode(' AND ', $where);
+    $stmt = $db->prepare(
+        "SELECT
+            COALESCE(SUM(c.estado = 'pendiente'), 0) AS pendientes,
+            COALESCE(SUM(IF(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE(), c.monto, 0)), 0) AS vencidos_monto,
+            COALESCE(SUM(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE()), 0) AS vencidos_cantidad,
+            COALESCE(SUM(IF(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) = CURDATE(), c.monto, 0)), 0) AS hoy_monto,
+            COALESCE(SUM(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) = CURDATE()), 0) AS hoy_cantidad,
+            COALESCE(SUM(IF(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) > CURDATE() AND DATE(c.fecha_compromiso) <= DATE_ADD(CURDATE(), INTERVAL 7 DAY), c.monto, 0)), 0) AS proximos_monto,
+            COALESCE(SUM(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) > CURDATE() AND DATE(c.fecha_compromiso) <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)), 0) AS proximos_cantidad,
+            COALESCE(SUM(IF(c.estado IN ('pagado','parcial') AND c.fecha_resolucion >= DATE_FORMAT(CURDATE(), '%Y-%m-01'), c.monto_pagado, 0)), 0) AS cobrado_mes
+         FROM compromisos c{$condiciones}"
+    );
+    $stmt->execute($params);
+    $r = $stmt->fetch();
+
+    return [
+        'pendientes' => (int) $r['pendientes'],
+        'vencidos' => ['monto' => $r['vencidos_monto'], 'cantidad' => (int) $r['vencidos_cantidad']],
+        'hoy' => ['monto' => $r['hoy_monto'], 'cantidad' => (int) $r['hoy_cantidad']],
+        'proximos' => ['monto' => $r['proximos_monto'], 'cantidad' => (int) $r['proximos_cantidad']],
+        'cobrado_mes' => $r['cobrado_mes'],
+    ];
+}
+
+/**
+ * Una fila por quien cargó compromisos. Cumplimiento del mes: del $ prometido
+ * para fechas del mes que ya llegaron (día 1 a hoy), el % que se cobró.
+ *
+ * @return list<array<string, mixed>>
+ */
+function compromisos_por_usuario(PDO $db): array
+{
+    $mes = "DATE(c.fecha_compromiso) BETWEEN DATE_FORMAT(CURDATE(), '%Y-%m-01') AND CURDATE()";
+    $filas = $db->query(
+        "SELECT c.creado_por_usuario_id AS usuario_id,
+                COALESCE(MAX(u.nombre), NULLIF(MAX(c.creado_por_nombre), ''), 'Sin registrar') AS nombre,
+                COUNT(*) AS total,
+                SUM(c.estado = 'pendiente') AS pendientes_cantidad,
+                COALESCE(SUM(IF(c.estado = 'pendiente', c.monto, 0)), 0) AS pendientes_monto,
+                SUM(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE()) AS vencidos_cantidad,
+                COALESCE(SUM(IF(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE(), c.monto, 0)), 0) AS vencidos_monto,
+                COALESCE(SUM(IF(c.estado IN ('pagado','parcial') AND c.fecha_resolucion >= DATE_FORMAT(CURDATE(), '%Y-%m-01'), c.monto_pagado, 0)), 0) AS cobrado_mes,
+                COALESCE(SUM(IF({$mes}, c.monto, 0)), 0) AS prometido_mes,
+                COALESCE(SUM(IF({$mes} AND c.estado IN ('pagado','parcial'), c.monto_pagado, 0)), 0) AS cobrado_prometido_mes,
+                MAX(c.creado_por_nombre) AS nombre_copiado
+         FROM compromisos c LEFT JOIN usuarios u ON u.id = c.creado_por_usuario_id
+         GROUP BY c.creado_por_usuario_id, IF(c.creado_por_usuario_id IS NULL, c.creado_por_nombre, NULL)
+         ORDER BY nombre ASC"
+    )->fetchAll();
+
+    $salida = [];
+    foreach ($filas as $f) {
+        $prometido = api_centavos($f['prometido_mes']);
+        $cobrado = api_centavos($f['cobrado_prometido_mes']);
+        $usuarioId = $f['usuario_id'] === null ? null : (int) $f['usuario_id'];
+        $salida[] = [
+            'usuario_id' => $usuarioId,
+            // Valor que se manda tal cual en ?creado_por= para filtrar por esta fila.
+            'filtro' => $usuarioId !== null ? (string) $usuarioId : 'ex:' . $f['nombre_copiado'],
+            'nombre' => $f['nombre'],
+            'total' => (int) $f['total'],
+            'pendientes' => ['cantidad' => (int) $f['pendientes_cantidad'], 'monto' => $f['pendientes_monto']],
+            'vencidos' => ['cantidad' => (int) $f['vencidos_cantidad'], 'monto' => $f['vencidos_monto']],
+            'cobrado_mes' => $f['cobrado_mes'],
+            'cumplimiento_mes' => $prometido > 0 ? (int) round($cobrado * 100 / $prometido) : null,
+        ];
+    }
+
+    return $salida;
+}
+
+/** Evita que Excel interprete como fórmula un texto cargado por un usuario. */
+function compromiso_csv_celda(string $valor): string
+{
+    return $valor !== '' && strpbrk($valor[0], "=+-@\t\r") !== false ? "'" . $valor : $valor;
+}
+
+/**
+ * CSV de lo que se está viendo (mismos filtros y orden): separador ";", UTF-8 con
+ * BOM, fechas dd/mm/aaaa y coma decimal, como lo espera Excel en español.
+ *
+ * @param array<string, mixed> $params
+ */
+function compromisos_exportar_csv(PDO $db, string $from, array $params, string $orden): never
+{
+    $stmt = $db->prepare(
+        'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . ' AS situacion, '
+        . COMPROMISO_ATRASO_SQL . ' AS dias_atraso, k.nombre AS contacto_nombre, k.celular AS contacto_celular'
+        . $from . ' ORDER BY ' . $orden . ' LIMIT ' . COMPROMISOS_CSV_MAXIMO
+    );
+    $stmt->execute($params);
+
+    $estados = [
+        'vencido' => 'Vencido', 'hoy' => 'Para hoy', 'proximo' => 'Próximo',
+        'pagado' => 'Pagado', 'parcial' => 'Pago parcial', 'incumplido' => 'Incumplido',
+    ];
+    $fecha = static fn (?string $valor): string => $valor ? date('d/m/Y', strtotime($valor)) : '';
+    $monto = static fn (?string $valor): string => $valor === null ? '' : number_format((float) $valor, 2, ',', '');
+
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="pagos-' . date('Y-m-d') . '.csv"');
+    header('Cache-Control: no-store');
+    echo "\xEF\xBB\xBF";
+    $salida = fopen('php://output', 'w');
+    fputcsv($salida, ['Fecha', 'Cliente', 'Celular', 'Concepto', 'Monto', 'Pagado', 'Estado', 'Atraso (días)', 'Cargó', 'Resolvió', 'Fecha de registro', 'Nota'], ';', '"', '');
+    foreach ($stmt as $f) {
+        fputcsv($salida, array_map('compromiso_csv_celda', [
+            $fecha($f['fecha_compromiso']), (string) $f['contacto_nombre'], (string) $f['contacto_celular'], (string) $f['concepto'],
+            $monto($f['monto']), $monto($f['monto_pagado']), $estados[$f['situacion']] ?? '', (string) $f['dias_atraso'],
+            (string) $f['creado_por_nombre'], (string) $f['resuelto_por_nombre'], $fecha($f['fecha_resolucion']),
+            str_replace(["\r", "\n"], ' ', (string) $f['nota']),
+        ]), ';', '"', '');
+    }
+    fclose($salida);
+    exit;
+}
+
 function compromisos_listar(PDO $db): never
 {
     $filtro = api_string($_GET, 'estado', 20) ?: 'todos';
@@ -276,24 +474,63 @@ function compromisos_listar(PDO $db): never
         $params['q_norm'] = $like;
         $params['q_concepto'] = $like;
     }
+
+    [$whereBase, $paramsBase] = compromisos_filtros_base();
+    $where = array_merge($where, $whereBase);
+    $params = array_merge($params, $paramsBase);
     $condiciones = $where === [] ? '' : ' WHERE ' . implode(' AND ', $where);
+
+    // Sin ?orden= se mantiene el orden de siempre: pendientes primero, por fecha.
+    $ordenSql = "c.estado = 'pendiente' DESC,
+                  IF(c.estado = 'pendiente', c.fecha_compromiso, NULL) ASC,
+                  c.fecha_resolucion DESC, c.id DESC";
+    $orden = api_string($_GET, 'orden', 12);
+    if ($orden !== '') {
+        if (!isset(COMPROMISOS_ORDEN[$orden])) {
+            json_response(['ok' => false, 'error' => 'El orden pedido no es válido.'], 422);
+        }
+        $dir = match (strtolower(api_string($_GET, 'dir', 4)) ?: 'asc') {
+            'asc' => 'ASC',
+            'desc' => 'DESC',
+            default => json_response(['ok' => false, 'error' => 'La dirección del orden no es válida.'], 422),
+        };
+        $ordenSql = COMPROMISOS_ORDEN[$orden] . " {$dir}, c.id {$dir}";
+    }
+
+    $from = ' FROM compromisos c INNER JOIN contactos k ON k.id = c.contacto_id' . $condiciones;
+
+    $formato = api_string($_GET, 'formato', 5);
+    if ($formato === 'csv') {
+        compromisos_exportar_csv($db, $from, $params, $ordenSql);
+    }
+    if ($formato !== '') {
+        json_response(['ok' => false, 'error' => 'El formato pedido no es válido.'], 422);
+    }
 
     $pagina = max(1, api_integer($_GET['pagina'] ?? 1));
     $offset = ($pagina - 1) * COMPROMISOS_POR_PAGINA;
 
-    $from = ' FROM compromisos c INNER JOIN contactos k ON k.id = c.contacto_id' . $condiciones;
-    $total = $db->prepare('SELECT COUNT(*)' . $from);
-    $total->execute($params);
-    $total = (int) $total->fetchColumn();
+    // Totales de TODO lo que cumple los filtros (no solo de la página): la fila de
+    // totales de la tabla y los subtotales por día tienen que ser exactos.
+    $totales = $db->prepare('SELECT COUNT(*) AS cantidad, COALESCE(SUM(c.monto), 0) AS monto, COALESCE(SUM(c.monto_pagado), 0) AS pagado' . $from);
+    $totales->execute($params);
+    $totales = $totales->fetch();
+    $total = (int) $totales['cantidad'];
+
+    $porDia = $db->prepare(
+        'SELECT DATE(c.fecha_compromiso) AS dia, COUNT(*) AS cantidad, SUM(c.monto) AS monto,
+                COALESCE(SUM(IF(c.estado = \'pendiente\', c.monto, 0)), 0) AS pendiente' . $from . '
+         GROUP BY dia ORDER BY dia ASC LIMIT 400'
+    );
+    $porDia->execute($params);
 
     $stmt = $db->prepare(
-        'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . ' AS situacion,
+        'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . ' AS situacion, '
+        . COMPROMISO_ATRASO_SQL . ' AS dias_atraso,
                 k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm,
-                k.estado AS contacto_estado' . $from . "
-         ORDER BY c.estado = 'pendiente' DESC,
-                  IF(c.estado = 'pendiente', c.fecha_compromiso, NULL) ASC,
-                  c.fecha_resolucion DESC, c.id DESC
-         LIMIT :limite OFFSET :offset"
+                k.estado AS contacto_estado' . $from . '
+         ORDER BY ' . $ordenSql . '
+         LIMIT :limite OFFSET :offset'
     );
     foreach ($params as $clave => $valor) {
         $stmt->bindValue(':' . $clave, $valor);
@@ -303,32 +540,18 @@ function compromisos_listar(PDO $db): never
     $stmt->execute();
     $items = $stmt->fetchAll();
 
-    // Totales de la pantalla: siempre sobre todos los compromisos, sin los filtros.
-    $resumen = $db->query(
-        "SELECT
-            SUM(estado = 'pendiente') AS pendientes,
-            COALESCE(SUM(IF(estado = 'pendiente' AND DATE(fecha_compromiso) < CURDATE(), monto, 0)), 0) AS vencidos_monto,
-            SUM(estado = 'pendiente' AND DATE(fecha_compromiso) < CURDATE()) AS vencidos_cantidad,
-            COALESCE(SUM(IF(estado = 'pendiente' AND DATE(fecha_compromiso) = CURDATE(), monto, 0)), 0) AS hoy_monto,
-            SUM(estado = 'pendiente' AND DATE(fecha_compromiso) = CURDATE()) AS hoy_cantidad,
-            COALESCE(SUM(IF(estado = 'pendiente' AND DATE(fecha_compromiso) > CURDATE() AND DATE(fecha_compromiso) <= DATE_ADD(CURDATE(), INTERVAL 7 DAY), monto, 0)), 0) AS proximos_monto,
-            SUM(estado = 'pendiente' AND DATE(fecha_compromiso) > CURDATE() AND DATE(fecha_compromiso) <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)) AS proximos_cantidad,
-            COALESCE(SUM(IF(estado IN ('pagado','parcial') AND fecha_resolucion >= DATE_FORMAT(CURDATE(), '%Y-%m-01'), monto_pagado, 0)), 0) AS cobrado_mes
-         FROM compromisos"
-    )->fetch();
-
     json_response(['ok' => true, 'data' => [
         'items' => $items,
         'pagina' => $pagina,
         'total' => $total,
         'hay_mas' => $offset + count($items) < $total,
-        'resumen' => [
-            'pendientes' => (int) $resumen['pendientes'],
-            'vencidos' => ['monto' => $resumen['vencidos_monto'], 'cantidad' => (int) $resumen['vencidos_cantidad']],
-            'hoy' => ['monto' => $resumen['hoy_monto'], 'cantidad' => (int) $resumen['hoy_cantidad']],
-            'proximos' => ['monto' => $resumen['proximos_monto'], 'cantidad' => (int) $resumen['proximos_cantidad']],
-            'cobrado_mes' => $resumen['cobrado_mes'],
-        ],
+        'totales' => ['cantidad' => $total, 'monto' => $totales['monto'], 'pagado' => $totales['pagado']],
+        'por_dia' => $porDia->fetchAll(),
+        // Global: sin filtros. Filtrado: respeta rango de fechas y quién lo cargó.
+        'resumen' => compromisos_resumen($db, [], []),
+        'resumen_filtrado' => compromisos_resumen($db, $whereBase, $paramsBase),
+        'filtros_activos' => $whereBase !== [],
+        'por_usuario' => compromisos_por_usuario($db),
     ]]);
 }
 
