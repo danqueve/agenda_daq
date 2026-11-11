@@ -44,23 +44,7 @@ declare(strict_types=1);
                         </label>
                         <template x-for="cliente in sasResultados" :key="cliente.id">
                             <button type="button" class="cell" @click="elegirClienteSas(cliente)">
-                                <span
-                                    class="avatar"
-                                    :style="`background:${colorAvatar(cliente.nombre)}`"
-                                    x-text="iniciales(cliente.nombre)"
-                                ></span>
-                                <span class="cell__content">
-                                    <span class="cell__title" x-text="cliente.nombre"></span>
-                                    <span
-                                        class="cell__subtitle"
-                                        x-text="[cliente.dni && `DNI ${cliente.dni}`, cliente.telefono, cliente.localidad].filter(Boolean).join(' · ')"
-                                    ></span>
-                                </span>
-                                <span
-                                    class="chip-estado"
-                                    x-show="cliente.estado && cliente.estado !== 'ACTIVO'"
-                                    x-text="cliente.estado === 'MOROSO' ? 'Moroso' : 'Inactivo'"
-                                ></span>
+                                <?php require __DIR__ . '/../parciales/sas_cliente_contenido.php'; ?>
                             </button>
                         </template>
                         <p class="group__footer footnote" x-show="sasBuscando">Buscando…</p>

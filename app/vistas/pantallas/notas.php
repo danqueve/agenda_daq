@@ -89,17 +89,7 @@ declare(strict_types=1);
                             <i class="nota-card__pin" data-lucide="pin"></i>
                         </div>
                         <p class="nota-card__texto" x-text="nota.texto"></p>
-                        <div class="nota-card__pie">
-                            <span class="contacto-chip" x-show="nota.contacto_nombre">
-                                <span
-                                    class="avatar"
-                                    :style="`background:${colorAvatar(nota.contacto_nombre)}`"
-                                    x-text="iniciales(nota.contacto_nombre)"
-                                ></span>
-                                <span x-text="nota.contacto_nombre"></span>
-                            </span>
-                            <span class="nota-card__fecha tabular" x-text="fechaNotaFijada(nota.actualizado_en)"></span>
-                        </div>
+                        <?php $metodoFecha = 'fechaNotaFijada'; require __DIR__ . '/../parciales/nota_pie.php'; ?>
                     </button>
                 </template>
             </div>
@@ -116,17 +106,7 @@ declare(strict_types=1);
                     >
                         <h3 class="nota-card__titulo" x-text="nota.titulo || 'Sin título'"></h3>
                         <p class="nota-card__texto" x-text="nota.texto"></p>
-                        <div class="nota-card__pie">
-                            <span class="contacto-chip" x-show="nota.contacto_nombre">
-                                <span
-                                    class="avatar"
-                                    :style="`background:${colorAvatar(nota.contacto_nombre)}`"
-                                    x-text="iniciales(nota.contacto_nombre)"
-                                ></span>
-                                <span x-text="nota.contacto_nombre"></span>
-                            </span>
-                            <span class="nota-card__fecha tabular" x-text="fechaNotaReciente(nota.actualizado_en)"></span>
-                        </div>
+                        <?php $metodoFecha = 'fechaNotaReciente'; require __DIR__ . '/../parciales/nota_pie.php'; ?>
                     </button>
                 </template>
             </div>
