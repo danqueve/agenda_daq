@@ -42,6 +42,7 @@ function pagosModule() {
         pagosHasta: '',
         errorRangoPagos: '',
         pagosCreadoPor: '',
+        pagosConcepto: '',
         ordenPagos: 'fecha',
         dirPagos: 'asc',
         pagosUsuariosAbierto: false,
@@ -89,6 +90,7 @@ function pagosModule() {
                 if (this.pagosHasta) query.set('hasta', this.pagosHasta);
             }
             if (this.pagosCreadoPor) query.set('creado_por', this.pagosCreadoPor);
+            if (this.pagosConcepto) query.set('concepto', this.pagosConcepto);
             const vista = this.vistaPagosEfectiva();
             if (vista === 'agenda') {
                 // Agrupada por día: siempre por fecha; lo ya resuelto, lo más reciente primero.
@@ -269,6 +271,7 @@ function pagosModule() {
             const chips = [];
             if (this.pagosDesde || this.pagosHasta) chips.push({ clave: 'rango', texto: this.textoRangoPagos() });
             if (this.pagosCreadoPor) chips.push({ clave: 'creado', texto: `Cargó: ${this.nombreCreadoPorPagos()}` });
+            if (this.pagosConcepto) chips.push({ clave: 'concepto', texto: `Concepto: ${this.pagosConcepto === '@sin' ? 'sin concepto' : this.pagosConcepto}` });
             if (this.busquedaPagos.trim()) chips.push({ clave: 'texto', texto: `Búsqueda: «${this.busquedaPagos.trim()}»` });
             return chips;
         },
@@ -279,6 +282,7 @@ function pagosModule() {
                 return;
             }
             if (clave === 'creado') this.pagosCreadoPor = '';
+            if (clave === 'concepto') this.pagosConcepto = '';
             if (clave === 'texto') this.busquedaPagos = '';
             this.cargarPagos(true);
         },
@@ -289,6 +293,7 @@ function pagosModule() {
             this.pagosHasta = '';
             this.errorRangoPagos = '';
             this.pagosCreadoPor = '';
+            this.pagosConcepto = '';
             this.busquedaPagos = '';
             this.cargarPagos(true);
         },
@@ -369,7 +374,8 @@ function pagosModule() {
         estadoAtrasoPago(pago) {
             const etiqueta = this.etiquetaPago(pago);
             const dias = Number(pago.dias_atraso) || 0;
-            if (dias <= 0) return etiqueta;
+            // Reprogramar no es una falta: no se muestra atraso, para que no parezca una penalidad.
+            if (dias <= 0 || pago.estado === 'reprogramado') return etiqueta;
             const texto = `${dias} ${dias === 1 ? 'día' : 'días'}`;
             return ['pagado', 'parcial'].includes(pago.estado) ? `${etiqueta} · ${texto} tarde` : `${etiqueta} · ${texto}`;
         },
@@ -411,18 +417,19 @@ function pagosModule() {
             return {
                 vencido: 'card-pastel--vencido', hoy: 'card-pastel--hoy', proximo: 'card-pastel--proximo',
                 pagado: 'card-pastel--concreto', parcial: 'card-pastel--concreto', incumplido: 'card-pastel--cerrado',
+                reprogramado: 'card-pastel--cerrado',
             }[pago.situacion] || 'card-pastel--proximo';
         },
 
         etiquetaPago(pago) {
             return {
                 vencido: 'Vencido', hoy: 'Para hoy', proximo: 'Próximo',
-                pagado: 'Pagado', parcial: 'Pago parcial', incumplido: 'Incumplido',
+                pagado: 'Pagado', parcial: 'Pago parcial', incumplido: 'Incumplido', reprogramado: 'Reprogramado',
             }[pago.situacion] || '';
         },
 
         fechaPago(pago) {
-            const resuelto = ['pagado', 'parcial', 'incumplido'].includes(pago.situacion);
+            const resuelto = ['pagado', 'parcial', 'incumplido', 'reprogramado'].includes(pago.situacion);
             const fecha = new Date((resuelto && pago.fecha_resolucion ? pago.fecha_resolucion : pago.fecha_compromiso).replace(' ', 'T'));
             if (pago.situacion === 'hoy') return 'Hoy';
             const texto = new Intl.DateTimeFormat('es-AR', { weekday: 'short', day: 'numeric', month: 'short' }).format(fecha).replace('.', '');
@@ -508,10 +515,24 @@ function pagosModule() {
             return `compromiso-item--${pago.situacion}`;
         },
 
+        // Cadena de reprogramaciones en la ficha: "15/11 $50.000 → reprogramado al 22/11 por Juan".
+        // El compromiso nuevo dice de cuándo viene.
+        cadenaCompromisoTexto(compromiso) {
+            const lista = this.contactoActual?.compromisos || [];
+            const dia = (fechaSql) => this.fechaCortaPago(String(fechaSql).slice(0, 10));
+            if (compromiso.estado === 'reprogramado') {
+                const hijo = lista.find((c) => Number(c.origen_id) === Number(compromiso.id));
+                const quien = compromiso.resuelto_por_nombre ? ` por ${compromiso.resuelto_por_nombre}` : '';
+                return `${dia(compromiso.fecha_compromiso)} ${this.formatoMonto(compromiso.monto)} → reprogramado${hijo ? ` al ${dia(hijo.fecha_compromiso)}` : ''}${quien}`;
+            }
+            const origen = compromiso.origen_id ? lista.find((c) => Number(c.id) === Number(compromiso.origen_id)) : null;
+            return origen && origen.estado === 'reprogramado' ? `Reprogramado desde el ${dia(origen.fecha_compromiso)}` : '';
+        },
+
         // ---------- Nuevo / Editar compromiso ----------
 
         compromisoFormVacio() {
-            return { id: null, monto: '', concepto: '', fecha_compromiso: '', nota: '', nombre: '', celular: '' };
+            return { id: null, monto: '', concepto: '', cuota: '', fecha_compromiso: '', nota: '', nombre: '', celular: '' };
         },
 
         abrirCompromisoNuevo(contacto = null) {
@@ -603,7 +624,7 @@ function pagosModule() {
                 return;
             }
             const editando = this.compromisoModo === 'editar';
-            const payload = { monto: form.monto, concepto: form.concepto, fecha_compromiso: form.fecha_compromiso, nota: form.nota };
+            const payload = { monto: form.monto, concepto: this.conceptoConCuota(form.concepto, form.cuota), fecha_compromiso: form.fecha_compromiso, nota: form.nota };
             if (!editando) {
                 if (this.compromisoContacto) {
                     payload.contacto_id = this.compromisoContacto.id;
@@ -740,6 +761,7 @@ function pagosModule() {
 
         async pagosRefrescar(contactoId) {
             await Promise.all([this.cargarPagos(true), this.cargarPanel(), this.cargarAgendaMes(), this.cargarContactos(true)]);
+            this.cargarConceptosPagos();
             if (contactoId && this.contactoActual && Number(this.contactoActual.id) === Number(contactoId)) {
                 const result = await this.api(`api/contactos.php?id=${contactoId}`);
                 this.contactoActual = result.data;

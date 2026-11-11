@@ -27,7 +27,24 @@ const COMPROMISO_ATRASO_SQL = "CASE
 
 /** Columnas que el frontend necesita de cada compromiso (alias `c`). */
 const COMPROMISO_COLUMNAS_SQL = 'c.id, c.contacto_id, c.monto, c.concepto, c.fecha_compromiso, c.estado, c.monto_pagado,
-        c.fecha_resolucion, c.nota, c.origen_id, c.creado_por_nombre, c.resuelto_por_nombre, c.creado_en';
+        c.fecha_resolucion, c.nota, c.origen_id, c.creado_por_nombre, c.resuelto_por_nombre, c.creado_en,
+        c.ultimo_aviso_en, c.ultimo_aviso_por_nombre';
+
+/** Opciones fijas del campo Concepto; se suman los conceptos más usados de la base. */
+const COMPROMISO_CONCEPTOS_FIJOS = ['Cuota', 'Saldo', 'Refinanciación', 'Entrega', 'Otro'];
+
+/** Variables que se pueden usar en las plantillas de WhatsApp. */
+const COMPROMISO_PLANTILLA_VARIABLES = ['nombre', 'monto', 'fecha', 'concepto', 'dias_atraso'];
+
+/**
+ * Plantillas por defecto del recordatorio por WhatsApp. Lo que edita el admin se
+ * guarda en config (clave wa_plantilla_<tipo>); sin fila, se usa este texto.
+ */
+const COMPROMISO_PLANTILLAS_WHATSAPP = [
+    'antes' => 'Hola {nombre}, ¿cómo andás? Te escribo para recordarte que el {fecha} vence tu pago de {monto} ({concepto}). Cualquier cosa avisanos. ¡Gracias!',
+    'hoy' => 'Hola {nombre}, ¿todo bien? Hoy vence tu pago de {monto} ({concepto}). Si ya lo hiciste, avisanos así lo registramos. ¡Gracias!',
+    'vencido' => 'Hola {nombre}, ¿cómo estás? Tenés pendiente un pago de {monto} ({concepto}) que vencía el {fecha}, con {dias_atraso} de atraso. ¿Cuándo podrías regularizarlo? Cualquier cosa, contanos.',
+];
 
 /**
  * Compromisos de un contacto, los pendientes primero (por fecha) y después
@@ -53,8 +70,35 @@ function compromiso_ya_paso(string $fechaSql): bool
     return $fechaSql <= date('Y-m-d H:i:s');
 }
 
-/** Inserta un compromiso pendiente y devuelve su id. */
-function compromiso_insertar(PDO $db, int $contactoId, int $centavos, string $concepto, string $fecha, ?string $nota, ?int $origenId): int
+/**
+ * Plantillas de WhatsApp vigentes: lo guardado en config o, si no hay, el texto por defecto.
+ *
+ * @return array<string, string>
+ */
+function compromiso_plantillas_whatsapp(PDO $db): array
+{
+    $plantillas = COMPROMISO_PLANTILLAS_WHATSAPP;
+    $claves = array_map(static fn (string $tipo): string => 'wa_plantilla_' . $tipo, array_keys($plantillas));
+    $stmt = $db->prepare('SELECT clave, valor FROM config WHERE clave IN (' . implode(',', array_fill(0, count($claves), '?')) . ')');
+    $stmt->execute($claves);
+    foreach ($stmt as $fila) {
+        $tipo = substr((string) $fila['clave'], strlen('wa_plantilla_'));
+        if (trim((string) $fila['valor']) !== '') {
+            $plantillas[$tipo] = (string) $fila['valor'];
+        }
+    }
+
+    return $plantillas;
+}
+
+/**
+ * Inserta un compromiso pendiente y devuelve su id. $autor ({id, nombre}) sirve para
+ * que un compromiso reprogramado siga a nombre de quien cargó el original; sin él,
+ * queda a nombre del usuario actual.
+ *
+ * @param array{id: ?int, nombre: string}|null $autor
+ */
+function compromiso_insertar(PDO $db, int $contactoId, int $centavos, string $concepto, string $fecha, ?string $nota, ?int $origenId, ?array $autor = null): int
 {
     $stmt = $db->prepare(
         'INSERT INTO compromisos
@@ -67,7 +111,8 @@ function compromiso_insertar(PDO $db, int $contactoId, int $centavos, string $co
         'fecha' => $fecha, 'nota' => $nota, 'origen_id' => $origenId,
         // Si la fecha ya pasó al cargarlo, no se manda un push de algo viejo.
         'enviado' => compromiso_ya_paso($fecha) ? 1 : 0,
-        'usuario_id' => usuario_actual_id(), 'usuario_nombre' => usuario_actual_nombre(),
+        'usuario_id' => $autor ? $autor['id'] : usuario_actual_id(),
+        'usuario_nombre' => $autor ? $autor['nombre'] : usuario_actual_nombre(),
     ]);
 
     return (int) $db->lastInsertId();

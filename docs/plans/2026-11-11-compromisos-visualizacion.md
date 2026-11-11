@@ -56,17 +56,29 @@ Archivos probables: `api/panel.php` (montos por día y totales), `assets/js/pane
 Archivos probables: `api/compromisos.php` (filtros nuevos, resumen por usuario, CSV), `api/agenda.php`,
 `assets/js/pagos.js`, `index.php`, `assets/css/pastel.css`.
 
-## Fase 3 — Registrar más rápido
+## Fase 3 — Registrar más rápido, reprogramar y WhatsApp con plantillas
 
-**Objetivo:** cobrar en el menor número de toques posible.
+**Objetivo:** cobrar en el menor número de toques, mover una fecha sin ensuciar el cumplimiento y
+avisar por WhatsApp con el texto armado.
 
-1. **Pagó total en un toque** desde la tarjeta (sin abrir la hoja), con opción de deshacer.
-2. **Parcial** y **Reprogramar** como atajos claros, sin pasar por la hoja completa cuando alcanza con una fecha.
-3. **WhatsApp con texto prellenado** (recordatorio de pago con nombre, monto y concepto).
-4. **Concepto como lista** de opciones frecuentes (cuota, saldo, seña…) en vez de texto libre.
+1. **Estado «reprogramado»** (migración `007_compromisos_reprogramado_avisos.sql`): cierra el
+   compromiso original y crea uno nuevo con `origen_id`, a nombre de quien cargó el original. No cuenta
+   como incumplido ni en el cumplimiento (un parcial con saldo agendado cuenta solo por lo pagado).
+   En la ficha, la cadena se lee como historial: «15/11 $50.000 → reprogramado al 22/11 por Juan».
+2. **Acciones rápidas** en Hoy, Pagos y el panel del día del Calendario: **Pagó** en un toque (aviso de
+   6 segundos con «Deshacer»), **Parcial** y **Reprogramar** en una hoja compacta con pills de fecha, y
+   el menú **Más** con «No pagó» y «Abrir detalle». Si otro usuario ya lo registró (409) se avisa y se
+   refresca.
+3. **WhatsApp con plantillas** (Ajustes › Mensajes de WhatsApp, solo admin): según la situación del pago
+   se arma el texto con `{nombre}`, `{monto}`, `{fecha}`, `{concepto}` y `{dias_atraso}`. Tocar el botón
+   deja una nota en el historial del contacto y «Último aviso: hace 2 días por María» en la fila. Sin
+   celular válido el botón queda deshabilitado, con el motivo.
+4. **Concepto como lista** (opciones fijas + los más usados, «N° de cuota» para «Cuota») y filtro por
+   concepto en Pagos, agrupado por la primera palabra.
 
-Archivos probables: `assets/js/pagos.js`, `index.php` (hojas de pago y tarjetas), `api/compromisos.php`
-si hace falta guardar el concepto de forma normalizada (migración `sql/migrations/007_…`).
+Archivos: `sql/migrations/007_…`, `app/compromisos.php`, `api/compromisos.php`, `api/ajustes.php`,
+`app/vistas/pago_acciones.php`, `app/vistas/pago_rapido_hoja.php`, `assets/js/pagos_rapido.js`,
+`assets/js/pagos.js`, `index.php`, `assets/css/pastel.css`.
 
 ## Fase 4 — Datos de SAS en cada compromiso
 

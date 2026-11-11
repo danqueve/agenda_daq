@@ -18,12 +18,19 @@ function seguimientosModule() {
             if (registro.tipo === 'recontacto') {
                 return registro.proximo_asignado ? 'orange' : 'green';
             }
+            if (registro.tipo === 'nota' && registro.resultado === 'mensaje_enviado') {
+                return 'green';
+            }
             return { consulta: 'indigo', nota: 'gray', cambio_estado: 'tint' }[registro.tipo] || 'gray';
         },
 
         tituloTimeline(registro) {
             if (registro.tipo === 'recontacto') {
                 return { atendio: 'Llamada', no_atendio: 'No atendió', mensaje_enviado: 'Mensaje enviado' }[registro.resultado] || 'Recontacto';
+            }
+            // El aviso de pago por WhatsApp se anota como nota con resultado mensaje_enviado.
+            if (registro.tipo === 'nota' && registro.resultado === 'mensaje_enviado') {
+                return 'Aviso por WhatsApp';
             }
             return { consulta: 'Consulta cargada', nota: 'Nota', cambio_estado: 'Reabierto' }[registro.tipo] || registro.tipo;
         },
@@ -34,13 +41,16 @@ function seguimientosModule() {
             if (registro.tipo === 'recontacto') {
                 return { atendio: 'phone', no_atendio: 'phone-missed', mensaje_enviado: 'message-circle' }[registro.resultado] || 'phone';
             }
+            if (registro.tipo === 'nota' && registro.resultado === 'mensaje_enviado') {
+                return 'message-circle';
+            }
             return { consulta: 'plus', nota: 'sticky-note', cambio_estado: 'rotate-ccw' }[registro.tipo] || 'sticky-note';
         },
 
         // Últimas notas sueltas del contacto (tipo 'nota' en el historial),
         // para las .nota-mini de la columna derecha de la ficha.
         notasDelContacto(contacto) {
-            return (contacto?.historial || []).filter((registro) => registro.tipo === 'nota').slice(0, 2);
+            return (contacto?.historial || []).filter((registro) => registro.tipo === 'nota' && registro.resultado !== 'mensaje_enviado').slice(0, 2);
         },
 
         // Nota más reciente con texto, para el detalle de .ficha-proximo

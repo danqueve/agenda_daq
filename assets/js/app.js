@@ -6,6 +6,7 @@ function appShell() {
         ...ajustesModule(),
         ...notasModule(),
         ...pagosModule(),
+        ...pagosRapidoModule(),
         activo: 'hoy',
         badgeHoy: 0,
         fechaHoy: '',
@@ -38,6 +39,7 @@ function appShell() {
             this.iniciarAjustes();
             this.iniciarNotas();
             this.iniciarPagos();
+            this.iniciarPagosRapido();
             const contactoNotificado = new URLSearchParams(window.location.search).get('contacto');
             if (contactoNotificado && /^\d+$/.test(contactoNotificado)) {
                 window.setTimeout(() => this.abrirFicha(Number(contactoNotificado)), 250);
@@ -56,12 +58,12 @@ function appShell() {
             });
         },
 
-        mostrarHud(texto, icono = 'check') {
+        mostrarHud(texto, icono = 'check', duracion = 2200) {
             this.hudTexto = texto;
             this.hudIcono = icono;
             this.hudVisible = true;
             clearTimeout(this.hudTimer);
-            this.hudTimer = setTimeout(() => { this.hudVisible = false; }, 2200);
+            this.hudTimer = setTimeout(() => { this.hudVisible = false; }, duracion);
             this.refrescarIconos();
         },
     };

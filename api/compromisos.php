@@ -257,6 +257,146 @@ function compromiso_reabrir(PDO $db, int $id, array $actual): never
     json_response(['ok' => true, 'data' => compromiso_buscar($db, $id)]);
 }
 
+/**
+ * Reprogramar: el cliente avisó que paga otro día. Cierra el compromiso como
+ * 'reprogramado' (no es un incumplimiento y no entra en el cumplimiento) y agenda
+ * uno nuevo enlazado por origen_id, que sigue a nombre de quien cargó el original.
+ * Todo en una transacción; el segundo usuario que lo intente recibe un 409.
+ */
+function compromiso_reprogramar(PDO $db, int $id, array $actual, array $body): never
+{
+    $nuevaFecha = compromiso_fecha_obligatoria($body, 'fecha');
+    $dia = substr($nuevaFecha, 0, 10);
+    if ($dia < date('Y-m-d')) {
+        json_response(['ok' => false, 'error' => 'La nueva fecha tiene que ser hoy o posterior.'], 422);
+    }
+    if ($dia === substr((string) $actual['fecha_compromiso'], 0, 10)) {
+        json_response(['ok' => false, 'error' => 'Elegí una fecha distinta a la actual.'], 422);
+    }
+    $nuevoMonto = trim((string) ($body['monto'] ?? '')) !== ''
+        ? compromiso_monto_obligatorio($body, 'monto', 'Ingresá un monto válido para el nuevo compromiso.')
+        : api_centavos($actual['monto']);
+
+    $autorId = $db->prepare('SELECT creado_por_usuario_id FROM compromisos WHERE id = :id');
+    $autorId->execute(['id' => $id]);
+    $autorId = $autorId->fetchColumn();
+    $autor = ['id' => $autorId === false || $autorId === null ? null : (int) $autorId, 'nombre' => (string) $actual['creado_por_nombre']];
+
+    $db->beginTransaction();
+    try {
+        $update = $db->prepare(
+            "UPDATE compromisos
+             SET estado = 'reprogramado', monto_pagado = NULL, fecha_resolucion = NOW(),
+                 resuelto_por_usuario_id = :usuario_id, resuelto_por_nombre = :usuario_nombre,
+                 nota = COALESCE(:nota, nota)
+             WHERE id = :id AND estado = 'pendiente'"
+        );
+        $update->execute([
+            'usuario_id' => usuario_actual_id(), 'usuario_nombre' => usuario_actual_nombre(),
+            'nota' => api_nullable_string($body, 'nota', 2000), 'id' => $id,
+        ]);
+        if ($update->rowCount() === 0) {
+            $db->rollBack();
+            json_response(['ok' => false, 'error' => 'Este compromiso ya fue registrado por otra persona.'], 409);
+        }
+        $nuevoId = compromiso_insertar($db, (int) $actual['contacto_id'], $nuevoMonto, (string) $actual['concepto'], $nuevaFecha, null, $id, $autor);
+        $db->commit();
+    } catch (Throwable $error) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        throw $error;
+    }
+
+    json_response(['ok' => true, 'data' => compromiso_buscar($db, $id), 'nuevo' => compromiso_buscar($db, $nuevoId)]);
+}
+
+/**
+ * Se tocó el botón de WhatsApp de un compromiso pendiente: queda una nota en el
+ * historial del contacto y el compromiso guarda el último aviso (quién y cuándo),
+ * para que el resto del equipo vea que ya se avisó. Dos toques seguidos del mismo
+ * usuario cuentan como uno.
+ */
+function compromiso_aviso(PDO $db, int $id, array $actual): never
+{
+    if ($actual['estado'] !== 'pendiente') {
+        json_response(['ok' => false, 'error' => 'Solo se avisa por compromisos pendientes.'], 422);
+    }
+    $repetido = $actual['ultimo_aviso_en'] !== null
+        && $actual['ultimo_aviso_por_nombre'] === usuario_actual_nombre()
+        && strtotime((string) $actual['ultimo_aviso_en']) > time() - 60;
+
+    if (!$repetido) {
+        $centavos = api_centavos($actual['monto']);
+        $monto = '$' . ($centavos % 100 === 0 ? number_format($centavos / 100, 0, ',', '.') : number_format($centavos / 100, 2, ',', '.'));
+        $db->beginTransaction();
+        try {
+            $db->prepare(
+                "INSERT INTO seguimientos (contacto_id, tipo, resultado, nota)
+                 VALUES (:contacto_id, 'nota', 'mensaje_enviado', :nota)"
+            )->execute([
+                'contacto_id' => (int) $actual['contacto_id'],
+                'nota' => "WhatsApp: recordatorio de pago {$monto} · " . usuario_actual_nombre(),
+            ]);
+            $db->prepare(
+                'UPDATE compromisos
+                 SET ultimo_aviso_en = NOW(), ultimo_aviso_por_usuario_id = :usuario_id, ultimo_aviso_por_nombre = :usuario_nombre
+                 WHERE id = :id'
+            )->execute(['usuario_id' => usuario_actual_id(), 'usuario_nombre' => usuario_actual_nombre(), 'id' => $id]);
+            $db->commit();
+        } catch (Throwable $error) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            throw $error;
+        }
+    }
+
+    json_response(['ok' => true, 'data' => compromiso_buscar($db, $id)]);
+}
+
+/**
+ * Opciones del campo Concepto y del filtro de Pagos. Los frecuentes no repiten lo que
+ * ya cubren las opciones fijas ("Cuota 3" ya está en "Cuota"); los grupos son la
+ * primera palabra de cada concepto.
+ */
+function compromisos_conceptos(PDO $db): never
+{
+    $fijos = array_map('mb_strtolower', COMPROMISO_CONCEPTOS_FIJOS);
+    $filas = $db->query(
+        "SELECT MIN(TRIM(concepto)) AS texto, COUNT(*) AS usos
+         FROM compromisos WHERE TRIM(concepto) <> ''
+         GROUP BY TRIM(concepto) ORDER BY usos DESC, texto ASC LIMIT 60"
+    );
+    $frecuentes = [];
+    foreach ($filas as $fila) {
+        if (in_array(mb_strtolower(explode(' ', (string) $fila['texto'])[0]), $fijos, true)) {
+            continue;
+        }
+        $frecuentes[] = (string) $fila['texto'];
+        if (count($frecuentes) === 10) {
+            break;
+        }
+    }
+
+    $grupos = $db->query(
+        "SELECT MIN(SUBSTRING_INDEX(TRIM(concepto), ' ', 1)) AS valor, COUNT(*) AS cantidad
+         FROM compromisos WHERE TRIM(concepto) <> ''
+         GROUP BY SUBSTRING_INDEX(TRIM(concepto), ' ', 1) ORDER BY cantidad DESC, valor ASC LIMIT 30"
+    )->fetchAll();
+    foreach ($grupos as &$grupo) {
+        // MIN() sobre una colación _ci devuelve cualquier variante ("cuota"/"Cuota"): se normaliza la inicial.
+        $grupo['valor'] = mb_strtoupper(mb_substr((string) $grupo['valor'], 0, 1)) . mb_substr((string) $grupo['valor'], 1);
+        $grupo['cantidad'] = (int) $grupo['cantidad'];
+    }
+    unset($grupo);
+    $sin = (int) $db->query("SELECT COUNT(*) FROM compromisos WHERE TRIM(concepto) = ''")->fetchColumn();
+
+    json_response(['ok' => true, 'data' => [
+        'fijos' => COMPROMISO_CONCEPTOS_FIJOS, 'frecuentes' => $frecuentes, 'grupos' => $grupos, 'sin_concepto' => $sin,
+    ]]);
+}
+
 /** Fecha YYYY-MM-DD del query string, o null si no vino. 422 si no es una fecha real. */
 function compromiso_fecha_filtro(string $clave): ?string
 {
@@ -314,6 +454,15 @@ function compromisos_filtros_base(): array
         }
     }
 
+    // Concepto agrupado por su primera palabra ("Cuota" incluye "Cuota 3"); "@sin" = sin concepto.
+    $concepto = api_string($_GET, 'concepto', 150);
+    if ($concepto === '@sin') {
+        $where[] = "TRIM(c.concepto) = ''";
+    } elseif ($concepto !== '') {
+        $where[] = "SUBSTRING_INDEX(TRIM(c.concepto), ' ', 1) = :f_concepto";
+        $params['f_concepto'] = explode(' ', trim($concepto))[0];
+    }
+
     return [$where, $params];
 }
 
@@ -354,12 +503,16 @@ function compromisos_resumen(PDO $db, array $where, array $params): array
 /**
  * Una fila por quien cargó compromisos. Cumplimiento del mes: del $ prometido
  * para fechas del mes que ya llegaron (día 1 a hoy), el % que se cobró.
+ * Lo prometido no cuenta dos veces lo que se movió a otra fecha: un compromiso
+ * 'reprogramado' no entra (cuenta el nuevo, en su fecha) y un pago parcial con el
+ * saldo ya agendado entra solo por lo que se pagó (el saldo cuenta en el nuevo).
  *
  * @return list<array<string, mixed>>
  */
 function compromisos_por_usuario(PDO $db): array
 {
     $mes = "DATE(c.fecha_compromiso) BETWEEN DATE_FORMAT(CURDATE(), '%Y-%m-01') AND CURDATE()";
+    $prometido = "IF(c.estado = 'parcial' AND EXISTS (SELECT 1 FROM compromisos h WHERE h.origen_id = c.id), c.monto_pagado, c.monto)";
     $filas = $db->query(
         "SELECT c.creado_por_usuario_id AS usuario_id,
                 COALESCE(MAX(u.nombre), NULLIF(MAX(c.creado_por_nombre), ''), 'Sin registrar') AS nombre,
@@ -369,7 +522,7 @@ function compromisos_por_usuario(PDO $db): array
                 SUM(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE()) AS vencidos_cantidad,
                 COALESCE(SUM(IF(c.estado = 'pendiente' AND DATE(c.fecha_compromiso) < CURDATE(), c.monto, 0)), 0) AS vencidos_monto,
                 COALESCE(SUM(IF(c.estado IN ('pagado','parcial') AND c.fecha_resolucion >= DATE_FORMAT(CURDATE(), '%Y-%m-01'), c.monto_pagado, 0)), 0) AS cobrado_mes,
-                COALESCE(SUM(IF({$mes}, c.monto, 0)), 0) AS prometido_mes,
+                COALESCE(SUM(IF({$mes} AND c.estado <> 'reprogramado', {$prometido}, 0)), 0) AS prometido_mes,
                 COALESCE(SUM(IF({$mes} AND c.estado IN ('pagado','parcial'), c.monto_pagado, 0)), 0) AS cobrado_prometido_mes,
                 MAX(c.creado_por_nombre) AS nombre_copiado
          FROM compromisos c LEFT JOIN usuarios u ON u.id = c.creado_por_usuario_id
@@ -421,7 +574,7 @@ function compromisos_exportar_csv(PDO $db, string $from, array $params, string $
 
     $estados = [
         'vencido' => 'Vencido', 'hoy' => 'Para hoy', 'proximo' => 'Próximo',
-        'pagado' => 'Pagado', 'parcial' => 'Pago parcial', 'incumplido' => 'Incumplido',
+        'pagado' => 'Pagado', 'parcial' => 'Pago parcial', 'incumplido' => 'Incumplido', 'reprogramado' => 'Reprogramado',
     ];
     $fecha = static fn (?string $valor): string => $valor ? date('d/m/Y', strtotime($valor)) : '';
     $monto = static fn (?string $valor): string => $valor === null ? '' : number_format((float) $valor, 2, ',', '');
@@ -459,6 +612,7 @@ function compromisos_listar(PDO $db): never
         case 'proximos': $where[] = "c.estado = 'pendiente' AND DATE(c.fecha_compromiso) > CURDATE()"; break;
         case 'pagados': $where[] = "c.estado IN ('pagado','parcial')"; break;
         case 'incumplidos': $where[] = "c.estado = 'incumplido'"; break;
+        case 'reprogramados': $where[] = "c.estado = 'reprogramado'"; break;
         case 'todos': break;
         default: json_response(['ok' => false, 'error' => 'El filtro no es válido.'], 422);
     }
@@ -567,6 +721,9 @@ if ($method === 'GET') {
         }
         json_response(['ok' => true, 'data' => $compromiso]);
     }
+    if (api_string($_GET, 'lista', 20) === 'conceptos') {
+        compromisos_conceptos($db);
+    }
     compromisos_listar($db);
 }
 
@@ -590,6 +747,12 @@ if ($method === 'POST') {
     }
     if ($accion === 'reabrir') {
         compromiso_reabrir($db, $id, $actual);
+    }
+    if ($accion === 'reprogramar') {
+        compromiso_reprogramar($db, $id, $actual, $body);
+    }
+    if ($accion === 'aviso') {
+        compromiso_aviso($db, $id, $actual);
     }
     json_response(['ok' => false, 'error' => 'Acción no válida.'], 422);
 }

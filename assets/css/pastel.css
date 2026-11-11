@@ -788,13 +788,15 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .compromiso-item--proximo    { background: var(--pastel-indigo); border-color: var(--pastel-indigo-borde); }
 .compromiso-item--pagado,
 .compromiso-item--parcial    { background: var(--pastel-green);  border-color: var(--pastel-green-borde); }
-.compromiso-item--incumplido { background: var(--pastel-gray);   border-color: var(--pastel-gray-borde); }
+.compromiso-item--incumplido,
+.compromiso-item--reprogramado { background: var(--pastel-gray);   border-color: var(--pastel-gray-borde); }
 .compromiso-item--vencido .chip-estado    { color: var(--red-texto); }
 .compromiso-item--hoy .chip-estado        { color: var(--orange-texto); }
 .compromiso-item--proximo .chip-estado    { color: var(--indigo-texto); }
 .compromiso-item--pagado .chip-estado,
 .compromiso-item--parcial .chip-estado    { color: var(--green-texto); }
-.compromiso-item--incumplido .chip-estado { color: var(--pastel-label-2); }
+.compromiso-item--incumplido .chip-estado,
+.compromiso-item--reprogramado .chip-estado { color: var(--pastel-label-2); }
 .compromiso-item__fila { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .compromiso-item__monto { font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 700; }
 .compromiso-item__detalle { margin: 0; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); }
@@ -1318,7 +1320,7 @@ button.card-pastel { cursor: pointer; font: inherit; }
 
 /* Fila compacta de un compromiso (Agenda). La reutilizan Hoy y la ficha en las fases siguientes. */
 .pago-fila {
-    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "persona monto" "estado acciones";
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "persona monto" "estado estado" "acciones acciones";
     align-items: center; gap: 4px 12px; padding: 8px 12px;
     border: 1px solid; border-radius: var(--radio-grupo); color: var(--pastel-label);
 }
@@ -1326,12 +1328,12 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .pago-fila--hoy        { background: var(--pastel-orange); border-color: var(--pastel-orange-borde); }
 .pago-fila--proximo    { background: var(--pastel-indigo); border-color: var(--pastel-indigo-borde); }
 .pago-fila--pagado, .pago-fila--parcial { background: var(--pastel-green); border-color: var(--pastel-green-borde); }
-.pago-fila--incumplido { background: var(--pastel-gray);   border-color: var(--pastel-gray-borde); }
+.pago-fila--incumplido, .pago-fila--reprogramado { background: var(--pastel-gray);   border-color: var(--pastel-gray-borde); }
 .pago-fila--vencido .chip-estado    { color: var(--red-texto); }
 .pago-fila--hoy .chip-estado        { color: var(--orange-texto); }
 .pago-fila--proximo .chip-estado    { color: var(--indigo-texto); }
 .pago-fila--pagado .chip-estado, .pago-fila--parcial .chip-estado { color: var(--green-texto); }
-.pago-fila--incumplido .chip-estado { color: var(--pastel-label-2); }
+.pago-fila--incumplido .chip-estado, .pago-fila--reprogramado .chip-estado { color: var(--pastel-label-2); }
 .pago-fila .chip-estado, .pagos-tabla .chip-estado { text-transform: none; letter-spacing: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); }
 .pago-fila__persona {
     grid-area: persona; display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
@@ -1342,25 +1344,21 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .pago-fila__detalle { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); }
 .pago-fila__monto { grid-area: monto; justify-self: end; font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 700; white-space: nowrap; }
 .pago-fila__estado { grid-area: estado; justify-self: start; }
-.pago-fila__acciones { grid-area: acciones; display: flex; justify-content: flex-end; gap: 6px; }
-.pago-icono {
-    display: inline-flex; align-items: center; justify-content: center; flex: none;
-    width: var(--celda-alto-min); height: var(--celda-alto-min); padding: 0; border: 0;
-    border-radius: var(--radio-grupo); background: #fff; color: var(--pastel-label); text-decoration: none; cursor: pointer;
-}
-.pago-icono svg { width: 18px; height: 18px; }
-.pago-icono--llamar svg { color: var(--tint); }
-.pago-icono--whatsapp svg, .pago-icono--cobrar svg { color: var(--green); }
-.pago-icono--deshacer svg { color: var(--gray); }
+.pago-fila > .pago-acciones { grid-area: acciones; justify-content: flex-start; }
 @media (min-width: 640px) {
-    .pago-fila { grid-template-columns: minmax(0, 1fr) minmax(96px, auto) 176px auto; grid-template-areas: "persona monto estado acciones"; gap: 12px; }
+    .pago-fila { grid-template-columns: minmax(0, 1fr) minmax(96px, auto) 176px; grid-template-areas: "persona monto estado" "acciones acciones acciones"; gap: 4px 12px; }
     .pago-fila__estado { justify-self: stretch; text-align: center; }
+    .pago-fila > .pago-acciones { justify-content: flex-end; }
+}
+/* Con ancho de sobra la botonera va en la misma línea. */
+@media (min-width: 1280px) {
+    .pago-fila { grid-template-columns: minmax(0, 1fr) minmax(96px, auto) 176px auto; grid-template-areas: "persona monto estado acciones"; gap: 12px; }
 }
 
 /* Tabla (desde 900 px) */
 .pagos-tabla-envoltorio { margin-top: 16px; overflow-x: auto; border: 1px solid var(--separator); border-radius: var(--radio-grupo); background: var(--bg-card); box-shadow: var(--sombra-sm); }
 .pagos-tabla { width: 100%; border-collapse: collapse; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--label); }
-.pagos-tabla th, .pagos-tabla td { padding: 4px 10px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--separator); }
+.pagos-tabla th, .pagos-tabla td { padding: 4px 8px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--separator); }
 .pagos-tabla thead th { padding-top: 0; padding-bottom: 0; background: var(--bg-card-2); color: var(--label-2); font-size: var(--fs-footnote); font-weight: 600; white-space: nowrap; }
 .pagos-tabla thead th[aria-sort="ascending"], .pagos-tabla thead th[aria-sort="descending"] { color: var(--label); }
 .pagos-tabla .pagos-tabla__num { text-align: right; }
@@ -1375,12 +1373,12 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .pagos-tabla__fila--hoy td:first-child { box-shadow: inset 3px 0 0 var(--orange); }
 .pagos-tabla__fila--proximo td:first-child { box-shadow: inset 3px 0 0 var(--indigo); }
 .pagos-tabla__fila--pagado td:first-child, .pagos-tabla__fila--parcial td:first-child { box-shadow: inset 3px 0 0 var(--green); }
-.pagos-tabla__fila--incumplido td:first-child { box-shadow: inset 3px 0 0 var(--gray); }
+.pagos-tabla__fila--incumplido td:first-child, .pagos-tabla__fila--reprogramado td:first-child { box-shadow: inset 3px 0 0 var(--gray); }
 .pagos-tabla__fila--vencido .chip-estado { color: var(--red-texto); background: var(--pastel-red); }
 .pagos-tabla__fila--hoy .chip-estado { color: var(--orange-texto); background: var(--pastel-orange); }
 .pagos-tabla__fila--proximo .chip-estado { color: var(--indigo-texto); background: var(--pastel-indigo); }
 .pagos-tabla__fila--pagado .chip-estado, .pagos-tabla__fila--parcial .chip-estado { color: var(--green-texto); background: var(--pastel-green); }
-.pagos-tabla__fila--incumplido .chip-estado { color: var(--pastel-label-2); background: var(--pastel-gray); }
+.pagos-tabla__fila--incumplido .chip-estado, .pagos-tabla__fila--reprogramado .chip-estado { color: var(--pastel-label-2); background: var(--pastel-gray); }
 .pagos-tabla tfoot th, .pagos-tabla tfoot td { padding-top: 12px; padding-bottom: 12px; background: var(--bg-card-2); border-bottom: 0; font-weight: 700; }
 
 /* Calendario (vista Mes): cuánto hay para cobrar cada día, sin abrir la celda.
@@ -1422,6 +1420,94 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .calendario-leyenda__nivel--3::after { height: 6px; }
 .calendario-leyenda__nivel--4::after { height: 8px; }
 .calendario-leyenda__rojo { margin-right: 4px; color: var(--red-texto); }
+
+/* =====================================================================
+   12c. PAGOS · acciones rápidas, WhatsApp, avisos y reprogramado
+        (Fase 3 de docs/plans/2026-11-11-compromisos-visualizacion.md)
+   ===================================================================== */
+
+/* Botonera de un compromiso (app/vistas/pago_acciones.php) */
+.pago-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.pago-acciones__grupo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pago-acciones__grupo--principal { order: -1; }
+.pago-accion {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none;
+    min-height: var(--celda-alto-min); padding: 0 12px; box-sizing: border-box;
+    border: 0; border-radius: var(--radio-grupo); background: #fff; color: var(--pastel-label);
+    font: inherit; font-size: var(--fs-subhead); font-weight: 600; text-decoration: none; white-space: nowrap; cursor: pointer;
+}
+.pago-accion svg { width: 16px; height: 16px; flex: none; }
+.pago-accion--icono { width: var(--celda-alto-min); padding: 0; }
+.pago-accion--icono svg { width: 18px; height: 18px; }
+.pago-accion--llamar svg { color: var(--tint); }
+.pago-accion--whatsapp svg { color: var(--green); }
+.pago-accion--pago { background: var(--green); color: #fff; }
+.pago-accion--pago svg { color: #fff; }
+.pago-accion--pago:not(.pago-accion--icono) { padding: 0 16px; }
+.pago-accion:disabled { opacity: .55; cursor: not-allowed; }
+/* Tarjetas y panel: los botones se reparten el ancho, cada grupo en su línea. */
+.pago-acciones--texto .pago-acciones__grupo { flex: 1 1 100%; }
+.pago-acciones--texto .pago-accion { flex: 1 1 0; min-width: 0; padding: 0 8px; }
+
+/* Tabla: la botonera va en una sola línea (los textos de las otras columnas son los que se acomodan). */
+.pago-acciones--tabla, .pago-acciones--tabla .pago-acciones__grupo { flex-wrap: nowrap; gap: 4px; }
+/* Celulares angostos: los tres botones principales se reparten el ancho; Parcial y Reprogramar pierden el ícono. */
+@media (max-width: 420px) {
+    .pago-acciones--texto .pago-accion { padding: 0 6px; }
+    .pago-acciones--texto .pago-acciones__grupo--principal .pago-accion:not(.pago-accion--pago) svg { display: none; }
+}
+
+/* Último aviso por WhatsApp / motivo por el que no se puede avisar */
+.card-pastel__aviso, .compromiso-item__aviso { margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.pago-fila__aviso { max-width: 100%; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.pagos-tabla__aviso { display: block; max-width: 220px; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+
+/* Historial de reprogramaciones en la ficha */
+.compromiso-item__cadena { margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600; color: var(--pastel-label-2); }
+
+/* Aviso con acción ("Pago registrado · Deshacer") */
+.toast-accion {
+    position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 90;
+    display: flex; align-items: center; gap: 12px; box-sizing: border-box; width: max-content; max-width: min(92vw, 460px);
+    padding: 6px 6px 6px 16px; border-radius: var(--radio-grupo);
+    background: var(--label); color: #fff; box-shadow: 0 6px 24px rgba(9, 30, 66, .28);
+}
+.toast-accion svg { width: 20px; height: 20px; flex: none; color: #8FE0CB; }
+.toast-accion__texto { flex: 1; font-size: var(--fs-subhead); line-height: var(--lh-subhead); font-weight: 600; }
+.toast-accion__boton {
+    min-height: var(--celda-alto-min); padding: 0 16px; border: 0; border-radius: var(--radio-chico);
+    background: rgba(255, 255, 255, .16); color: #fff; font: inherit; font-size: var(--fs-subhead); font-weight: 700; cursor: pointer;
+}
+@media (min-width: 1024px) { .toast-accion { bottom: 24px; } }
+
+/* Hoja compacta: Parcial, Reprogramar y Más */
+.sheet--compacta .sheet__header .btn-texto { min-height: var(--celda-alto-min); padding: 0 8px; }
+.pill--input input { height: 100%; }
+.pago-rapido-opciones { display: flex; flex-direction: column; gap: 8px; }
+.pago-rapido-opcion {
+    display: flex; align-items: flex-start; gap: 12px; min-height: var(--celda-alto-min); padding: 14px 16px; box-sizing: border-box;
+    border: 1px solid var(--separator); border-radius: var(--radio-grupo); background: var(--bg-card); color: var(--label);
+    font: inherit; text-align: left; cursor: pointer;
+}
+.pago-rapido-opcion svg { width: 20px; height: 20px; flex: none; margin-top: 2px; color: var(--label-2); }
+.pago-rapido-opcion strong, .pago-rapido-opcion small { display: block; }
+.pago-rapido-opcion small { margin-top: 2px; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+.pago-rapido-botones { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+
+/* Ajustes › Mensajes de WhatsApp */
+.plantillas-form { display: flex; flex-direction: column; gap: 16px; }
+.plantillas-form__ayuda { margin: 0; }
+.plantilla { display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid var(--separator); border-radius: var(--radio-grupo); background: var(--bg-card); }
+.plantilla > p { margin: 0; }
+.plantilla__cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.plantilla__titulo { font-weight: 600; }
+.plantilla__texto {
+    width: 100%; box-sizing: border-box; min-height: 96px; padding: 10px 12px;
+    border: 1px solid var(--separator); border-radius: var(--radio-chico); background: var(--bg-card); color: var(--label);
+    font: inherit; font-size: 16px; line-height: 22px; resize: vertical;
+}
+.plantilla__vista { padding: 10px 12px; border-radius: var(--radio-grupo); background: var(--pastel-green); color: var(--pastel-label); font-size: var(--fs-subhead); line-height: var(--lh-subhead); }
+.plantilla__vista-rotulo { display: block; margin-bottom: 2px; font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--green-texto); }
 
 /* =====================================================================
    13. MOVIMIENTO

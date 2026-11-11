@@ -63,9 +63,10 @@ agenda_daq/
 ├── api/                 # endpoints JSON (compromisos, contactos, agenda, panel, seguimientos, notas,
 │                        #   etiquetas, usuarios, ajustes, push, sas_clientes)
 ├── app/                 # config, db, auth, csrf, helpers, api, compromisos, push, sas (bloqueado)
+│   └── vistas/          #   partials de index.php (botonera de un compromiso, hoja de acciones rápidas)
 ├── assets/css/          # tokens.css, base.css, components.css, pastel.css (carga en ese orden)
 ├── assets/js/           # app.js + un módulo por pantalla: pagos, contactos, seguimientos, panel,
-│                        #   notas, ajustes, pwa
+│                        #   notas, ajustes, pagos_rapido, pwa
 ├── assets/icons/        # íconos de la app (PWA)
 ├── assets/vendor/       # alpine.min.js, lucide (local)
 ├── cron/                # scripts CLI: push (bloqueado)
@@ -80,7 +81,18 @@ agenda_daq/
   se guarda también lo que se tipeó en `celular`.
 - Fechas en BD como DATETIME en hora local Argentina.
 - Compromisos de pago: un pago prometido por registro, con estados pendiente,
-  pagado, parcial o incumplido; `origen_id` enlaza saldos y reprogramaciones.
+  pagado, parcial, incumplido o reprogramado; `origen_id` enlaza saldos y reprogramaciones.
+  «Reprogramado» = el cliente avisó que paga otro día: el original se cierra así (no es un
+  incumplimiento y no entra en el cumplimiento) y se crea uno nuevo con `origen_id`, a nombre
+  de quien cargó el original. Deshacer (`reabrir`) borra el nuevo si sigue pendiente.
+- Cumplimiento del mes (`por_usuario`): lo cobrado sobre lo prometido para fechas del mes que
+  ya llegaron; un reprogramado no cuenta y un parcial con saldo agendado cuenta por lo pagado.
+- Acciones de un compromiso (Pagó, Parcial, Reprogramar, WhatsApp, Más): un solo partial,
+  `app/vistas/pago_acciones.php`, incluido en Hoy, Pagos (agenda, tabla, tarjetas) y el panel
+  del día del Calendario. La lógica está en `assets/js/pagos_rapido.js`.
+- Plantillas de WhatsApp (antes del vencimiento / vence hoy / vencido): se guardan en `config`
+  (`wa_plantilla_*`), solo las edita el admin; los textos por defecto viven en `app/compromisos.php`.
+  Tocar el botón anota un seguimiento «WhatsApp: recordatorio de pago…» y el último aviso del compromiso.
 - Eliminar un contacto elimina en cascada sus compromisos, seguimientos,
   etiquetas y avisos asociados.
 - Rutas: en WAMP la app corre en subcarpeta (http://localhost/agenda_daq/) y en producción en la raíz

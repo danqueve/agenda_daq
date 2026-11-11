@@ -33,7 +33,7 @@ function contactosModule() {
                 id: null,
                 nombre: '', celular: '', dni: '', sas_cliente_id: null, consulta: '', producto_interes: '', origen: 'otro',
                 localidad: '', provincia: '', proximo_contacto: '', etiquetas: [], masDatos: false,
-                conPago: false, pago: { monto: '', concepto: '', dia: '' },
+                conPago: false, pago: { monto: '', concepto: '', cuota: '', dia: '' },
             };
         },
 
@@ -105,7 +105,10 @@ function contactosModule() {
             const response = await fetch(url, { credentials: 'same-origin', ...options, headers });
             const payload = await response.json().catch(() => ({}));
             if (!response.ok || !payload.ok) {
-                throw new Error(payload.error || 'No se pudo completar la acción. Probá de nuevo.');
+                const error = new Error(payload.error || 'No se pudo completar la acción. Probá de nuevo.');
+                // Con el código HTTP se distingue, por ejemplo, un 409 (ya lo registró otra persona).
+                error.status = response.status;
+                throw error;
             }
             return payload;
         },
@@ -290,7 +293,7 @@ function contactosModule() {
                     return;
                 }
                 form.proximo_contacto = '';
-                form.compromiso = { monto: pago.monto, concepto: pago.concepto, fecha_compromiso: `${pago.dia}T09:00` };
+                form.compromiso = { monto: pago.monto, concepto: this.conceptoConCuota(pago.concepto, pago.cuota), fecha_compromiso: `${pago.dia}T09:00` };
             }
             this.guardandoContacto = true;
             try {

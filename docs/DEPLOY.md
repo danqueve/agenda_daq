@@ -178,6 +178,13 @@ Si la instalación ya existe, ejecutar la migración de compromisos con el PHP
 mysql -u c2881399_agenda -p c2881399_agenda < sql/migrations/005_compromisos.sql
 ```
 
+Para sumar el estado «reprogramado», el último aviso por WhatsApp y ampliar `config.valor`
+(plantillas de WhatsApp), ejecutar también, una sola vez:
+
+```bash
+mysql -u c2881399_agenda -p c2881399_agenda < sql/migrations/007_compromisos_reprogramado_avisos.sql
+```
+
 La tabla `compromisos` usa `ON DELETE CASCADE` hacia `contactos`: al eliminar
 un contacto también se eliminan sus compromisos de pago.
 

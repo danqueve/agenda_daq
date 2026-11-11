@@ -140,11 +140,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <p class="card-pastel__monto tabular" x-text="formatoMonto(pago.monto)"></p>
                                     <p class="card-pastel__fecha tabular"><i data-lucide="calendar-days"></i><span x-text="fechaPago(pago)"></span></p>
                                     <p class="card-pastel__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
-                                    <div class="card-pastel__acciones">
-                                        <a class="quick-action-card quick-action-card--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
-                                        <a class="quick-action-card quick-action-card--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
-                                        <button type="button" class="quick-action-card quick-action-card--cobrar" @click="abrirPagoResolver(pago)"><i data-lucide="hand-coins"></i>Registrar</button>
-                                    </div>
+                                    <p class="card-pastel__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></p>
+                                    <?php $variante = 'texto'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
                                 </article>
                             </template>
                         </div>
@@ -385,12 +382,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                         </div>
                                         <p class="compromiso-item__detalle" x-text="[pago.contacto_nombre, pago.concepto].filter(Boolean).join(' · ')"></p>
                                         <p class="compromiso-item__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
-                                        <div class="compromiso-item__acciones">
-                                            <a class="boton-blanco boton-blanco--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
-                                            <a class="boton-blanco boton-blanco--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
-                                            <button type="button" class="boton-blanco boton-blanco--hecho" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)"><i data-lucide="hand-coins"></i>Registrar pago</button>
-                                            <button type="button" class="boton-blanco" x-show="pago.estado !== 'pendiente'" @click="abrirFicha(pago.contacto_id)">Abrir ficha</button>
-                                        </div>
+                                        <p class="compromiso-item__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></p>
+                                        <?php $variante = 'texto'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
                                     </div>
                                 </template>
                             </div>
@@ -590,7 +583,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                         <div class="stat-card stat-card--proximo"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Próximos 7 días</span><span class="stat-card__icono"><i data-lucide="calendar-days"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().proximos.monto)"></strong><p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenVisiblePagos().proximos.cantidad)"></p></div>
                         <div class="stat-card stat-card--concreto"><div class="stat-card__cabecera"><span class="stat-card__etiqueta">Cobrado</span><span class="stat-card__icono"><i data-lucide="check"></i></span></div><strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().cobrado_mes)"></strong><p class="stat-card__ayuda">Este mes</p></div>
                     </div>
-                    <p class="pagos-nota" x-show="pagosResumenFiltrado" x-cloak><i data-lucide="filter"></i><span>Estos totales cuentan solo lo que cumple el filtro de fechas y de quién lo cargó.</span><button class="btn-texto" type="button" @click="limpiarFiltrosPagos()">Quitar filtros</button></p>
+                    <p class="pagos-nota" x-show="pagosResumenFiltrado" x-cloak><i data-lucide="filter"></i><span>Estos totales cuentan solo lo que cumple el filtro de fechas, de quién lo cargó y de concepto.</span><button class="btn-texto" type="button" @click="limpiarFiltrosPagos()">Quitar filtros</button></p>
 
                     <div class="pagos-barra">
                         <div class="segmented pagos-vistas" role="tablist" aria-label="Vista de los pagos">
@@ -602,7 +595,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                     </div>
 
                     <div class="filtro-pills pagos-filtros" role="tablist" aria-label="Estado de los compromisos">
-                        <template x-for="opcion in [{id: 'pendientes', texto: 'Pendientes'}, {id: 'vencidos', texto: 'Vencidos'}, {id: 'hoy', texto: 'Para hoy'}, {id: 'proximos', texto: 'Próximos'}, {id: 'pagados', texto: 'Pagados'}, {id: 'incumplidos', texto: 'Incumplidos'}, {id: 'todos', texto: 'Todos'}]" :key="opcion.id">
+                        <template x-for="opcion in [{id: 'pendientes', texto: 'Pendientes'}, {id: 'vencidos', texto: 'Vencidos'}, {id: 'hoy', texto: 'Para hoy'}, {id: 'proximos', texto: 'Próximos'}, {id: 'pagados', texto: 'Pagados'}, {id: 'incumplidos', texto: 'Incumplidos'}, {id: 'reprogramados', texto: 'Reprogramados'}, {id: 'todos', texto: 'Todos'}]" :key="opcion.id">
                             <button class="filtro-pill" type="button" role="tab" :aria-selected="filtroPagos === opcion.id" @click="filtrarPagos(opcion.id)" x-text="opcion.texto"></button>
                         </template>
                     </div>
@@ -620,6 +613,15 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 <option value="yo">Yo</option>
                                 <template x-for="usuario in otrosUsuariosPagos()" :key="usuario.filtro">
                                     <option :value="usuario.filtro" x-text="usuario.usuario_id === null ? `${usuario.nombre} (cuenta eliminada)` : usuario.nombre"></option>
+                                </template>
+                            </select>
+                        </label>
+                        <label class="pagos-campo">
+                            <span class="pagos-campo__rotulo">Concepto</span>
+                            <select x-model="pagosConcepto" @change="cargarPagos(true)">
+                                <option value="">Todos</option>
+                                <template x-for="opcion in opcionesConceptoFiltro()" :key="opcion.valor">
+                                    <option :value="opcion.valor" x-text="opcion.texto"></option>
                                 </template>
                             </select>
                         </label>
@@ -671,15 +673,11 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                                 <button type="button" class="pago-fila__persona" @click="abrirFicha(pago.contacto_id)">
                                                     <span class="pago-fila__nombre" x-text="pago.contacto_nombre"></span>
                                                     <span class="pago-fila__detalle" x-text="detallePagoFila(pago)"></span>
+                                                    <span class="pago-fila__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></span>
                                                 </button>
                                                 <strong class="pago-fila__monto tabular" x-text="montoPagoTexto(pago)"></strong>
                                                 <span class="chip-estado chip-estado--estado pago-fila__estado" x-text="estadoAtrasoPago(pago)"></span>
-                                                <div class="pago-fila__acciones">
-                                                <a class="pago-icono pago-icono--llamar" :href="`tel:+${pago.contacto_celular_norm}`" :title="`Llamar a ${pago.contacto_nombre}`" :aria-label="`Llamar a ${pago.contacto_nombre}`"><i data-lucide="phone"></i></a>
-                                                <a class="pago-icono pago-icono--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`" :title="`WhatsApp a ${pago.contacto_nombre}`" :aria-label="`WhatsApp a ${pago.contacto_nombre}`"><i data-lucide="message-circle"></i></a>
-                                                <button type="button" class="pago-icono pago-icono--cobrar" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)" :title="`Registrar pago de ${pago.contacto_nombre}`" :aria-label="`Registrar pago de ${pago.contacto_nombre}`"><i data-lucide="hand-coins"></i></button>
-                                                <button type="button" class="pago-icono pago-icono--deshacer" x-show="pago.estado !== 'pendiente'" @click="reabrirCompromiso(pago)" :title="`Deshacer el registro de ${pago.contacto_nombre}`" :aria-label="`Deshacer el registro de ${pago.contacto_nombre}`"><i data-lucide="rotate-ccw"></i></button>
-                                                </div>
+                                                <?php $variante = 'fila'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
                                             </article>
                                         </template>
                                     </div>
@@ -709,7 +707,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <template x-for="pago in pagos" :key="`pt-${pago.id}`">
                                         <tr :class="`pagos-tabla__fila--${pago.situacion}`">
                                             <td class="tabular" x-text="fechaTablaPago(pago)"></td>
-                                            <td><button type="button" class="pagos-tabla__cliente" @click="abrirFicha(pago.contacto_id)" x-text="pago.contacto_nombre"></button></td>
+                                            <td><button type="button" class="pagos-tabla__cliente" @click="abrirFicha(pago.contacto_id)" x-text="pago.contacto_nombre"></button><small class="pagos-tabla__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></small></td>
                                             <td x-text="pago.concepto || '—'"></td>
                                             <td class="pagos-tabla__num tabular" x-text="montoPagoTexto(pago)"></td>
                                             <td><span class="chip-estado chip-estado--estado" x-text="etiquetaPago(pago)"></span></td>
@@ -717,12 +715,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                             <td x-text="pago.creado_por_nombre || 'Sin registrar'"></td>
                                             <td x-text="pago.resuelto_por_nombre || '—'"></td>
                                             <td>
-                                                <div class="pago-fila__acciones">
-                                                <a class="pago-icono pago-icono--llamar" :href="`tel:+${pago.contacto_celular_norm}`" :title="`Llamar a ${pago.contacto_nombre}`" :aria-label="`Llamar a ${pago.contacto_nombre}`"><i data-lucide="phone"></i></a>
-                                                <a class="pago-icono pago-icono--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`" :title="`WhatsApp a ${pago.contacto_nombre}`" :aria-label="`WhatsApp a ${pago.contacto_nombre}`"><i data-lucide="message-circle"></i></a>
-                                                <button type="button" class="pago-icono pago-icono--cobrar" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)" :title="`Registrar pago de ${pago.contacto_nombre}`" :aria-label="`Registrar pago de ${pago.contacto_nombre}`"><i data-lucide="hand-coins"></i></button>
-                                                <button type="button" class="pago-icono pago-icono--deshacer" x-show="pago.estado !== 'pendiente'" @click="reabrirCompromiso(pago)" :title="`Deshacer el registro de ${pago.contacto_nombre}`" :aria-label="`Deshacer el registro de ${pago.contacto_nombre}`"><i data-lucide="rotate-ccw"></i></button>
-                                                </div>
+                                                <?php $variante = 'tabla'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
                                             </td>
                                         </tr>
                                     </template>
@@ -756,12 +749,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <p class="card-pastel__monto tabular" x-text="montoPagoTexto(pago)"></p>
                                     <p class="card-pastel__fecha tabular"><i data-lucide="calendar-days"></i><span x-text="fechaPago(pago)"></span></p>
                                     <p class="card-pastel__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
-                                    <div class="card-pastel__acciones">
-                                        <a class="quick-action-card quick-action-card--llamar" :href="`tel:+${pago.contacto_celular_norm}`"><i data-lucide="phone"></i>Llamar</a>
-                                        <a class="quick-action-card quick-action-card--whatsapp" target="_blank" rel="noopener" :href="`https://wa.me/${pago.contacto_celular_norm}`"><i data-lucide="message-circle"></i>WhatsApp</a>
-                                        <button type="button" class="quick-action-card quick-action-card--cobrar" x-show="pago.estado === 'pendiente'" @click="abrirPagoResolver(pago)"><i data-lucide="hand-coins"></i>Registrar</button>
-                                        <button type="button" class="quick-action-card quick-action-card--deshacer" x-show="pago.estado !== 'pendiente'" @click="reabrirCompromiso(pago)"><i data-lucide="rotate-ccw"></i>Deshacer</button>
-                                    </div>
+                                    <p class="card-pastel__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></p>
+                                    <?php $variante = 'texto'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
                                 </article>
                             </template>
                         </section>
@@ -821,6 +810,25 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <span class="cell__chevron"><i data-lucide="chevron-right"></i></span>
                                 </button>
                             </div>
+                        </div>
+
+                        <div x-show="esAdmin" x-cloak>
+                            <p class="group__header footnote">mensajes de whatsapp</p>
+                            <form class="plantillas-form" @submit.prevent="guardarPlantillasWhatsapp()">
+                                <p class="footnote plantillas-form__ayuda">El botón de WhatsApp de cada compromiso arma el mensaje con el texto que corresponda. Variables: <span x-text="plantillaVariables.map((v) => `{${v}}`).join(' ')"></span></p>
+                                <template x-for="tipo in tiposPlantilla" :key="tipo.id">
+                                    <div class="plantilla">
+                                        <div class="plantilla__cabecera">
+                                            <label class="plantilla__titulo" :for="`plantilla-${tipo.id}`" x-text="tipo.titulo"></label>
+                                            <button type="button" class="btn-texto" @click="restablecerPlantilla(tipo.id)">Restablecer</button>
+                                        </div>
+                                        <p class="footnote" x-text="tipo.ayuda"></p>
+                                        <textarea class="plantilla__texto" :id="`plantilla-${tipo.id}`" x-model="formularioPlantillas[tipo.id]" rows="4" maxlength="500"></textarea>
+                                        <p class="plantilla__vista"><span class="plantilla__vista-rotulo">Así se ve</span><span x-text="vistaPreviaPlantilla(formularioPlantillas[tipo.id])"></span></p>
+                                    </div>
+                                </template>
+                                <button class="btn-principal" type="submit" :disabled="guardandoPlantillas"><i data-lucide="message-circle"></i><span x-text="guardandoPlantillas ? 'Guardando…' : 'Guardar mensajes'"></span></button>
+                            </form>
                         </div>
 
                         <div x-show="esAdmin" x-cloak>
@@ -915,7 +923,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                             <div x-show="formularioContacto.conPago" x-transition.opacity>
                                 <div class="group form-group">
                                     <label class="cell form-cell"><span class="cell__label">Monto</span><input type="number" step="0.01" min="0.01" inputmode="decimal" x-model="formularioContacto.pago.monto" :required="formularioContacto.conPago" placeholder="$ 0"></label>
-                                    <label class="cell form-cell"><span class="cell__label">Concepto</span><input x-model.trim="formularioContacto.pago.concepto" maxlength="150" placeholder="Ej. seña, cuota 1"></label>
+                                    <label class="cell form-cell"><span class="cell__label">Concepto</span><input x-model.trim="formularioContacto.pago.concepto" maxlength="150" list="conceptos-pagos" autocomplete="off" placeholder="Elegí o escribí"></label>
+                                    <label class="cell form-cell" x-show="esConceptoCuota(formularioContacto.pago.concepto)"><span class="cell__label">N° de cuota</span><input type="number" min="1" max="999" inputmode="numeric" x-model="formularioContacto.pago.cuota" placeholder="Opcional, ej. 3"></label>
                                 </div>
                                 <p class="group__header footnote">fecha del pago</p>
                                 <div class="group form-group">
@@ -978,7 +987,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                     <p class="group__header footnote">pago</p>
                     <div class="group form-group">
                         <label class="cell form-cell"><span class="cell__label">Monto</span><input type="number" step="0.01" min="0.01" inputmode="decimal" x-model="compromisoForm.monto" required placeholder="$ 0"></label>
-                        <label class="cell form-cell"><span class="cell__label">Concepto</span><input x-model.trim="compromisoForm.concepto" maxlength="150" placeholder="Ej. cuota 3, saldo"></label>
+                        <label class="cell form-cell"><span class="cell__label">Concepto</span><input x-model.trim="compromisoForm.concepto" maxlength="150" list="conceptos-pagos" autocomplete="off" placeholder="Elegí o escribí"></label>
+                                    <label class="cell form-cell" x-show="esConceptoCuota(compromisoForm.concepto)"><span class="cell__label">N° de cuota</span><input type="number" min="1" max="999" inputmode="numeric" x-model="compromisoForm.cuota" placeholder="Opcional, ej. 3"></label>
                     </div>
 
                     <p class="group__header footnote">fecha del pago</p>
@@ -1040,6 +1050,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                 </div>
             </form>
         </div>
+
+<?php require __DIR__ . '/app/vistas/pago_rapido_hoja.php'; ?>
 
         <div class="sheet-backdrop" x-show="sheetDuplicado" x-transition.opacity @keydown.escape.window="sheetDuplicado = false" @click.self="sheetDuplicado = false" x-cloak>
             <section class="sheet sheet--media alert-sheet" role="alertdialog" aria-modal="true" aria-labelledby="duplicado-titulo"><div class="sheet__grabber"></div><div class="sheet__body"><i class="alert-sheet__icon" data-lucide="copy"></i><h2 id="duplicado-titulo" class="title2">Este número ya está cargado</h2><p class="subhead">Se lo agregará como una nueva consulta a <strong x-text="duplicadoPendiente?.nombre"></strong>.</p><div class="alert-sheet__actions"><button type="button" class="btn-principal" @click="guardarContacto(true)">Agregar consulta</button><button type="button" class="btn-texto" @click="sheetDuplicado = false">Cancelar</button></div></div></section>
@@ -1110,6 +1122,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                             <span class="chip-estado chip-estado--estado" x-text="etiquetaPago(compromiso)"></span>
                                         </div>
                                         <p class="compromiso-item__detalle" x-text="[compromiso.concepto, fechaPago(compromiso)].filter(Boolean).join(' · ')"></p>
+                                        <p class="compromiso-item__cadena" x-show="cadenaCompromisoTexto(compromiso)" x-text="cadenaCompromisoTexto(compromiso)"></p>
                                         <div class="compromiso-item__acciones">
                                             <button type="button" class="boton-blanco boton-blanco--hecho" x-show="compromiso.estado === 'pendiente'" @click="abrirPagoResolver(compromiso)"><i data-lucide="hand-coins"></i>Registrar pago</button>
                                             <button type="button" class="boton-blanco" x-show="compromiso.estado === 'pendiente'" @click="abrirCompromisoEditar(compromiso)"><i data-lucide="pencil"></i>Editar</button>
@@ -1174,6 +1187,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
 
         <div class="sheet-backdrop" x-show="sheetEliminar" x-transition.opacity @keydown.escape.window="sheetEliminar = false" @click.self="sheetEliminar = false" x-cloak><section class="sheet sheet--media alert-sheet" role="alertdialog" aria-modal="true"><div class="sheet__grabber"></div><div class="sheet__body"><i class="alert-sheet__icon alert-sheet__icon--danger" data-lucide="trash-2"></i><h2 class="title2">¿Eliminar contacto?</h2><p class="subhead">Se eliminarán también sus consultas y su historial. Esta acción no se puede deshacer.</p><div class="alert-sheet__actions"><button class="btn-principal btn-principal--danger" type="button" @click="eliminarContacto()">Eliminar contacto</button><button class="btn-texto" type="button" @click="sheetEliminar = false">Cancelar</button></div></div></section></div>
 
+        <datalist id="conceptos-pagos"><template x-for="opcion in conceptoOpciones()" :key="opcion"><option :value="opcion"></option></template></datalist>
         <div class="hud-capa" x-show="hudVisible" x-transition.opacity x-cloak><div class="hud"><i :data-lucide="hudIcono"></i><span x-text="hudTexto"></span></div></div>
     </div>
 
@@ -1186,6 +1200,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     <script src="assets/js/ajustes.js"></script>
     <script src="assets/js/notas.js"></script>
     <script src="assets/js/pagos.js"></script>
+    <script src="assets/js/pagos_rapido.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/pwa.js"></script>
 </body>

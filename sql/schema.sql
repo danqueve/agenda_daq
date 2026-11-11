@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS avisos_enviados (
 -- Ajustes clave/valor (ej. hora del resumen push diario)
 CREATE TABLE IF NOT EXISTS config (
     clave VARCHAR(50) NOT NULL,
-    valor VARCHAR(255) DEFAULT NULL,
+    valor TEXT DEFAULT NULL,
     PRIMARY KEY (clave)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -158,12 +158,15 @@ CREATE TABLE IF NOT EXISTS compromisos (
     monto DECIMAL(12,2) NOT NULL,
     concepto VARCHAR(150) NOT NULL DEFAULT '',
     fecha_compromiso DATETIME NOT NULL,
-    estado ENUM('pendiente','pagado','parcial','incumplido') NOT NULL DEFAULT 'pendiente',
+    estado ENUM('pendiente','pagado','parcial','incumplido','reprogramado') NOT NULL DEFAULT 'pendiente',
     monto_pagado DECIMAL(12,2) DEFAULT NULL,
     fecha_resolucion DATETIME DEFAULT NULL,
     nota TEXT,
     origen_id INT UNSIGNED DEFAULT NULL,
     recordatorio_enviado TINYINT(1) NOT NULL DEFAULT 0,
+    ultimo_aviso_en DATETIME DEFAULT NULL,
+    ultimo_aviso_por_usuario_id INT UNSIGNED DEFAULT NULL,
+    ultimo_aviso_por_nombre VARCHAR(100) NOT NULL DEFAULT '',
     creado_por_usuario_id INT UNSIGNED DEFAULT NULL,
     creado_por_nombre VARCHAR(100) NOT NULL DEFAULT '',
     resuelto_por_usuario_id INT UNSIGNED DEFAULT NULL,
@@ -176,5 +179,6 @@ CREATE TABLE IF NOT EXISTS compromisos (
     CONSTRAINT fk_compromisos_contacto FOREIGN KEY (contacto_id) REFERENCES contactos (id) ON DELETE CASCADE,
     CONSTRAINT fk_compromisos_origen FOREIGN KEY (origen_id) REFERENCES compromisos (id) ON DELETE SET NULL,
     CONSTRAINT fk_compromisos_creado_por FOREIGN KEY (creado_por_usuario_id) REFERENCES usuarios (id) ON DELETE SET NULL,
-    CONSTRAINT fk_compromisos_resuelto_por FOREIGN KEY (resuelto_por_usuario_id) REFERENCES usuarios (id) ON DELETE SET NULL
+    CONSTRAINT fk_compromisos_resuelto_por FOREIGN KEY (resuelto_por_usuario_id) REFERENCES usuarios (id) ON DELETE SET NULL,
+    CONSTRAINT fk_compromisos_ultimo_aviso_por FOREIGN KEY (ultimo_aviso_por_usuario_id) REFERENCES usuarios (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
