@@ -1,6 +1,8 @@
 /vendor/
 /.env
 /storage/logs/*
+# Marca temporal de «SAS no responde» (app/sas.php): no se versiona.
+/storage/sas_no_disponible
 !/storage/logs/.gitkeep
 /storage/backups/*
 !/storage/backups/.gitkeep

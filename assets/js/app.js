@@ -7,6 +7,7 @@ function appShell() {
         ...notasModule(),
         ...pagosModule(),
         ...pagosRapidoModule(),
+        ...sasModule(),
         activo: 'hoy',
         badgeHoy: 0,
         fechaHoy: '',

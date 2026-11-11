@@ -23,7 +23,7 @@ function compromiso_buscar(PDO $db, int $id): ?array
 {
     $stmt = $db->prepare(
         'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . ' AS situacion,
-                k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm,
+                k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm, k.sas_cliente_id AS contacto_sas_cliente_id,
                 k.estado AS contacto_estado
          FROM compromisos c INNER JOIN contactos k ON k.id = c.contacto_id
          WHERE c.id = :id'
@@ -681,7 +681,7 @@ function compromisos_listar(PDO $db): never
     $stmt = $db->prepare(
         'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . ' AS situacion, '
         . COMPROMISO_ATRASO_SQL . ' AS dias_atraso,
-                k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm,
+                k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm, k.sas_cliente_id AS contacto_sas_cliente_id,
                 k.estado AS contacto_estado' . $from . '
          ORDER BY ' . $ordenSql . '
          LIMIT :limite OFFSET :offset'

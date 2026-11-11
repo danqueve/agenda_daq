@@ -182,3 +182,12 @@ CREATE TABLE IF NOT EXISTS compromisos (
     CONSTRAINT fk_compromisos_resuelto_por FOREIGN KEY (resuelto_por_usuario_id) REFERENCES usuarios (id) ON DELETE SET NULL,
     CONSTRAINT fk_compromisos_ultimo_aviso_por FOREIGN KEY (ultimo_aviso_por_usuario_id) REFERENCES usuarios (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Caché del resumen de SAS Imperio por cliente (migración 008). Se puede vaciar sin perder datos.
+CREATE TABLE IF NOT EXISTS sas_resumen_cache (
+    sas_cliente_id INT UNSIGNED NOT NULL,
+    datos JSON NOT NULL,
+    consultado_en DATETIME NOT NULL,
+    PRIMARY KEY (sas_cliente_id),
+    KEY idx_sas_cache_consultado (consultado_en)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

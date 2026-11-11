@@ -82,19 +82,27 @@ Archivos: `sql/migrations/007_…`, `app/compromisos.php`, `api/compromisos.php`
 
 ## Fase 4 — Datos de SAS en cada compromiso
 
-**Objetivo:** que el compromiso muestre cómo está el cliente en SAS Imperio, sin salir de la agenda.
+**Objetivo:** al ver un compromiso, saber sin abrir SAS cuánto debe el cliente y si ya pagó algo que todavía
+no se registró en la Agenda. Siempre en **solo lectura**: `SasDb::get()` abre la sesión en `READ ONLY`, y si SAS
+no responde la Agenda funciona igual, sin esos datos.
 
-1. En cada compromiso: **días de atraso**, **cuotas vencidas** y **fecha del último pago**, leídos de SAS.
-2. **Sugerencia de "pagado"**: si SAS registró un pago posterior al compromiso, la agenda lo propone como
-   pagado para confirmar (nunca se marca solo).
-3. **Requisito**: hoy el usuario de SAS solo puede leer `ic_clientes`; hay que pedir un
-   `GRANT SELECT` sobre las tablas de cuotas y pagos que se vayan a leer.
+1. **Permisos** (`sql/sas_usuario_solo_lectura.sql`): `SELECT` por columnas sobre `ic_clientes`, `ic_creditos`,
+   `ic_cuotas`, `ic_pagos_confirmados` e `ic_pagos_temporales`. Detalle en `docs/DEPLOY.md`.
+2. **Vincular contactos**: `cron/vincular_sas.php` (simula por defecto, `--aplicar` escribe solo en la Agenda;
+   una sola coincidencia por DNI o celular, el resto va a un reporte) y botón «Vincular con SAS» en la ficha.
+3. **Resumen por cliente** (créditos activos y saldo, cuotas vencidas y atraso, último pago, pagos informados sin
+   aprobar), sin mora y con días hábiles como SAS. Se guarda 10 minutos en `sas_resumen_cache` (migración 008) y
+   se pide por lote (`api/sas_resumen.php`).
+4. **Mostrarlo**: chip «SAS: 3 cuotas vencidas · 42 días» en cada compromiso pendiente (Hoy, Pagos, Calendario),
+   bloque «En SAS Imperio» en la ficha y sugerencia «SAS registró un pago de $X el 13/11 · ¿Marcar como pagado?»
+   que nunca marca sola y usa el registro rápido de la Fase 3.
 
-Reglas que no cambian: SAS es **solo lectura** (nunca se escribe) y si SAS no responde o la integración
-está apagada, la agenda funciona igual, sin esos datos (`SasDb::get()` devuelve `null`).
+Queda para más adelante: el filtro «Con pago en SAS sin registrar» en Pagos (necesita cruzar con SAS en cada
+listado paginado).
 
-Archivos probables: `app/sas.php`, `api/sas_clientes.php` o un endpoint nuevo, `api/compromisos.php`,
-`assets/js/pagos.js`, `index.php`.
+Archivos: `app/sas.php`, `api/sas_resumen.php`, `api/sas_vinculo.php`, `cron/vincular_sas.php`,
+`app/vistas/pago_sas.php`, `app/vistas/sas_ficha.php`, `app/vistas/sas_vincular_hoja.php`, `assets/js/sas.js`,
+`index.php`, `assets/css/pastel.css`.
 
 ## Fase 5 — Ordenar el código
 

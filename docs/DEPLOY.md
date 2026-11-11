@@ -203,21 +203,46 @@ Generar las claves VAPID para push y pegarlas en `.env` (`VAPID_PUBLIC` y `VAPID
 ## 5b. Integración opcional con SAS Imperio (solo lectura)
 
 Permite buscar clientes de SAS Imperio por celular, DNI o apellido/nombre desde
-**Nueva consulta**. Requiere que la base de SAS esté en el mismo servidor MySQL.
-La Agenda solo lee `ic_clientes`; nunca escribe en SAS.
+**Nueva consulta**, vincular contactos existentes y mostrar en cada compromiso lo que
+dice SAS (cuotas vencidas, saldo, último pago). Requiere que la base de SAS esté en el
+mismo servidor MySQL. **La Agenda nunca escribe en SAS**: toda consulta pasa por
+`SasDb::get()`, que además abre la sesión en `READ ONLY`. Si `SAS_DB_NAME` queda vacío
+o SAS no responde, la Agenda funciona igual, sin esos datos.
 
-1. Crear un usuario MySQL de solo lectura (reemplazar `<base_sas>` y la clave):
+1. Crear el usuario de solo lectura con `sql/sas_usuario_solo_lectura.sql` (cambiar la
+   clave antes). Se ejecuta como root, en el servidor y también en local. Da `SELECT` solo
+   sobre estas columnas:
 
-   ```sql
-   CREATE USER 'agenda_sas_ro'@'localhost' IDENTIFIED BY '<clave-larga>';
-   GRANT SELECT ON `<base_sas>`.`ic_clientes` TO 'agenda_sas_ro'@'localhost';
-   FLUSH PRIVILEGES;
+   | Tabla | Columnas | Para qué |
+   |---|---|---|
+   | `ic_clientes` | `id, nombres, apellidos, dni, telefono, telefono_alt, localidad, estado` | Buscar y vincular contactos por DNI, celular o nombre |
+   | `ic_creditos` | `id, cliente_id, estado` | Créditos activos (`EN_CURSO` y `MOROSO`) |
+   | `ic_cuotas` | `id, credito_id, fecha_vencimiento, monto_cuota, saldo_pagado, estado` | Saldo, cuotas vencidas impagas y atraso de la más vieja |
+   | `ic_pagos_confirmados` | `cuota_id, fecha_jornada, monto_total, revertido` | Último pago confirmado (sin los revertidos) |
+   | `ic_pagos_temporales` | `cuota_id, fecha_registro, fecha_jornada, monto_total, estado` | Pagos informados por el cobrador que esperan aprobación |
+
+   No se lee CUIL, dirección, coordenadas, token de acceso, mora ni usuarios de SAS.
+   Verificar con `SHOW GRANTS FOR 'agenda_sas_ro'@'localhost';` (solo `SELECT`, por columnas).
+
+2. Completar en `.env`: `SAS_DB_HOST`, `SAS_DB_NAME`, `SAS_DB_USER`, `SAS_DB_PASS`
+   (en local, también con el usuario de solo lectura, no con `root`).
+3. Ejecutar `sql/migrations/006_contactos_sas.sql` (agrega `dni` y `sas_cliente_id` a
+   `contactos`) y `sql/migrations/008_sas_resumen_cache.sql` (caché del resumen, 10 minutos;
+   se puede vaciar sin perder nada) una sola vez.
+4. Vincular los contactos que ya existen (mismo PHP 8.x explícito que el resto de los cron):
+
+   ```bash
+   /ruta/al/php8 cron/vincular_sas.php            # --simular: muestra qué haría, no escribe
+   /ruta/al/php8 cron/vincular_sas.php --aplicar  # escribe sas_cliente_id (solo en la Agenda)
+   /ruta/al/php8 cron/vincular_sas.php --solo=12,15 --aplicar  # solo esos contactos de la Agenda
    ```
 
-2. Completar en `.env`: `SAS_DB_HOST`, `SAS_DB_NAME`, `SAS_DB_USER`, `SAS_DB_PASS`.
-   Si `SAS_DB_NAME` queda vacío, el buscador no aparece.
-3. Ejecutar `sql/migrations/006_contactos_sas.sql` una sola vez (agrega `dni` y
-   `sas_cliente_id` a `contactos`).
+   Vincula solo si hay **una** coincidencia (primero DNI exacto, después celular). Si hay varias,
+   o el cliente de SAS ya está vinculado a otro contacto, lo lista para revisión manual.
+
+Notas de lectura: el saldo y los montos vencidos se muestran **sin mora** (la mora la calcula
+SAS con su propia regla) y los días de atraso son **hábiles** (lunes a sábado, sin feriados),
+igual que en SAS.
 
 ## 6. Permisos de carpetas de escritura
 

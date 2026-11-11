@@ -129,6 +129,7 @@ function pagosModule() {
                 this.pagosPorUsuario = data.por_usuario;
                 this.badgePagos = data.resumen.vencidos.cantidad + data.resumen.hoy.cantidad;
                 this.paginaPagos += 1;
+                this.cargarResumenesSasDe(this.pagos);
                 this.refrescarIconos();
             } catch (error) {
                 if (solicitud === this.pagosSolicitud) this.errorPagos = error.message;
@@ -364,6 +365,11 @@ function pagosModule() {
             if (dia === vecino(1)) return `Mañana · ${titulo}`;
             if (dia === vecino(-1)) return `Ayer · ${titulo}`;
             return titulo;
+        },
+
+        // Clases de la fila de la agenda; "con-sas" reserva una línea para el chip y la sugerencia de SAS.
+        clasePagoFila(pago) {
+            return { [`pago-fila--${pago.situacion}`]: true, 'pago-fila--con-sas': Boolean(this.chipSas(pago) || this.sugerenciaSas(pago)) };
         },
 
         detallePagoFila(pago) {

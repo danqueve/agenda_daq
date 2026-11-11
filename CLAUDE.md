@@ -40,6 +40,19 @@ Desde Nueva consulta se buscan clientes de SAS Imperio (celular, DNI, apellido/n
 `ic_clientes` con un usuario MySQL de SOLO LECTURA (`app/sas.php`, `api/sas_clientes.php`).
 El contacto guarda `dni` y `sas_cliente_id` (migración `006_contactos_sas.sql`).
 
+La Agenda **nunca escribe en SAS**: todo pasa por `SasDb::get()`, que usa el usuario `agenda_sas_ro`
+(`sql/sas_usuario_solo_lectura.sql`, `SELECT` por columnas) y abre la sesión en `READ ONLY`. Si SAS no
+responde (o `SAS_DB_NAME` está vacío) la Agenda funciona igual, sin esos datos, y no se muestran errores técnicos.
+- **Resumen por cliente** (`sas_resumen_clientes()`): créditos activos y saldo, cuotas vencidas y atraso de la
+  más vieja, último pago confirmado y pagos informados por el cobrador sin aprobar. Montos **sin mora**; atraso en
+  **días hábiles** (lunes a sábado, sin feriados), como SAS. Se guarda 10 minutos en `sas_resumen_cache`
+  (migración 008) y se pide por lote: `api/sas_resumen.php?contacto_ids=1,2,3`.
+- Se muestra como chip «SAS: 3 cuotas vencidas · 42 días» en cada compromiso pendiente, como sugerencia
+  «¿Marcar como pagado?» si SAS registró un pago posterior (nunca se marca solo: usa el registro rápido) y como
+  bloque «En SAS Imperio» en la ficha.
+- Vincular contactos: botón «Vincular con SAS» en la ficha (`api/sas_vinculo.php`) y `cron/vincular_sas.php`
+  (simula por defecto; con `--aplicar` escribe solo en la base de la Agenda; vincula únicamente si hay UNA coincidencia).
+
 ## Diseño
 La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML exactas +
 `assets/css/pastel.css`). `docs/DESIGN.md` queda para voz, íconos y reglas generales.
@@ -61,15 +74,15 @@ agenda_daq/
 ├── manifest.webmanifest
 ├── sw.js                # service worker (en la raíz para tener scope completo)
 ├── api/                 # endpoints JSON (compromisos, contactos, agenda, panel, seguimientos, notas,
-│                        #   etiquetas, usuarios, ajustes, push, sas_clientes)
+│                        #   etiquetas, usuarios, ajustes, push, sas_clientes, sas_resumen, sas_vinculo)
 ├── app/                 # config, db, auth, csrf, helpers, api, compromisos, push, sas (bloqueado)
 │   └── vistas/          #   partials de index.php (botonera de un compromiso, hoja de acciones rápidas)
 ├── assets/css/          # tokens.css, base.css, components.css, pastel.css (carga en ese orden)
 ├── assets/js/           # app.js + un módulo por pantalla: pagos, contactos, seguimientos, panel,
-│                        #   notas, ajustes, pagos_rapido, pwa
+│                        #   notas, ajustes, pagos_rapido, sas, pwa
 ├── assets/icons/        # íconos de la app (PWA)
 ├── assets/vendor/       # alpine.min.js, lucide (local)
-├── cron/                # scripts CLI: push (bloqueado)
+├── cron/                # scripts CLI: push, vincular_sas (bloqueado)
 ├── docs/                # DESIGN.md (bloqueado)
 ├── sql/                 # schema.sql y migraciones (bloqueado)
 ├── storage/logs         # logs (bloqueado)

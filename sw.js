@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'agenda-daq-v31';
+const CACHE_VERSION = 'agenda-daq-v32';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const SHELL_ASSETS = [
@@ -17,6 +17,7 @@ const SHELL_ASSETS = [
     './assets/js/notas.js',
     './assets/js/pagos.js',
     './assets/js/pagos_rapido.js',
+    './assets/js/sas.js',
     './assets/js/pwa.js',
     './assets/vendor/alpine.min.js',
     './assets/vendor/lucide/lucide.min.js',

@@ -274,6 +274,7 @@ function panelModule() {
             try {
                 const result = await this.api('api/panel.php');
                 this.panel = result.data;
+                this.cargarResumenesSasDe(this.panel.compromisos);
                 this.badgeHoy = result.data.vencidos.length + result.data.hoy.length;
                 this.refrescarIconos();
             } catch (error) {
@@ -292,6 +293,7 @@ function panelModule() {
                 const hasta = dias[dias.length - 1].iso;
                 const result = await this.api(`api/agenda.php?desde=${desde}&hasta=${hasta}`);
                 this.agenda = result.data;
+                this.cargarResumenesSasDe(Object.values(this.agenda.pagos_por_dia || {}).flat());
                 this.refrescarIconos();
             } catch (error) {
                 this.errorPanel = error.message;

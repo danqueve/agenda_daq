@@ -1510,6 +1510,64 @@ button.card-pastel { cursor: pointer; font: inherit; }
 .plantilla__vista-rotulo { display: block; margin-bottom: 2px; font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--green-texto); }
 
 /* =====================================================================
+   12d. SAS IMPERIO · chip, sugerencia y bloque de la ficha
+        (Fase 4 de docs/plans/2026-11-11-compromisos-visualizacion.md)
+   ===================================================================== */
+/* Línea de SAS de la fila (chip + sugerencia): ocupa todo el ancho y solo existe cuando hay algo para mostrar. */
+.pago-fila__sas { grid-area: sas; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
+.pago-fila__sas .sas-sugerencia { flex: 1 1 320px; }
+.pago-fila--con-sas { grid-template-areas: "persona monto" "sas sas" "estado estado" "acciones acciones"; }
+@media (min-width: 640px) {
+    .pago-fila--con-sas { grid-template-areas: "persona monto estado" "sas sas sas" "acciones acciones acciones"; }
+}
+@media (min-width: 1280px) {
+    .pago-fila--con-sas { grid-template-areas: "persona monto estado acciones" "sas sas sas sas"; }
+}
+
+/* «SAS: 3 cuotas vencidas · 42 días». El estado se lee por el texto; el color solo lo refuerza. */
+.chip-sas {
+    display: inline-block; max-width: 100%; box-sizing: border-box;
+    padding: 2px 8px; border-radius: var(--radio-chico); background: #fff; color: var(--pastel-label-2);
+    font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600;
+}
+.chip-sas--vencido { color: var(--red-texto); }
+.chip-sas--aldia { color: var(--green-texto); }
+.pagos-tabla .chip-sas, .sas-dato .chip-sas { background: var(--bg-card-2); }
+.sas-dato .chip-sas { margin-left: 6px; }
+
+/* «SAS registró un pago de $X el 13/11 · ¿Marcar como pagado?» */
+.sas-sugerencia {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; box-sizing: border-box; max-width: 100%;
+    padding: 6px 6px 6px 10px; border: 1px solid var(--pastel-tint-borde); border-radius: var(--radio-grupo);
+    background: #fff; color: var(--pastel-label); font-size: var(--fs-footnote); line-height: var(--lh-footnote);
+}
+.sas-sugerencia svg { width: 16px; height: 16px; flex: none; color: var(--tint); }
+.sas-sugerencia__texto { flex: 1 1 170px; font-weight: 600; }
+.sas-sugerencia__boton {
+    min-height: var(--celda-alto-min); padding: 0 12px; border: 0; border-radius: var(--radio-chico);
+    background: var(--tint); color: #fff; font: inherit; font-size: var(--fs-subhead); font-weight: 600; white-space: nowrap; cursor: pointer;
+}
+.sas-sugerencia__boton:disabled { opacity: .55; cursor: not-allowed; }
+/* Tabla: la fila de SAS va debajo del compromiso, a todo el ancho; la del compromiso pierde su línea de abajo. */
+.pagos-tabla .pagos-tabla__sas td { padding-top: 0; padding-bottom: 8px; white-space: normal; }
+.pagos-tabla .pagos-tabla__grupo--con-sas > tr:first-child td { border-bottom: 0; }
+
+/* Ficha: bloque «En SAS Imperio» */
+.ficha-sas { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.ficha-sas .btn-texto { min-height: var(--celda-alto-min); padding: 0 8px; }
+.ficha-sas__vacio { margin: 0; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--label-2); }
+.sas-bloque { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px solid var(--pastel-tint-borde); border-radius: var(--radio-grupo); background: var(--pastel-tint); color: var(--pastel-label); }
+.sas-bloque > .ficha-sas__vacio { color: var(--pastel-label-2); }
+.sas-datos { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.sas-dato { display: flex; flex-direction: column; gap: 2px; }
+.sas-dato dt { font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--label-2); }
+.sas-dato dd { margin: 0; font-size: var(--fs-subhead); line-height: var(--lh-subhead); }
+.sas-dato--alerta dd { color: var(--red-texto); }
+.sas-dato--aviso dd { color: var(--orange-texto); }
+.ficha-sas__pie { display: flex; flex-direction: column; gap: 2px; margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+.ficha-sas__desvincular { align-self: flex-start; }
+
+/* =====================================================================
    13. MOVIMIENTO
    ===================================================================== */
 .card-pastel, .stat-card, .nota-card, .estado-opcion, .filtro-pill, .pill, .repro-pill, .color-dot {

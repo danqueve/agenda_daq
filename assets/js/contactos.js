@@ -332,6 +332,7 @@ function contactosModule() {
                 this.contactoActual = result.data;
                 this.sheetFicha = true;
                 this.refrescarIconos();
+                this.cargarResumenSasFicha();
             } catch (error) {
                 this.mostrarHud(error.message, 'circle-alert');
             }

@@ -141,6 +141,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <p class="card-pastel__fecha tabular"><i data-lucide="calendar-days"></i><span x-text="fechaPago(pago)"></span></p>
                                     <p class="card-pastel__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
                                     <p class="card-pastel__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></p>
+                                    <?php require __DIR__ . '/app/vistas/pago_sas.php'; ?>
                                     <?php $variante = 'texto'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
                                 </article>
                             </template>
@@ -383,6 +384,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                         <p class="compromiso-item__detalle" x-text="[pago.contacto_nombre, pago.concepto].filter(Boolean).join(' · ')"></p>
                                         <p class="compromiso-item__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
                                         <p class="compromiso-item__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></p>
+                                        <?php require __DIR__ . '/app/vistas/pago_sas.php'; ?>
                                         <?php $variante = 'texto'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
                                     </div>
                                 </template>
@@ -669,12 +671,15 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     </header>
                                     <div class="pagos-dia__lista">
                                         <template x-for="pago in grupo.items" :key="`pf-${pago.id}`">
-                                            <article class="pago-fila" :class="`pago-fila--${pago.situacion}`">
+                                            <article class="pago-fila" :class="clasePagoFila(pago)">
                                                 <button type="button" class="pago-fila__persona" @click="abrirFicha(pago.contacto_id)">
                                                     <span class="pago-fila__nombre" x-text="pago.contacto_nombre"></span>
                                                     <span class="pago-fila__detalle" x-text="detallePagoFila(pago)"></span>
                                                     <span class="pago-fila__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></span>
                                                 </button>
+                                                <div class="pago-fila__sas" x-show="chipSas(pago) || sugerenciaSas(pago)">
+                                                    <?php require __DIR__ . '/app/vistas/pago_sas.php'; ?>
+                                                </div>
                                                 <strong class="pago-fila__monto tabular" x-text="montoPagoTexto(pago)"></strong>
                                                 <span class="chip-estado chip-estado--estado pago-fila__estado" x-text="estadoAtrasoPago(pago)"></span>
                                                 <?php $variante = 'fila'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
@@ -703,8 +708,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                         <th scope="col"><span class="sr-only">Acciones</span></th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <template x-for="pago in pagos" :key="`pt-${pago.id}`">
+                                <template x-for="pago in pagos" :key="`pt-${pago.id}`">
+                                    <tbody class="pagos-tabla__grupo" :class="{'pagos-tabla__grupo--con-sas': chipSas(pago) || sugerenciaSas(pago)}">
                                         <tr :class="`pagos-tabla__fila--${pago.situacion}`">
                                             <td class="tabular" x-text="fechaTablaPago(pago)"></td>
                                             <td><button type="button" class="pagos-tabla__cliente" @click="abrirFicha(pago.contacto_id)" x-text="pago.contacto_nombre"></button><small class="pagos-tabla__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></small></td>
@@ -718,8 +723,13 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                                 <?php $variante = 'tabla'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
                                             </td>
                                         </tr>
-                                    </template>
-                                </tbody>
+                                        <tr class="pagos-tabla__sas" :class="`pagos-tabla__fila--${pago.situacion}`" x-show="chipSas(pago) || sugerenciaSas(pago)">
+                                            <td colspan="9"><div class="pago-fila__sas">
+                                                <?php require __DIR__ . '/app/vistas/pago_sas.php'; ?>
+                                            </div></td>
+                                        </tr>
+                                    </tbody>
+                                </template>
                                 <tfoot>
                                     <tr>
                                         <th scope="row" colspan="3" x-text="`Total · ${cantidadPagosTexto(totalesPagos.cantidad)}`"></th>
@@ -750,6 +760,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                     <p class="card-pastel__fecha tabular"><i data-lucide="calendar-days"></i><span x-text="fechaPago(pago)"></span></p>
                                     <p class="card-pastel__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
                                     <p class="card-pastel__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></p>
+                                    <?php require __DIR__ . '/app/vistas/pago_sas.php'; ?>
                                     <?php $variante = 'texto'; require __DIR__ . '/app/vistas/pago_acciones.php'; ?>
                                 </article>
                             </template>
@@ -1110,6 +1121,8 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                                 </div>
                             </div>
 
+<?php require __DIR__ . '/app/vistas/sas_ficha.php'; ?>
+
                             <div class="ficha-compromisos" x-show="contactoActual?.compromisos?.length">
                                 <div class="ficha-compromisos__cabecera">
                                     <p class="group__header footnote">compromisos de pago</p>
@@ -1187,6 +1200,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
 
         <div class="sheet-backdrop" x-show="sheetEliminar" x-transition.opacity @keydown.escape.window="sheetEliminar = false" @click.self="sheetEliminar = false" x-cloak><section class="sheet sheet--media alert-sheet" role="alertdialog" aria-modal="true"><div class="sheet__grabber"></div><div class="sheet__body"><i class="alert-sheet__icon alert-sheet__icon--danger" data-lucide="trash-2"></i><h2 class="title2">¿Eliminar contacto?</h2><p class="subhead">Se eliminarán también sus consultas y su historial. Esta acción no se puede deshacer.</p><div class="alert-sheet__actions"><button class="btn-principal btn-principal--danger" type="button" @click="eliminarContacto()">Eliminar contacto</button><button class="btn-texto" type="button" @click="sheetEliminar = false">Cancelar</button></div></div></section></div>
 
+<?php require __DIR__ . '/app/vistas/sas_vincular_hoja.php'; ?>
         <datalist id="conceptos-pagos"><template x-for="opcion in conceptoOpciones()" :key="opcion"><option :value="opcion"></option></template></datalist>
         <div class="hud-capa" x-show="hudVisible" x-transition.opacity x-cloak><div class="hud"><i :data-lucide="hudIcono"></i><span x-text="hudTexto"></span></div></div>
     </div>
@@ -1201,6 +1215,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     <script src="assets/js/notas.js"></script>
     <script src="assets/js/pagos.js"></script>
     <script src="assets/js/pagos_rapido.js"></script>
+    <script src="assets/js/sas.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/pwa.js"></script>
 </body>
