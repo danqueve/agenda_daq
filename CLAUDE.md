@@ -4,10 +4,26 @@ Repo: https://github.com/danqueve/agenda_daq.git (rama main)
 Base de datos: c2881399_agenda
 
 ## Qué es
-Agenda personal de un único usuario (Alejandro) para anotar consultas de clientes
-(nombre, celular, consulta) y agendar recontactos con recordatorios.
-Se usa desde PC, celular y tablet como PWA instalable, con look & feel de app nativa de iOS.
+Sistema de gestión comercial y de cobranza de Imperio Comercial, usado por varios usuarios.
+Lo central son los **compromisos de pago**: promesas de pago de deuda (monto + fecha + concepto)
+ligadas a un contacto, que se cobran, se registran como pagado / parcial / incumplido y se
+reagendan (tabla `compromisos`, `app/compromisos.php`, `api/compromisos.php`, `assets/js/pagos.js`).
+Las consultas de clientes (nombre, celular, consulta) y sus recontactos programados siguen
+existiendo, pero pasan a segundo plano.
+Se usa desde PC, celular y tablet como PWA instalable, con el diseño pastel de tarjetas.
 Los avisos son el panel "Hoy" y notificaciones push. NO hay envío de emails.
+
+## Usuarios y roles
+Cada persona tiene su usuario (tabla `usuarios`, columna `rol`, ver `app/auth.php`):
+- `admin`: todo lo de la agenda, más crear y eliminar usuarios (Ajustes › Equipo, `api/usuarios.php`).
+- `supervisor`: todo lo de la agenda, sin la gestión de usuarios.
+Ambos roles ven y editan los mismos contactos, notas y compromisos. Lo que se carga queda firmado con
+el nombre de quien lo hizo (`creado_por_usuario_id` + `creado_por_nombre`, que sobrevive si se borra la cuenta).
+
+## Bases de datos
+- `c2881399_agenda`: la base propia de la app, lectura y escritura.
+- SAS Imperio: base de otro sistema, de **solo lectura** (`app/sas.php`, variables `SAS_DB_*` en `.env`).
+  Nunca se escribe en SAS. Si `SAS_DB_NAME` está vacío la integración se apaga sola.
 
 ## Stack y reglas
 - PHP 8.3 sin framework, PDO con prepared statements SIEMPRE. Nada de SQL concatenado.
@@ -21,8 +37,8 @@ Los avisos son el panel "Hoy" y notificaciones push. NO hay envío de emails.
 
 ## Integración con SAS Imperio (opcional)
 Desde Nueva consulta se buscan clientes de SAS Imperio (celular, DNI, apellido/nombre) leyendo
-`ic_clientes` de su base MySQL con un usuario de SOLO LECTURA (`SAS_DB_*` en `.env`, `app/sas.php`,
-`api/sas_clientes.php`). Nunca se escribe en SAS. El contacto guarda `dni` y `sas_cliente_id`.
+`ic_clientes` con un usuario MySQL de SOLO LECTURA (`app/sas.php`, `api/sas_clientes.php`).
+El contacto guarda `dni` y `sas_cliente_id` (migración `006_contactos_sas.sql`).
 
 ## Diseño
 La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML exactas +
@@ -44,10 +60,12 @@ agenda_daq/
 ├── login.php / logout.php
 ├── manifest.webmanifest
 ├── sw.js                # service worker (en la raíz para tener scope completo)
-├── api/                 # endpoints JSON (contactos, compromisos, seguimientos, etiquetas, panel, push)
-├── app/                 # config, db, auth, csrf, helpers (bloqueado)
-├── assets/css/          # tokens.css, base.css, components.css, screens.css
-├── assets/js/           # app.js + módulos por pantalla (incluye pagos.js)
+├── api/                 # endpoints JSON (compromisos, contactos, agenda, panel, seguimientos, notas,
+│                        #   etiquetas, usuarios, ajustes, push, sas_clientes)
+├── app/                 # config, db, auth, csrf, helpers, api, compromisos, push, sas (bloqueado)
+├── assets/css/          # tokens.css, base.css, components.css, pastel.css (carga en ese orden)
+├── assets/js/           # app.js + un módulo por pantalla: pagos, contactos, seguimientos, panel,
+│                        #   notas, ajustes, pwa
 ├── assets/icons/        # íconos de la app (PWA)
 ├── assets/vendor/       # alpine.min.js, lucide (local)
 ├── cron/                # scripts CLI: push (bloqueado)
@@ -69,6 +87,11 @@ agenda_daq/
   del subdominio. Nunca hardcodear "/" ni el dominio: usar rutas relativas en HTML/JS/manifest/sw.js
   y una constante BASE_URL tomada de APP_URL en .env para links absolutos (push).
 - Cada fase termina con: código funcionando en WAMP, schema actualizado en sql/, y un resumen de qué se hizo.
+
+## Plan de mejoras en curso
+Hacer más visibles los compromisos de pago (Hoy como tablero de cobranza, Pagos con vistas y filtros,
+registro más rápido, datos de SAS, orden del código). Plan por fases, una por vez:
+`docs/plans/2026-11-11-compromisos-visualizacion.md`. Leelo antes de tocar Hoy, Pagos o el Calendario.
 
 ## Nota de desarrollo local
 Este repo se desarrolla en la carpeta `C:\wamp64\www\agenda` (no `agenda_daq`), reutilizando una
