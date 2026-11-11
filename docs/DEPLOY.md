@@ -241,11 +241,24 @@ Datos de producción:
      ```
 
    - Si **ya existe** con `SELECT` sobre las tablas enteras (`ic_clientes`, `ic_usuarios`),
-     quitárselo para que quede solo lo que dice el script:
+     quitárselo **antes** de correr el script, para que quede solo lo que dice el script:
 
      ```bash
      mysql -e "REVOKE SELECT ON \`c2881399_credit\`.\`ic_clientes\` FROM 'c2881399_agendasas'@'localhost'; REVOKE SELECT ON \`c2881399_credit\`.\`ic_usuarios\` FROM 'c2881399_agendasas'@'localhost';"
      ```
+
+     **El orden importa:** un `REVOKE` sobre la tabla entera borra también los permisos por
+     columna de esa tabla. Si se hace después del script, `ic_clientes` e `ic_usuarios` quedan sin
+     ningún permiso y SAS deja de funcionar (la búsqueda, el cobrador y los chips); se arregla
+     volviendo a correr el script. Si el `REVOKE` responde `ERROR 1147`, esos permisos ya no estaban:
+     seguí con el script.
+
+   Después, correr el script con el nombre de producción y sin la línea `CREATE USER` (el usuario ya existe):
+
+   ```bash
+   sed -e "s/agenda_sas_ro/c2881399_agendasas/g" -e "/CREATE USER/d" sql/sas_usuario_solo_lectura.sql > /tmp/sas_grants.sql
+   mysql < /tmp/sas_grants.sql
+   ```
 
    El script da `SELECT` solo sobre estas columnas:
 
