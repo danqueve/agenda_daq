@@ -47,9 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Agenda IC — Ingresar</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/pantallas/login.css">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/tokens.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/base.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/login.css')) ?>">
 </head>
 <body>
     <main class="login" aria-labelledby="login-titulo">
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </main>
 
-    <script src="assets/js/pwa.js"></script>
+    <script src="<?= e(asset('assets/js/pwa.js')) ?>"></script>
     <script>
         document.querySelectorAll('[data-pw-toggle]').forEach((btn) => {
             const input = document.getElementById(btn.getAttribute('aria-controls'));

@@ -114,6 +114,9 @@ agenda_daq/
 - Rutas: en WAMP la app corre en subcarpeta (http://localhost/agenda_daq/) y en producción en la raíz
   del subdominio. Nunca hardcodear "/" ni el dominio: usar rutas relativas en HTML/JS/manifest/sw.js
   y una constante BASE_URL tomada de APP_URL en .env para links absolutos (push).
+- Versión: todo CSS y JS se enlaza con `asset()` (`app/helpers.php`), que agrega `?v=APP_VERSION`. Cada cambio
+  de CSS o JS sube `APP_VERSION` en `app/config.php`; `pwa.js` registra `sw.js?v=…` y el service worker toma
+  de ahí el nombre de su caché, así que no hay otro número que mantener.
 - Cada fase termina con: código funcionando en WAMP, schema actualizado en sql/, y un resumen de qué se hizo.
 
 ## Plan de mejoras en curso

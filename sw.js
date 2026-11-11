@@ -1,10 +1,10 @@
-const CACHE_VERSION = 'agenda-daq-v33';
+// La versión llega en el ?v= con que pwa.js registra este archivo: es APP_VERSION de app/config.php.
+const VERSION = new URL(self.location.href).searchParams.get('v') || 'dev';
+const CACHE_VERSION = `agenda-daq-v${VERSION}`;
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
-const SHELL_ASSETS = [
-    './',
-    './login.php',
-    './manifest.webmanifest',
+// CSS y JS llevan el mismo ?v= que les pone asset() en index.php y login.php, así el pedido coincide con lo guardado.
+const CON_VERSION = [
     './assets/css/tokens.css',
     './assets/css/base.css',
     './assets/css/components.css',
@@ -28,6 +28,12 @@ const SHELL_ASSETS = [
     './assets/js/pwa.js',
     './assets/vendor/alpine.min.js',
     './assets/vendor/lucide/lucide.min.js',
+].map((ruta) => `${ruta}?v=${encodeURIComponent(VERSION)}`);
+const SHELL_ASSETS = [
+    './',
+    './login.php',
+    './manifest.webmanifest',
+    ...CON_VERSION,
     './assets/icons/icon-192.png',
     './assets/icons/icon-512.png',
     './assets/icons/icon-maskable-512.png',

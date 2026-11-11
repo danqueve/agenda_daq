@@ -29,16 +29,16 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     <title>Agenda IC</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
-    <link rel="stylesheet" href="assets/css/tokens.css">
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/pantallas/hoy.css">
-    <link rel="stylesheet" href="assets/css/pantallas/contactos.css">
-    <link rel="stylesheet" href="assets/css/pantallas/calendario.css">
-    <link rel="stylesheet" href="assets/css/pantallas/ficha.css">
-    <link rel="stylesheet" href="assets/css/pantallas/notas.css">
-    <link rel="stylesheet" href="assets/css/pantallas/ajustes.css">
-    <link rel="stylesheet" href="assets/css/pantallas/pagos.css">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/tokens.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/base.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/components.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/hoy.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/contactos.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/calendario.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/ficha.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/notas.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/ajustes.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/pagos.css')) ?>">
 </head>
 <body>
     <div class="app-shell" x-data="appShell()" x-init="init()" :class="{'modo-contactos': activo === 'contactos'}">
@@ -128,17 +128,17 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     </div>
 
     <script>window.APP_CONFIG = { sasHabilitado: <?= SasDb::habilitado() ? 'true' : 'false' ?>, csrf: <?= json_encode(csrf_token(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>, usuario: <?= json_encode(['id' => $usuarioId, 'nombre' => $usuarioNombre, 'rol' => $usuarioRol], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> };</script>
-    <script src="assets/vendor/alpine.min.js" defer></script>
-    <script src="assets/vendor/lucide/lucide.min.js"></script>
-    <script src="assets/js/contactos.js"></script>
-    <script src="assets/js/seguimientos.js"></script>
-    <script src="assets/js/panel.js"></script>
-    <script src="assets/js/ajustes.js"></script>
-    <script src="assets/js/notas.js"></script>
-    <script src="assets/js/pagos.js"></script>
-    <script src="assets/js/pagos_rapido.js"></script>
-    <script src="assets/js/sas.js"></script>
-    <script src="assets/js/app.js"></script>
-    <script src="assets/js/pwa.js"></script>
+    <script src="<?= e(asset('assets/vendor/alpine.min.js')) ?>" defer></script>
+    <script src="<?= e(asset('assets/vendor/lucide/lucide.min.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/contactos.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/seguimientos.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/panel.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/ajustes.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/notas.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/pagos.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/pagos_rapido.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/sas.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/app.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/pwa.js')) ?>"></script>
 </body>
 </html>

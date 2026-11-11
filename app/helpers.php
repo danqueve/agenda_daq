@@ -7,6 +7,12 @@ function e(?string $valor): string
     return htmlspecialchars($valor ?? '', ENT_QUOTES, 'UTF-8');
 }
 
+// Ruta de un CSS o JS con ?v=APP_VERSION: al subir la versión, el navegador y el service worker piden el archivo nuevo.
+function asset(string $ruta): string
+{
+    return $ruta . '?v=' . rawurlencode(APP_VERSION);
+}
+
 function json_response(array $data, int $status = 200): never
 {
     http_response_code($status);

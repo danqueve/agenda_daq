@@ -26,7 +26,7 @@ define('VAPID_PUBLIC', $_ENV['VAPID_PUBLIC'] ?? '');
 define('VAPID_PRIVATE', $_ENV['VAPID_PRIVATE'] ?? '');
 define('VAPID_SUBJECT', $_ENV['VAPID_SUBJECT'] ?? '');
 
-// Mantener en sync con CACHE_VERSION en sw.js (ambas suben juntas en cada fase).
+// Subirla en cada cambio de CSS o JS: va como ?v= en los <link> y <script> (asset()) y nombra el caché del service worker.
 define('APP_VERSION', '33');
 
 date_default_timezone_set(APP_TZ);
