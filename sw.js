@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'agenda-daq-v32';
+const CACHE_VERSION = 'agenda-daq-v33';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const SHELL_ASSETS = [
@@ -8,7 +8,14 @@ const SHELL_ASSETS = [
     './assets/css/tokens.css',
     './assets/css/base.css',
     './assets/css/components.css',
-    './assets/css/pastel.css',
+    './assets/css/pantallas/hoy.css',
+    './assets/css/pantallas/contactos.css',
+    './assets/css/pantallas/calendario.css',
+    './assets/css/pantallas/ficha.css',
+    './assets/css/pantallas/notas.css',
+    './assets/css/pantallas/ajustes.css',
+    './assets/css/pantallas/pagos.css',
+    './assets/css/pantallas/login.css',
     './assets/js/app.js',
     './assets/js/contactos.js',
     './assets/js/seguimientos.js',

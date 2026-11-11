@@ -167,7 +167,7 @@ function panelModule() {
         },
 
         // Clase del panel .cal-detalle: "para hoy" es el estilo de base de
-        // pastel.css (sin modificador); reprogramado/hecho pisan el tipo
+        // pantallas/calendario.css (sin modificador); reprogramado/hecho pisan el tipo
         // original una vez que el usuario termina la acción.
         claseCalDetalle() {
             if (this.resultadoEventoAbierto === 'reprogramado') return 'cal-detalle--reprogramado';

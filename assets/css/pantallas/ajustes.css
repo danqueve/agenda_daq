@@ -1,0 +1,79 @@
+/* =====================================================================
+   Pantalla Ajustes (incluye Mensajes de WhatsApp y Equipo).
+   ===================================================================== */
+
+/* =====================================================================
+   AJUSTES  ·  referencia 06-ajustes.html
+   ===================================================================== */
+.ajustes { max-width: 760px; display: flex; flex-direction: column; gap: 24px; }
+.perfil-card {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px;
+    border-radius: var(--radio-grupo);
+    background: var(--pastel-indigo); border: 1px solid var(--pastel-indigo-borde);
+    color: var(--pastel-label);
+}
+.perfil-card .avatar { width: 56px; height: 56px; font-size: 20px; border: 3px solid #fff; }
+.perfil-card__nombre { font-size: var(--fs-title2); line-height: var(--lh-title2); font-weight: 600; }
+.perfil-card__sub { font-size: var(--fs-subhead); color: var(--pastel-label-2); }
+.perfil-card__chip { margin-left: auto; font-size: var(--fs-footnote); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; background: #fff; color: var(--green-texto); border-radius: var(--radio-chico); padding: 4px 8px; }
+
+.ajustes .cell { min-height: 60px; padding: 10px 18px; gap: 14px; }
+.ajustes .cell__title { font-size: var(--fs-headline); font-weight: 600; }
+/* Cajita de ícono pastel (reemplaza el fondo sólido con ícono blanco) */
+.cell__icon-box { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.cell__icon-box svg { width: 18px; height: 18px; }
+.cell__icon-box--tint   { background: var(--pastel-tint);   color: var(--tint); }
+.cell__icon-box--orange { background: var(--pastel-orange); color: var(--orange); }
+.cell__icon-box--green  { background: var(--pastel-green);  color: var(--green); }
+.cell__icon-box--indigo { background: var(--pastel-indigo); color: var(--indigo); }
+.cell__icon-box--gray   { background: var(--pastel-gray);   color: var(--label-2); }
+.cell__icon-box--red    { background: var(--pastel-red);    color: var(--red); }
+.cell--peligro .cell__title { color: var(--red-texto); }
+.cell__valor-chip { font-size: var(--fs-headline); font-weight: 600; font-variant-numeric: tabular-nums; padding: 6px 10px; border-radius: var(--radio-chico); background: var(--bg-card-2); }
+.etiqueta-chip { display: inline-flex; align-items: center; gap: 5px; font-size: var(--fs-footnote); font-weight: 600; padding: 3px 8px; border-radius: var(--radio-chico); background: var(--bg-card-2); color: var(--label); }
+.ajustes-vista-etiquetas { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.ajustes-footer { margin: 0; text-align: center; font-size: var(--fs-footnote); color: var(--label-2); }
+
+/* Interruptor (toggle) en verde */
+.toggle { width: 51px; height: 31px; border-radius: 16px; background: var(--separator); position: relative; transition: background .3s var(--curva-ios); }
+.toggle[aria-checked="true"] { background: var(--green); }
+.toggle__perilla { position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.2); transition: left .3s var(--curva-ios); }
+.toggle[aria-checked="true"] .toggle__perilla { left: 22px; }
+
+/* Gestión de usuarios (solo Admin) */
+.usuarios-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.usuarios-form .btn-principal { align-self: flex-start; }
+.usuarios-form .btn-principal svg { width: 18px; height: 18px; }
+.usuario-fila { gap: 10px; }
+.usuario-rol {
+    flex: none;
+    padding: 3px 7px;
+    border-radius: var(--radio-chico);
+    font-size: var(--fs-footnote);
+    line-height: var(--lh-footnote);
+    font-weight: 600;
+}
+.usuario-rol--admin { background: var(--pastel-indigo); color: var(--indigo-texto); }
+.usuario-rol--supervisor { background: var(--pastel-green); color: var(--green-texto); }
+@media (max-width: 599px) {
+    .usuario-fila { align-items: flex-start; flex-wrap: wrap; }
+    .usuario-fila .cell__content { flex-basis: calc(100% - 58px); }
+    .usuario-fila .usuario-rol { margin-left: 44px; }
+    .usuario-fila .btn-texto--peligro { margin-left: auto; }
+}
+
+/* Ajustes › Mensajes de WhatsApp */
+.plantillas-form { display: flex; flex-direction: column; gap: 16px; }
+.plantillas-form__ayuda { margin: 0; }
+.plantilla { display: flex; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid var(--separator); border-radius: var(--radio-grupo); background: var(--bg-card); }
+.plantilla > p { margin: 0; }
+.plantilla__cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.plantilla__titulo { font-weight: 600; }
+.plantilla__texto {
+    width: 100%; box-sizing: border-box; min-height: 96px; padding: 10px 12px;
+    border: 1px solid var(--separator); border-radius: var(--radio-chico); background: var(--bg-card); color: var(--label);
+    font: inherit; font-size: 16px; line-height: 22px; resize: vertical;
+}
+.plantilla__vista { padding: 10px 12px; border-radius: var(--radio-grupo); background: var(--pastel-green); color: var(--pastel-label); font-size: var(--fs-subhead); line-height: var(--lh-subhead); }
+.plantilla__vista-rotulo { display: block; margin-bottom: 2px; font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--green-texto); }

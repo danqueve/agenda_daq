@@ -1,0 +1,45 @@
+/* =====================================================================
+   Pantalla de ingreso (login.php)  ·  referencia 00-login.html
+   login.php carga solo tokens.css, base.css y este archivo.
+   ===================================================================== */
+.login {
+    min-height: 100dvh; box-sizing: border-box;
+    padding: 48px 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+    background: var(--bg-grouped); color: var(--label);
+    position: relative; overflow: hidden;
+}
+.login__deco { position: absolute; border-radius: 16px; border: 1px solid; pointer-events: none; }
+.login__deco--1 { top: 8%;  left: 10%;  width: 180px; height: 120px; background: var(--pastel-orange); border-color: var(--pastel-orange-borde); transform: rotate(-8deg); }
+.login__deco--2 { top: 14%; right: 12%; width: 150px; height: 110px; background: var(--pastel-indigo); border-color: var(--pastel-indigo-borde); transform: rotate(7deg); }
+.login__deco--3 { bottom: 12%; left: 14%; width: 140px; height: 100px; background: var(--pastel-green); border-color: var(--pastel-green-borde); transform: rotate(6deg); }
+.login__deco--4 { bottom: 9%; right: 9%; width: 190px; height: 120px; background: var(--pastel-red); border-color: var(--pastel-red-borde); transform: rotate(-6deg); }
+@media (max-width: 599px) { .login__deco { opacity: .6; transform: scale(.6); } }
+.login__marca { position: relative; display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+.login__marca-icono { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--pastel-tint); border: 1px solid var(--pastel-tint-borde); color: var(--tint); }
+.login__card {
+    position: relative; width: 100%; max-width: 380px; box-sizing: border-box;
+    padding: 28px;
+    display: flex; flex-direction: column; gap: 18px;
+    border-radius: var(--radio-grupo);
+    background: var(--bg-card); border: 1px solid var(--separator);
+    box-shadow: 0 16px 48px rgba(9, 30, 66, .12);
+}
+.login__titulo { margin: 0; font-size: var(--fs-large-title); line-height: var(--lh-large-title); font-weight: 700; letter-spacing: -0.04em; }
+.login__sub { margin: 4px 0 0; color: var(--label-2); }
+.login__error { margin: 0; padding: 10px 12px; border-radius: var(--radio-grupo); background: var(--pastel-red); color: var(--red-texto); font-size: var(--fs-subhead); font-weight: 600; }
+.login__campo { display: flex; flex-direction: column; gap: 6px; }
+.login__label { font-size: var(--fs-subhead); font-weight: 600; color: var(--label-2); }
+.login__input {
+    min-height: 48px; box-sizing: border-box; padding: 0 14px;
+    border: 1px solid var(--separator); border-radius: var(--radio-chico);
+    background: var(--bg-card-2); color: var(--label);
+    font: inherit; font-size: 16px; outline: none;
+}
+.login__input:focus { border: 2px solid var(--tint); background: var(--bg-card); box-shadow: 0 0 0 4px var(--halo-foco); }
+.login__pw { position: relative; display: flex; }
+.login__pw .login__input { flex: 1; padding-right: 48px; }
+.login__ojo { position: absolute; right: 2px; top: 2px; width: 44px; height: 44px; border: 0; background: transparent; color: var(--label-2); display: flex; align-items: center; justify-content: center; }
+.login__boton { min-height: 48px; border: 0; border-radius: var(--radio-grupo); background: var(--tint); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
+.login__boton:hover { background: var(--tint-hover); }
+.login__nota { margin: 0; text-align: center; font-size: var(--fs-footnote); color: var(--label-2); }

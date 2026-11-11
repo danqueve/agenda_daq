@@ -1,0 +1,238 @@
+/* =====================================================================
+   Ficha del contacto (hoja que se abre desde todas las pantallas).
+   ===================================================================== */
+
+/* =====================================================================
+   FICHA DEL CONTACTO  (referencias 03, 03b, 03c)
+   ===================================================================== */
+
+/* En escritorio la ficha deja de ser una hoja angosta: panel ancho de 2 columnas */
+@media (min-width: 1024px) {
+    .contact-detail--ancho {
+        width: min(960px, calc(100vw - var(--sidebar-width) - 48px));
+        max-width: none;
+    }
+    .contact-detail__columnas {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+    }
+}
+.contact-detail__columna { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* Identidad: avatar + nombre + badge + etiquetas + acciones, con fondo
+   pastel según el estado (referencias 03-ficha-contacto.html / 03c). */
+.contact-detail__identidad {
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
+    padding: 20px; border-radius: var(--radio-grupo); border: 1px solid;
+}
+.contact-detail__identidad--nuevo { background: var(--pastel-tint); border-color: var(--pastel-tint-borde); }
+.contact-detail__identidad--seguimiento { background: var(--pastel-orange); border-color: var(--pastel-orange-borde); }
+.contact-detail__identidad--concreto { background: var(--pastel-green); border-color: var(--pastel-green-borde); }
+.contact-detail__identidad--cerrado { background: var(--pastel-gray); border-color: var(--pastel-gray-borde); }
+.contact-detail__identidad .avatar--grande { width: 80px; height: 80px; font-size: 28px; border: 4px solid #fff; }
+.contact-detail__texto { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+.contact-detail__nombre-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
+.contact-detail__nombre-fila h2 { margin: 0; }
+.contact-detail__sub { margin: 0; font-size: var(--fs-subhead); color: var(--pastel-label-2); }
+.contact-detail__cargado { margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.contact-detail__identidad .chip-estado { text-transform: none; letter-spacing: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label); }
+.contact-detail__badge { display: inline-flex; font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; background: #fff; border-radius: var(--radio-chico); padding: 4px 8px; }
+.contact-detail__identidad--nuevo .contact-detail__badge { color: var(--tint-texto); }
+.contact-detail__identidad--seguimiento .contact-detail__badge { color: var(--orange-texto); }
+.contact-detail__identidad--concreto .contact-detail__badge { color: var(--green-texto); }
+.contact-detail__identidad--cerrado .contact-detail__badge { color: var(--pastel-label-2); }
+.contact-detail__identidad .action-buttons { width: 100%; }
+
+@media (min-width: 1024px) {
+    .contact-detail__identidad { flex-direction: row; flex-wrap: wrap; text-align: left; gap: 24px; padding: 28px; }
+    .contact-detail__texto { align-items: flex-start; flex: 1 1 280px; }
+    .contact-detail__nombre-fila { justify-content: flex-start; }
+    .contact-detail__sub { font-size: var(--fs-headline); }
+    .contact-detail__identidad .action-buttons { width: auto; }
+}
+
+/* En Contactos la ficha se ancla en un panel lateral angosto. No puede
+   conservar la composición de dos columnas de la ficha modal: comprimía el
+   selector de estado y los datos hasta volverlos ilegibles. */
+@media (min-width: 1200px) {
+    .modo-contactos .contact-detail__columnas {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .modo-contactos .contact-detail__identidad {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .modo-contactos .contact-detail__texto {
+        align-items: center;
+    }
+
+    .modo-contactos .contact-detail__nombre-fila {
+        justify-content: center;
+    }
+
+    .modo-contactos .contact-detail__identidad .action-buttons {
+        width: 100%;
+    }
+}
+
+/* Botones blancos de la fila de acciones (Llamar, WhatsApp, Recontacto, Nota) */
+.action-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.action-button__icon {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    flex: none;
+    line-height: 0;
+}
+.action-button {
+    flex: 1 1 130px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: var(--celda-alto-min);
+    padding: 0 16px;
+    border: 0; border-radius: var(--radio-grupo);
+    background: #fff; color: var(--pastel-label);
+    font-weight: 600; text-decoration: none; cursor: pointer;
+}
+.action-button__icon svg { width: 17px; height: 17px; }
+.action-button--llamar .action-button__icon { color: var(--tint); }
+.action-button--whatsapp .action-button__icon { color: var(--green); }
+.action-button--recontacto .action-button__icon { color: var(--orange); }
+.action-button--nota .action-button__icon { color: var(--indigo); }
+.action-button--pago .action-button__icon { color: var(--green); }
+
+/* Próximo recontacto (tarjeta celeste) */
+.ficha-proximo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    border-radius: var(--radio-grupo);
+    background: var(--pastel-tint);
+    border: 1px solid var(--pastel-tint-borde);
+    color: var(--pastel-label);
+}
+.ficha-proximo__icono {
+    width: 44px; height: 44px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--radio-grupo);
+    background: #fff; color: var(--tint);
+}
+.ficha-proximo__icono svg { width: 22px; height: 22px; }
+.ficha-proximo__texto { flex: 1 1 180px; min-width: 0; }
+.ficha-proximo__rotulo { font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--tint-texto); }
+.ficha-proximo__cuando { font-size: var(--fs-title2); line-height: var(--lh-title2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.ficha-proximo__detalle { font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); }
+.ficha-proximo__acciones { display: flex; gap: 8px; }
+.ficha-proximo--vencido { background: var(--pastel-red); border-color: var(--pastel-red-borde); }
+.ficha-proximo--vencido .ficha-proximo__rotulo { color: var(--red-texto); }
+.ficha-proximo--vencido .ficha-proximo__icono { color: var(--red); }
+
+/* Selector de estado (grilla 2×2) */
+.group--estado { padding: 16px; }
+.group--estado .group__header { padding: 0 0 10px; background: transparent; }
+.estado-selector {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+.estado-opcion {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: var(--celda-alto-min);
+    padding: 0 10px;
+    border: 1px solid var(--separator);
+    border-radius: var(--radio-grupo);
+    background: var(--bg-card);
+    color: var(--label);
+    font-size: var(--fs-subhead);
+    font-weight: 500;
+    cursor: pointer;
+}
+.estado-opcion__punto { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.estado-opcion--nuevo .estado-opcion__punto { background: var(--tint); }
+.estado-opcion--seguimiento .estado-opcion__punto { background: var(--orange); }
+.estado-opcion--concreto .estado-opcion__punto { background: var(--green); }
+.estado-opcion--cerrado .estado-opcion__punto { background: var(--gray); }
+.estado-opcion[aria-checked="true"] { border-width: 2px; font-weight: 700; }
+.estado-opcion--nuevo[aria-checked="true"] { background: var(--pastel-tint); border-color: var(--tint); color: var(--tint-texto); }
+.estado-opcion--seguimiento[aria-checked="true"] { background: var(--pastel-orange); border-color: var(--orange); color: var(--orange-texto); }
+.estado-opcion--concreto[aria-checked="true"] { background: var(--pastel-green); border-color: var(--green); color: var(--green-texto); }
+.estado-opcion--cerrado[aria-checked="true"] { background: var(--bg-card-2); border-color: var(--gray); color: var(--label-2); }
+
+/* Historial: ícono en círculo pastel + línea vertical + burbuja de nota */
+.historial { display: flex; flex-direction: column; }
+.historial__item { display: flex; gap: 14px; }
+.historial__riel { display: flex; flex-direction: column; align-items: center; }
+.historial__icono {
+    width: 32px; height: 32px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+}
+.historial__icono svg { width: 15px; height: 15px; }
+.historial__linea { width: 2px; flex: 1; background: var(--separator); margin: 4px 0; }
+.historial__item:last-child .historial__linea { display: none; }
+.historial__cuerpo { padding-bottom: 18px; min-width: 0; }
+.historial__titulo { font-weight: 600; color: var(--label); }
+.historial__meta { font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); margin: 2px 0 6px; font-variant-numeric: tabular-nums; }
+.historial__nota { margin: 0; padding: 10px 12px; border-radius: var(--radio-grupo); background: var(--bg-card-2); color: var(--label); }
+.historial__chip { font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 600; padding: 2px 6px; border-radius: var(--radio-chico); margin-left: 6px; }
+/* Colores por tipo (mismo criterio que colorTimeline() en seguimientos.js) */
+.historial__icono--tint   { background: var(--pastel-tint);   color: var(--tint); }
+.historial__icono--orange { background: var(--pastel-orange); color: var(--orange); }
+.historial__icono--green  { background: var(--pastel-green);  color: var(--green); }
+.historial__icono--indigo { background: var(--pastel-indigo); color: var(--indigo); }
+.historial__icono--red    { background: var(--pastel-red);    color: var(--red); }
+.historial__icono--gray   { background: var(--bg-card-2);     color: var(--gray); }
+.historial__chip--orange { background: var(--pastel-orange); color: var(--orange-texto); }
+
+/* Compromisos de pago dentro de la ficha */
+.ficha-compromisos { display: flex; flex-direction: column; gap: 8px; }
+.ficha-compromisos__cabecera { display: flex; align-items: center; justify-content: space-between; }
+.compromiso-item { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: var(--radio-grupo); border: 1px solid; color: var(--pastel-label); }
+.compromiso-item--vencido    { background: var(--pastel-red);    border-color: var(--pastel-red-borde); }
+.compromiso-item--hoy        { background: var(--pastel-orange); border-color: var(--pastel-orange-borde); }
+.compromiso-item--proximo    { background: var(--pastel-indigo); border-color: var(--pastel-indigo-borde); }
+.compromiso-item--pagado,
+.compromiso-item--parcial    { background: var(--pastel-green);  border-color: var(--pastel-green-borde); }
+.compromiso-item--incumplido,
+.compromiso-item--reprogramado { background: var(--pastel-gray);   border-color: var(--pastel-gray-borde); }
+.compromiso-item--vencido .chip-estado    { color: var(--red-texto); }
+.compromiso-item--hoy .chip-estado        { color: var(--orange-texto); }
+.compromiso-item--proximo .chip-estado    { color: var(--indigo-texto); }
+.compromiso-item--pagado .chip-estado,
+.compromiso-item--parcial .chip-estado    { color: var(--green-texto); }
+.compromiso-item--incumplido .chip-estado,
+.compromiso-item--reprogramado .chip-estado { color: var(--pastel-label-2); }
+.compromiso-item__fila { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.compromiso-item__monto { font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 700; }
+.compromiso-item__detalle { margin: 0; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); }
+.compromiso-item__acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.compromiso-item__autor { margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+
+/* Notas del contacto en mini tarjetas pastel */
+.notas-mini-lista { display: flex; flex-direction: column; gap: 8px; }
+.nota-mini { padding: 14px 16px; border-radius: var(--radio-grupo); border: 1px solid; color: var(--pastel-label); }
+.nota-mini__titulo { font-weight: 600; }
+.nota-mini__texto { margin: 4px 0 0; }
+
+/* Ficha: bloque «En SAS Imperio» */
+.ficha-sas { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.ficha-sas .btn-texto { min-height: var(--celda-alto-min); padding: 0 8px; }
+.ficha-sas__vacio { margin: 0; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--label-2); }
+.sas-bloque { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px solid var(--pastel-tint-borde); border-radius: var(--radio-grupo); background: var(--pastel-tint); color: var(--pastel-label); }
+.sas-bloque > .ficha-sas__vacio { color: var(--pastel-label-2); }
+.sas-datos { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.sas-dato { display: flex; flex-direction: column; gap: 2px; }
+.sas-dato dt { font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--label-2); }
+.sas-dato dd { margin: 0; font-size: var(--fs-subhead); line-height: var(--lh-subhead); }
+.sas-dato--alerta dd { color: var(--red-texto); }
+.sas-dato--aviso dd { color: var(--orange-texto); }
+.ficha-sas__pie { display: flex; flex-direction: column; gap: 2px; margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+.ficha-sas__desvincular { align-self: flex-start; }

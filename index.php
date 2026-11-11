@@ -32,7 +32,13 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     <link rel="stylesheet" href="assets/css/tokens.css">
     <link rel="stylesheet" href="assets/css/base.css">
     <link rel="stylesheet" href="assets/css/components.css">
-    <link rel="stylesheet" href="assets/css/pastel.css">
+    <link rel="stylesheet" href="assets/css/pantallas/hoy.css">
+    <link rel="stylesheet" href="assets/css/pantallas/contactos.css">
+    <link rel="stylesheet" href="assets/css/pantallas/calendario.css">
+    <link rel="stylesheet" href="assets/css/pantallas/ficha.css">
+    <link rel="stylesheet" href="assets/css/pantallas/notas.css">
+    <link rel="stylesheet" href="assets/css/pantallas/ajustes.css">
+    <link rel="stylesheet" href="assets/css/pantallas/pagos.css">
 </head>
 <body>
     <div class="app-shell" x-data="appShell()" x-init="init()" :class="{'modo-contactos': activo === 'contactos'}">

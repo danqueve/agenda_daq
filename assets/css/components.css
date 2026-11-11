@@ -1,3 +1,9 @@
+/* =====================================================================
+   Componentes genéricos: shell, navegación, listas, botones, formularios, hojas,
+   tarjetas pastel y filtros. Se carga después de tokens.css y base.css y antes de
+   assets/css/pantallas/*.css.
+   ===================================================================== */
+
 /* ===== Layout general / shell ===== */
 
 .app-shell {
@@ -408,18 +414,10 @@ button.cell:active {
     }
 }
 
-/* ===== Contactos ===== */
-
 .error-inline {
     margin: 0 0 16px;
     color: var(--red);
     font-size: var(--fs-footnote);
-}
-
-.contacts-load-more {
-    display: block;
-    margin: -8px auto 24px;
-    padding: 10px;
 }
 
 .form-group { margin-bottom: 22px; }
@@ -519,7 +517,6 @@ button.cell:active {
     font-size: var(--fs-body);
 }
 
-
 .delete-contact {
     display: block;
     width: 100%;
@@ -534,17 +531,6 @@ button.cell:active {
 .alert-sheet .subhead { margin: 8px 0 22px; }
 .alert-sheet__actions { display: grid; gap: 12px; }
 .btn-principal--danger { background: var(--red); }
-
-.month-counts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 14px;
-    margin: 4px 4px 24px;
-    color: var(--label-2);
-    font-size: var(--fs-footnote);
-}
-
-.month-counts strong { color: var(--label); }
 
 .sheet-contact-name {
     margin: -4px 0 14px;
@@ -576,46 +562,6 @@ button.cell:active {
 
 .close-reasons { margin: 16px 0; }
 .close-reasons > .footnote { margin-bottom: 7px; }
-
-.agenda-empty { clear: both; }
-
-/* La lista de contactos usa un poco más de ancho en pantallas grandes. En
-   cualquier otra pestaña (Hoy, Agenda) la ficha de contacto se abre siempre
-   como sheet centrada y compacta (ver .sheet-backdrop/.sheet más abajo).
-   Solo en Contactos (clase .modo-contactos, ver regla siguiente) se ancla
-   al lado de la lista con position:fixed y bordes explícitos — evitando
-   a propósito depender de flex-stretch + min-height, que fue lo que antes
-   tapaba el header ("Cerrar"/"Editar") detrás de la barra superior fija. */
-@media (min-width: 1200px) {
-    .screen:has(.contact-list) { max-width: none; }
-
-    .screen:has(.contact-list) .screen__body {
-        width: min(680px, 42vw);
-        border-right: 1px solid var(--separator);
-        min-height: calc(100dvh - var(--topbar-height));
-    }
-
-    .modo-contactos .detail-backdrop {
-        background: transparent;
-        pointer-events: none;
-    }
-
-    .modo-contactos .detail-backdrop .contact-detail {
-        position: fixed;
-        top: var(--topbar-height);
-        right: 0;
-        bottom: 0;
-        left: auto;
-        width: min(420px, calc(100vw - var(--sidebar-width) - min(680px, 42vw)));
-        max-width: none;
-        max-height: none;
-        height: auto;
-        border-radius: 0;
-        border-left: 1px solid var(--separator);
-        box-shadow: var(--sombra-lg);
-        pointer-events: auto;
-    }
-}
 
 /* ===== Sheets ===== */
 
@@ -747,62 +693,6 @@ button.cell:active {
     font-weight: 600;
 }
 
-/* ===== Anillo del día ===== */
-
-.anillo-dia {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    background: var(--bg-card);
-    border-radius: var(--radio-grupo);
-    padding: 20px;
-    margin-bottom: 24px;
-}
-
-.anillo-dia__grafico {
-    flex-shrink: 0;
-    position: relative;
-    width: 110px;
-    height: 110px;
-}
-
-.anillo-dia__grafico svg {
-    width: 100%;
-    height: 100%;
-    transform: rotate(-90deg);
-}
-
-.anillo-dia__pista {
-    stroke: var(--bg-card-2);
-}
-
-.anillo-dia__progreso {
-    stroke: var(--tint);
-    stroke-linecap: round;
-    transition: stroke-dashoffset var(--duracion-push) var(--curva-ios);
-}
-
-.anillo-dia__numero {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.anillo-dia__numero strong {
-    font-size: 28px;
-    font-weight: 700;
-}
-
-.anillo-dia__filas {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
 /* ===== Interruptor (toggle) ===== */
 
 .toggle {
@@ -916,7 +806,6 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 .segmented__option[aria-selected="true"] { color: var(--label); background: var(--bg-card); box-shadow: var(--sombra-sm); }
 .pill { color: var(--label-2); background: var(--bg-card-2); border: 1px solid var(--separator); border-radius: var(--radio-chico); }
 .pill[aria-selected="true"] { color: var(--tint); background: color-mix(in srgb, var(--tint) 14%, var(--bg-card)); border-color: var(--tint); }
-.anillo-dia, .week-strip { border: 1px solid var(--separator); border-radius: var(--radio-grupo); box-shadow: var(--sombra-sm); }
 .sheet { border: 1px solid var(--separator); border-radius: var(--radio-sheet) var(--radio-sheet) 0 0; box-shadow: var(--sombra-lg); }
 .sheet__grabber { width: 36px; background: var(--separator); }
 .sheet__title { color: var(--label); }
@@ -970,13 +859,451 @@ body { background: var(--bg-grouped); letter-spacing: -0.01em; }
 .cell__title,
 .cell__subtitle { display: block; }
 
-/* Calendario mensual, panel del día y tira semanal: migrados por completo a
-   assets/css/pastel.css (secciones 7 y 9) con los valores exactos de
-   04-calendario.html, 04b/04c y 04d. pastel.css es la única fuente. */
-
-/* Secciones "Contactos: filtros, grilla y ficha pastel" migradas a
-   assets/css/pastel.css (clases .filtro-pill*, .card-pastel--*, .chip-estado,
-   .contact-detail--*): pastel.css es ahora la única fuente. */
-
 /* Controles deshabilitados por otra opción del formulario (ej. Recontactar con pago agendado). */
 .is-disabled { opacity: .45; pointer-events: none; }
+
+/* =====================================================================
+   SHELL · barra lateral (≥900px) y tab bar (celular)
+   Referencia: barra izquierda de 01-hoy.html · tab bar de 03c/04d/05c
+   ===================================================================== */
+.tabbar__item[aria-current="page"] { color: var(--tint-texto); font-weight: 600; }
+.tabbar__badge { background: var(--red); font-weight: 600; }
+
+/* En el celular y la tablet (<1024px, donde la navegación es la barra
+   inferior) Pagos ocupa el lugar de Notas; Notas se abre desde Ajustes. */
+@media (max-width: 1023px) {
+    .tabbar__item--solo-escritorio { display: none; }
+}
+@media (min-width: 1024px) {
+    .ajustes-notas-movil { display: none; }
+}
+
+@media (max-width: 1023px) {
+    /* La caja fija evita que el SVG de Lucide herede la línea del texto y
+       quede visualmente descentrado en la barra inferior. */
+    .tabbar {
+        min-height: calc(58px + env(safe-area-inset-bottom));
+        align-items: stretch;
+    }
+
+    .tabbar__item {
+        min-width: 0;
+        min-height: 58px;
+        justify-content: center;
+    }
+
+    .tabbar__icon {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        flex: none;
+        line-height: 0;
+    }
+
+    .tabbar__icon svg {
+        width: 22px;
+        height: 22px;
+        flex: none;
+    }
+
+    .tabbar__label {
+        display: block;
+        min-height: var(--lh-caption);
+        white-space: nowrap;
+    }
+}
+
+/* Algunos Android entregan un viewport CSS cercano a 980 px cuando la app
+   todavía conserva una vista anterior. Hasta 1023 px la interfaz siempre
+   debe conservar la navegación móvil, no el sidebar de escritorio. */
+@media (min-width: 900px) and (max-width: 1023px) {
+    .tabbar {
+        position: fixed;
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 60;
+        width: auto;
+        height: auto;
+        min-height: calc(58px + env(safe-area-inset-bottom));
+        padding: 0 0 env(safe-area-inset-bottom);
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0;
+        background: color-mix(in srgb, var(--bg-card) 96%, transparent);
+        border-top: 1px solid var(--separator);
+        border-right: 0;
+        box-shadow: var(--sombra-sm);
+    }
+
+    .tabbar__brand,
+    .tabbar__perfil { display: none; }
+    .tabbar__items { display: contents; }
+
+    .tabbar__item,
+    .tabbar__item--ajustes-movil {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        min-width: 0;
+        min-height: 58px;
+        padding: 6px 0 4px;
+        border-radius: 0;
+        background: transparent;
+        color: var(--gray);
+        font-size: inherit;
+    }
+
+    .tabbar__item[aria-current="page"] { background: transparent; color: var(--tint-texto); }
+    .tabbar__icon { display: grid; place-items: center; width: 22px; height: 22px; line-height: 0; }
+    .tabbar__icon svg { width: 22px; height: 22px; }
+    .tabbar__label { display: block; min-height: var(--lh-caption); font-size: var(--fs-caption); line-height: var(--lh-caption); white-space: nowrap; }
+    .tabbar__badge { position: absolute; top: 2px; right: calc(50% - 18px); margin-left: 0; }
+
+    .app-shell__content { min-height: 100dvh; margin-left: 0; padding-bottom: calc(98px + env(safe-area-inset-bottom)); }
+    .screen { max-width: 680px; }
+    .screen__body { padding-right: 16px; padding-bottom: 98px; padding-left: 16px; }
+
+    .sheet-backdrop { padding: 0; }
+    .sheet { width: 100%; max-width: 560px; max-height: 90dvh; border-radius: var(--radio-sheet) var(--radio-sheet) 0 0; }
+    .sheet__grabber { display: block; }
+    .contact-detail--ancho { width: 100%; }
+    .contact-detail__columnas { display: flex; flex-direction: column; }
+    .contact-detail__identidad { flex-direction: column; align-items: center; padding: 20px; text-align: center; }
+    .contact-detail__texto { align-items: center; }
+    .contact-detail__nombre-fila { justify-content: center; }
+    .contact-detail__identidad .action-buttons { width: 100%; }
+}
+
+@media (min-width: 1024px) {
+    .tabbar {
+        width: var(--sidebar-width);
+        padding: 24px 16px;
+        gap: 24px;
+        background: var(--bg-card);
+        border-right: 1px solid var(--separator);
+    }
+    .tabbar__brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; font-size: 17px; font-weight: 700; letter-spacing: -0.02em; color: var(--label); }
+    .tabbar__brand-mark {
+        width: 36px; height: 36px; border-radius: var(--radio-grupo);
+        display: flex; align-items: center; justify-content: center;
+        background: var(--pastel-tint); color: var(--tint);
+    }
+    .tabbar__brand-mark svg { width: 20px; height: 20px; }
+    .tabbar__items { display: flex; flex-direction: column; gap: 4px; }
+    .tabbar__item { min-height: var(--celda-alto-min); padding: 0 12px; color: var(--label-2); }
+    .tabbar__item[aria-current="page"] { background: var(--pastel-tint); color: var(--tint-texto); }
+    .tabbar__icon svg { width: 18px; height: 18px; }
+    .tabbar__perfil {
+        margin-top: auto;
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px; border-radius: var(--radio-grupo);
+        background: var(--bg-card-2); color: var(--label); text-align: left;
+    }
+    .tabbar__perfil[aria-current="page"] { background: var(--pastel-tint); box-shadow: inset 0 0 0 1px var(--pastel-tint-borde); }
+}
+
+/* =====================================================================
+   CABECERA DE PANTALLA (navbar) · títulos, buscador y botón principal
+   ===================================================================== */
+.navbar .subhead { color: var(--label-2); }
+.navbar__large-title { font-size: var(--fs-large-title); line-height: var(--lh-large-title); font-weight: 700; letter-spacing: -0.04em; }
+.navbar__acciones { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+.search-field--header, .workspace-search {
+    display: flex; align-items: center; gap: 8px;
+    min-height: var(--celda-alto-min); box-sizing: border-box;
+    width: 260px; max-width: 100%;
+    padding: 0 12px;
+    background: var(--bg-card); border: 1px solid var(--separator); border-radius: var(--radio-chico);
+    color: var(--label-2);
+}
+.search-field--header input { font-size: 16px; }
+.search-field--header svg, .workspace-search svg { width: 17px; height: 17px; }
+/* Celular: el título y las acciones (buscador + botón) van en dos líneas, y el
+   buscador ocupa el ancho que queda en vez de los 260px fijos que desbordaban la pantalla. */
+@media (max-width: 599px) {
+    .navbar__large-row { flex-wrap: wrap; }
+    .navbar__acciones { flex: 1 1 100%; flex-wrap: nowrap; }
+    .search-field--header, .workspace-search { flex: 1 1 0; width: auto; min-width: 0; }
+}
+
+.workspace-create, .btn-principal {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: var(--celda-alto-min);
+    padding: 0 18px;
+    border: 0; border-radius: var(--radio-grupo);
+    background: var(--tint); color: var(--tint-contraste);
+    font-size: var(--fs-headline); font-weight: 600;
+    box-shadow: var(--sombra-sm);
+}
+.workspace-create:hover, .btn-principal:hover { background: var(--tint-hover); }
+.workspace-create svg { width: 18px; height: 18px; }
+
+/* Tarjetas de resumen (Vencidos / Para hoy / Próximos / Concretaron) */
+.stat-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
+.stat-card {
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 20px;
+    border-radius: var(--radio-grupo); border: 1px solid;
+    color: var(--pastel-label);
+}
+.stat-card--vencido  { background: var(--pastel-red);    border-color: var(--pastel-red-borde); }
+.stat-card--hoy      { background: var(--pastel-orange); border-color: var(--pastel-orange-borde); }
+.stat-card--proximo  { background: var(--pastel-indigo); border-color: var(--pastel-indigo-borde); }
+.stat-card--concreto { background: var(--pastel-green);  border-color: var(--pastel-green-borde); }
+.stat-card__cabecera { display: flex; align-items: center; justify-content: space-between; }
+.stat-card__etiqueta { font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.stat-card--vencido .stat-card__etiqueta  { color: var(--red-texto); }
+.stat-card--hoy .stat-card__etiqueta      { color: var(--orange-texto); }
+.stat-card--proximo .stat-card__etiqueta  { color: var(--indigo-texto); }
+.stat-card--concreto .stat-card__etiqueta { color: var(--green-texto); }
+.stat-card__icono { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; }
+.stat-card__icono svg { width: 17px; height: 17px; }
+.stat-card--vencido .stat-card__icono  { color: var(--red); }
+.stat-card--hoy .stat-card__icono      { color: var(--orange); }
+.stat-card--proximo .stat-card__icono  { color: var(--indigo); }
+.stat-card--concreto .stat-card__icono { color: var(--green); }
+.stat-card__numero { font-size: 32px; line-height: 36px; font-weight: 700; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.stat-card__ayuda { margin: 0; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); }
+
+/* Título de sección con filtros a la derecha ("Recontactos", "Contactos") */
+.seccion-cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.seccion-cabecera h2 { margin: 0; font-size: var(--fs-title2); line-height: var(--lh-title2); font-weight: 600; }
+
+/* =====================================================================
+   TARJETA PASTEL (recontactos en Hoy, contactos en Contactos)
+   Referencias 01-hoy.html y 02-contactos.html
+   ===================================================================== */
+.card-pastel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.contact-list.card-pastel-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+@media (max-width: 599px) { .card-pastel-grid, .contact-list.card-pastel-grid { grid-template-columns: 1fr; } }
+
+.card-pastel {
+    display: flex; flex-direction: column; gap: 14px;
+    width: 100%; box-sizing: border-box;
+    padding: 18px;
+    border-radius: var(--radio-grupo); border: 1px solid;
+    box-shadow: var(--sombra-sm);
+    color: var(--pastel-label);
+    text-align: left;
+}
+button.card-pastel { cursor: pointer; font: inherit; }
+/* estados de recontacto (Hoy) */
+.card-pastel--vencido  { background: var(--pastel-red);    border-color: var(--pastel-red-borde); }
+.card-pastel--hoy      { background: var(--pastel-orange); border-color: var(--pastel-orange-borde); }
+.card-pastel--proximo  { background: var(--pastel-indigo); border-color: var(--pastel-indigo-borde); }
+/* estados de contacto (Contactos) */
+.card-pastel--nuevo       { background: var(--pastel-tint);   border-color: var(--pastel-tint-borde); }
+.card-pastel--seguimiento { background: var(--pastel-orange); border-color: var(--pastel-orange-borde); }
+.card-pastel--concreto    { background: var(--pastel-green);  border-color: var(--pastel-green-borde); }
+.card-pastel--cerrado     { background: var(--pastel-gray);   border-color: var(--pastel-gray-borde); }
+.card-pastel--seleccionada { border-width: 2px; border-color: var(--orange); }
+
+.card-pastel__head { display: flex; align-items: flex-start; gap: 12px; }
+.card-pastel__persona { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.card-pastel .avatar { width: 42px; height: 42px; flex: none; }
+.card-pastel__cuerpo { display: flex; flex-direction: column; min-width: 0; }
+.card-pastel__nombre { font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 600; }
+.card-pastel__detalle { font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); overflow: hidden; text-overflow: ellipsis; }
+.card-pastel__fecha { display: flex; align-items: center; gap: 6px; margin: 0; font-size: var(--fs-subhead); color: var(--pastel-label-2); font-variant-numeric: tabular-nums; }
+.card-pastel__fecha svg { width: 15px; height: 15px; }
+.card-pastel__acciones { display: flex; gap: 8px; }
+.card-pastel__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.card-pastel__pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.card-pastel__pie .origen-chip { margin-right: auto; }
+.card-pastel__autor { margin: -4px 0 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.card-pastel__monto { margin: 0; font-size: var(--fs-title2); line-height: var(--lh-title2); font-weight: 700; letter-spacing: -0.02em; }
+.origen-chip {
+    display: inline-flex; align-items: center; gap: 5px; flex: none;
+    min-height: 26px; padding: 3px 8px;
+    border-radius: var(--radio-chico); background: var(--bg-card-2);
+    color: var(--pastel-label-2); font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600;
+    white-space: nowrap;
+}
+.origen-chip svg { width: 14px; height: 14px; }
+.origen-chip--whatsapp, .origen-chip--referido { background: var(--pastel-green); color: var(--green-texto); }
+.origen-chip--instagram { background: var(--pastel-indigo); color: var(--indigo-texto); }
+.origen-chip--facebook { background: var(--pastel-tint); color: var(--tint-texto); }
+.origen-chip--llamada, .origen-chip--local { background: var(--pastel-orange); color: var(--orange-texto); }
+.origen-chip--otro { background: var(--bg-card-2); color: var(--pastel-label-2); }
+
+/* Chip blanco de estado / producto */
+.chip-estado {
+    flex: none;
+    font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 600;
+    letter-spacing: .04em; text-transform: uppercase;
+    background: #fff; color: var(--pastel-label);
+    border-radius: var(--radio-chico); padding: 4px 8px;
+}
+.card-pastel__tags .chip-estado:not(.chip-estado--estado) { text-transform: none; letter-spacing: 0; font-size: var(--fs-footnote); }
+.card-pastel--vencido .chip-estado, .card-pastel--vencido .chip-estado--estado { color: var(--red-texto); }
+.card-pastel--hoy .chip-estado, .card-pastel--seguimiento .chip-estado--estado { color: var(--orange-texto); }
+.card-pastel--proximo .chip-estado { color: var(--indigo-texto); }
+.card-pastel--nuevo .chip-estado--estado { color: var(--tint-texto); }
+.card-pastel--concreto .chip-estado--estado { color: var(--green-texto); }
+.card-pastel--cerrado .chip-estado--estado { color: var(--pastel-label-2); }
+
+/* =====================================================================
+   FILTROS (Contactos y Recontactos)  ·  referencia 02-contactos.html
+   ===================================================================== */
+.filtro-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.filtro-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 44px; padding: 0 14px;
+    border: 1px solid var(--separator); border-radius: var(--radio-chico);
+    background: var(--bg-card); color: var(--label);
+    font-size: var(--fs-subhead); cursor: pointer;
+}
+.filtro-pill__punto { width: 8px; height: 8px; border-radius: 50%; }
+.filtro-pill--nuevo { border-color: var(--pastel-tint-borde); }        .filtro-pill--nuevo .filtro-pill__punto { background: var(--tint); }
+.filtro-pill--seguimiento { border-color: var(--pastel-orange-borde); } .filtro-pill--seguimiento .filtro-pill__punto { background: var(--orange); }
+.filtro-pill--concreto { border-color: var(--pastel-green-borde); }    .filtro-pill--concreto .filtro-pill__punto { background: var(--green); }
+.filtro-pill--cerrado { border-color: var(--pastel-gray-borde); }      .filtro-pill--cerrado .filtro-pill__punto { background: var(--gray); }
+.filtro-pill[aria-selected="true"], .filtro-pill[aria-pressed="true"] { border-color: var(--tint); background: var(--pastel-tint); color: var(--tint-texto); font-weight: 600; }
+
+/* =====================================================================
+   HOJAS (sheets) Y FORMULARIOS  ·  referencias 01b, 03b
+   ===================================================================== */
+.sheet-backdrop {
+    /* Debe quedar por encima de la barra de navegación móvil (incluidos los
+       Android que entregan un viewport ancho) y de los encabezados sticky. */
+    z-index: 70;
+    background: rgba(47, 56, 79, .35);
+}
+/* El velo puede atenuar la página, pero cada hoja debe ser una superficie
+   completamente sólida: nunca debe transparentarse el contenido de atrás. */
+.sheet { background-color: var(--bg-grouped); background-image: none; box-shadow: var(--sombra-lg); }
+.sheet__header { background: var(--pastel-tint); border-bottom: 1px solid var(--pastel-tint-borde); color: var(--pastel-label); }
+.sheet__header .btn-texto { color: var(--tint-texto); }
+.group__header { font-size: var(--fs-footnote); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--label-2); }
+.group { background: var(--bg-card); border: 1px solid var(--separator); border-radius: var(--radio-grupo); box-shadow: none; overflow: hidden; }
+.form-cell { min-height: 48px; }
+.form-cell input, .form-cell select, .form-cell textarea { font-size: 16px; }
+.form-cell:focus-within { box-shadow: inset 0 0 0 2px var(--tint); }
+.form-cell .cell__label { width: 84px; flex: none; }
+.note-field textarea { font-size: 16px; line-height: 22px; }
+
+/* Campo de la consulta: caja aparte (no fila de .group) con halo celeste
+   al enfocar, como en 01b-nueva-consulta.html. */
+.textarea-celeste {
+    display: block;
+    border-radius: var(--radio-grupo);
+    background: var(--bg-card);
+    border: 1px solid var(--separator);
+    padding: 12px 16px;
+}
+.textarea-celeste:focus-within {
+    border: 2px solid var(--tint);
+    box-shadow: 0 0 0 4px var(--halo-foco);
+    padding: 11px 15px;
+}
+.textarea-celeste textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border: 0;
+    outline: none;
+    resize: vertical;
+    background: transparent;
+    font: inherit;
+    font-size: 16px;
+    line-height: 22px;
+    color: var(--label);
+}
+
+/* Pills de fecha rápida (Mañana / En 3 días / …) */
+.pill {
+    min-height: 36px; padding: 0 14px;
+    border: 1px solid var(--separator); border-radius: var(--radio-chico);
+    background: var(--bg-card); color: var(--label);
+    font-size: var(--fs-subhead);
+}
+.pill[aria-selected="true"] { border-color: var(--tint); background: var(--pastel-tint); color: var(--tint-texto); font-weight: 700; }
+
+/* Etiquetas seleccionables */
+.tag { min-height: 36px; padding: 0 12px; border-radius: 18px; border: 1px solid var(--separator); background: var(--bg-card); color: var(--label); }
+.tag--selected { border-color: var(--orange); background: var(--pastel-orange); color: var(--orange-texto); font-weight: 600; }
+.disclosure { color: var(--tint-texto); font-weight: 600; }
+
+/* Segmented (vistas Mes/Semana/Día, resultado) */
+.segmented { background: var(--bg-card-2); border: 1px solid var(--separator); border-radius: var(--radio-chico); padding: 3px; }
+.segmented__option[aria-selected="true"] { background: var(--bg-card); color: var(--label); font-weight: 600; box-shadow: var(--sombra-sm); }
+
+/* Alertas (eliminar, duplicado) */
+.alert-sheet__icon { color: var(--tint); }
+.alert-sheet__icon--danger { color: var(--red); }
+.btn-principal--danger { background: var(--red); }
+.btn-principal--danger:hover { background: var(--red-hover); }
+.error-inline { padding: 10px 12px; border-radius: var(--radio-grupo); background: var(--pastel-red); color: var(--red-texto); font-weight: 600; }
+
+/* Estado vacío */
+.empty-state { color: var(--label-2); }
+.empty-state svg { color: var(--label-3); }
+.empty-state__boton { min-height: var(--celda-alto-min); padding: 0 16px; border: 0; border-radius: var(--radio-grupo); background: var(--pastel-tint); color: var(--tint-texto); font-weight: 600; }
+
+/* ---------- Utilidades compartidas (ficha, calendario, notas) ---------- */
+
+.rotulo {                                   /* "PRÓXIMO RECONTACTO", "MOTIVO", etc. */
+    font-size: var(--fs-footnote);
+    line-height: var(--lh-footnote);
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--label-2);
+}
+
+.boton-blanco {                             /* botón blanco sobre superficie pastel */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: var(--celda-alto-min);
+    padding: 0 14px;
+    border: 0;
+    border-radius: var(--radio-grupo);
+    background: #fff;
+    color: var(--pastel-label);
+    font-weight: 600;
+    cursor: pointer;
+}
+.boton-blanco svg { width: 16px; height: 16px; }
+.boton-blanco--llamar svg { color: var(--tint); }
+.boton-blanco--whatsapp svg { color: var(--green); }
+.boton-blanco--posponer svg { color: var(--orange); }
+.boton-blanco--hecho svg { color: var(--green); }
+
+/* Hoja "Registrar recontacto": resultados como tarjetas pastel 2×2 */
+.resultado-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.resultado-grid--tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.resultado-opcion {
+    min-height: var(--celda-alto-min);
+    border: 1px solid var(--separator);
+    border-radius: var(--radio-grupo);
+    background: var(--bg-card);
+    color: var(--label);
+    font-size: var(--fs-subhead);
+    font-weight: 500;
+    cursor: pointer;
+}
+.resultado-opcion[aria-selected="true"] { border-width: 2px; font-weight: 700; }
+.resultado-opcion--atendio[aria-selected="true"]   { background: var(--pastel-tint);   border-color: var(--tint);   color: var(--tint-texto); }
+.resultado-opcion--no_atendio[aria-selected="true"]{ background: var(--pastel-red);    border-color: var(--red);    color: var(--red-texto); }
+.resultado-opcion--mensaje_enviado[aria-selected="true"] { background: var(--pastel-green); border-color: var(--green); color: var(--green-texto); }
+.resultado-opcion--pagado[aria-selected="true"]    { background: var(--pastel-green);  border-color: var(--green);  color: var(--green-texto); }
+.resultado-opcion--parcial[aria-selected="true"]   { background: var(--pastel-orange); border-color: var(--orange); color: var(--orange-texto); }
+.resultado-opcion--incumplido[aria-selected="true"]{ background: var(--bg-card-2);     border-color: var(--gray);   color: var(--label-2); }
+.resultado-opcion--pospuso[aria-selected="true"]   { background: var(--pastel-orange); border-color: var(--orange); color: var(--orange-texto); }
+
+/* =====================================================================
+   MOVIMIENTO
+   ===================================================================== */
+.card-pastel, .stat-card, .nota-card, .estado-opcion, .filtro-pill, .pill, .repro-pill, .color-dot {
+    transition: background-color .3s var(--curva-ios), border-color .3s var(--curva-ios), box-shadow .3s var(--curva-ios);
+}
+.card-pastel:active, .nota-card:active, .cal-item:active { filter: brightness(.97); }

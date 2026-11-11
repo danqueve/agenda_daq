@@ -1,0 +1,290 @@
+/* =====================================================================
+   Pantalla Pagos y componentes de un compromiso de pago que se usan en todas las
+   pantallas: botonera, fila, aviso con «Deshacer», hoja compacta y datos de SAS.
+   ===================================================================== */
+
+/* Pantalla Pagos: los totales son importes, tienen que entrar en 2 columnas en el celular. */
+.stat-card-grid--montos .stat-card { min-width: 0; container-type: inline-size; }
+/* El tamaño sigue el ancho de la tarjeta: un importe de 6 cifras con decimales no la desborda. */
+.stat-card-grid--montos .stat-card__numero { font-size: clamp(17px, 14.5cqi, 32px); line-height: 1.15; }
+.pagos-filtros { margin: 16px 0; }
+
+/* =====================================================================
+   PAGOS · vistas, filtros, resumen por usuario y calendario con importes
+        (Fase 2 de docs/plans/2026-11-11-compromisos-visualizacion.md)
+   ===================================================================== */
+
+/* Barra de vistas + exportar */
+.pagos-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 0 0; }
+.pagos-vistas { flex: 1 1 180px; max-width: 360px; margin: 0; }
+.pagos-vistas .segmented__option { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: var(--celda-alto-min); }
+.pagos-vistas .segmented__option svg { width: 16px; height: 16px; flex: none; }
+.pagos-vistas .pagos-vistas__tabla { display: none; }
+@media (min-width: 900px) { .pagos-vistas .pagos-vistas__tabla { display: inline-flex; } }
+.pagos-csv {
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: var(--celda-alto-min); padding: 0 14px;
+    border: 1px solid var(--separator); border-radius: var(--radio-chico);
+    background: var(--bg-card); color: var(--tint-texto);
+    font-size: var(--fs-subhead); font-weight: 600; text-decoration: none;
+}
+.pagos-csv svg { width: 16px; height: 16px; }
+
+/* Filtros: fechas, "Cargó" y chips de lo activo */
+.pagos-filtros-extra { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.pagos-campo { display: flex; flex-direction: column; gap: 4px; min-width: 150px; }
+.pagos-campo__rotulo { font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600; color: var(--label-2); }
+.pagos-campo select, .pagos-campo input {
+    min-height: var(--celda-alto-min); padding: 0 12px; box-sizing: border-box;
+    border: 1px solid var(--separator); border-radius: var(--radio-chico);
+    background: var(--bg-card); color: var(--label); font: inherit; font-size: 16px;
+}
+.pagos-rango { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-top: 12px; }
+.pagos-rango .error-inline { flex: 1 1 100%; margin: 0; }
+@media (max-width: 599px) {
+    .pagos-filtros, .pagos-filtros-extra .filtro-pills { flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding-inline: 16px; scrollbar-width: none; }
+    .pagos-filtros::-webkit-scrollbar, .pagos-filtros-extra .filtro-pills::-webkit-scrollbar { display: none; }
+    .pagos-filtros .filtro-pill, .pagos-filtros-extra .filtro-pill { flex: none; }
+    .pagos-filtros-extra .filtro-pills { flex: 1 1 100%; }
+    .pagos-filtros-extra > .pagos-campo { flex: 1 1 100%; }
+}
+.pagos-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.chip-filtro {
+    display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+    min-height: var(--celda-alto-min); padding: 0 12px; box-sizing: border-box;
+    border: 1px solid var(--pastel-tint-borde); border-radius: var(--radio-chico);
+    background: var(--pastel-tint); color: var(--tint-texto);
+    font: inherit; font-size: var(--fs-subhead); font-weight: 600; cursor: pointer;
+}
+.chip-filtro span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip-filtro svg { width: 14px; height: 14px; flex: none; }
+.pagos-nota { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 4px 0 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+.pagos-nota svg { width: 14px; height: 14px; flex: none; }
+.pagos-conteo { margin: 16px 0 0; text-align: center; font-size: var(--fs-footnote); color: var(--label-2); }
+
+/* Resumen por usuario */
+.pagos-usuarios { margin-top: 16px; border: 1px solid var(--separator); border-radius: var(--radio-grupo); background: var(--bg-card); box-shadow: var(--sombra-sm); overflow: hidden; }
+.pagos-usuarios__cabecera {
+    display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box;
+    min-height: 48px; padding: 0 16px; border: 0; background: none;
+    color: var(--label); font: inherit; font-weight: 600; text-align: left; cursor: pointer;
+}
+.pagos-usuarios__cabecera svg { width: 18px; height: 18px; flex: none; color: var(--label-2); }
+.pagos-usuarios__titulo { flex: 1; }
+.pagos-usuarios__cuenta { min-width: 24px; padding: 2px 8px; box-sizing: border-box; border-radius: var(--radio-chico); background: var(--bg-card-2); color: var(--label-2); font-size: var(--fs-footnote); text-align: center; }
+.pagos-usuarios__flecha { transition: transform .15s; }
+.pagos-usuarios__cabecera[aria-expanded="true"] .pagos-usuarios__flecha { transform: rotate(180deg); }
+.pagos-usuarios__cuerpo { display: flex; flex-direction: column; gap: 8px; padding: 0 12px 12px; border-top: 1px solid var(--separator); }
+.pagos-usuarios__ayuda { margin: 12px 4px 4px; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+.pagos-usuario {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; box-sizing: border-box;
+    min-height: var(--celda-alto-min); padding: 12px;
+    border: 1px solid var(--separator); border-radius: var(--radio-grupo);
+    background: var(--bg-card); color: var(--label); font: inherit; text-align: left; cursor: pointer;
+}
+.pagos-usuario[aria-pressed="true"] { border-color: var(--tint); background: var(--pastel-tint); }
+.pagos-usuario__nombre { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.pagos-usuario__nombre small { font-size: var(--fs-footnote); font-weight: 500; color: var(--label-2); }
+.pagos-usuario__dato { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pagos-usuario__rotulo { font-size: var(--fs-caption); line-height: var(--lh-caption); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--label-2); }
+.pagos-usuario__sub { font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+.pagos-usuario__dato--alerta strong { color: var(--red-texto); }
+.pagos-barra-fina { display: block; height: 6px; border-radius: 3px; background: var(--bg-card-2); overflow: hidden; }
+.pagos-usuario[aria-pressed="true"] .pagos-barra-fina { background: #fff; }
+.pagos-barra-fina > span { display: block; height: 100%; width: var(--valor, 0%); border-radius: 3px; background: var(--green); }
+@media (min-width: 900px) {
+    .pagos-usuario { grid-template-columns: minmax(140px, 1.2fr) repeat(3, minmax(0, 1fr)) minmax(140px, 1.2fr); align-items: center; }
+    .pagos-usuario__nombre { grid-column: auto; flex-direction: column; align-items: flex-start; gap: 0; }
+}
+
+/* Agenda: compromisos agrupados por día */
+.pagos-agenda { display: flex; flex-direction: column; gap: 20px; margin-top: 16px; }
+.pagos-dia__cabecera { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; padding: 0 4px 8px; }
+.pagos-dia__titulo { display: flex; align-items: center; gap: 8px; margin: 0; font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 600; }
+.pagos-dia__titulo::before { content: ''; flex: none; width: 10px; height: 10px; border-radius: 3px; border: 1px solid var(--gray); background: var(--pastel-gray); }
+.pagos-dia--vencido .pagos-dia__titulo::before { border-color: var(--red); background: var(--pastel-red); }
+.pagos-dia--hoy .pagos-dia__titulo::before { border-color: var(--orange); background: var(--pastel-orange); }
+.pagos-dia--proximo .pagos-dia__titulo::before { border-color: var(--indigo); background: var(--pastel-indigo); }
+.pagos-dia--resuelto .pagos-dia__titulo::before { border-color: var(--green); background: var(--pastel-green); }
+.pagos-dia__resumen { display: flex; align-items: baseline; gap: 10px; margin: 0; font-size: var(--fs-subhead); color: var(--label-2); }
+.pagos-dia__resumen strong { font-size: var(--fs-headline); color: var(--label); }
+.pagos-dia__lista { display: flex; flex-direction: column; gap: 8px; }
+
+/* Fila compacta de un compromiso (Agenda). La reutilizan Hoy y la ficha en las fases siguientes. */
+.pago-fila {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "persona monto" "estado estado" "acciones acciones";
+    align-items: center; gap: 4px 12px; padding: 8px 12px;
+    border: 1px solid; border-radius: var(--radio-grupo); color: var(--pastel-label);
+}
+.pago-fila--vencido    { background: var(--pastel-red);    border-color: var(--pastel-red-borde); }
+.pago-fila--hoy        { background: var(--pastel-orange); border-color: var(--pastel-orange-borde); }
+.pago-fila--proximo    { background: var(--pastel-indigo); border-color: var(--pastel-indigo-borde); }
+.pago-fila--pagado, .pago-fila--parcial { background: var(--pastel-green); border-color: var(--pastel-green-borde); }
+.pago-fila--incumplido, .pago-fila--reprogramado { background: var(--pastel-gray);   border-color: var(--pastel-gray-borde); }
+.pago-fila--vencido .chip-estado    { color: var(--red-texto); }
+.pago-fila--hoy .chip-estado        { color: var(--orange-texto); }
+.pago-fila--proximo .chip-estado    { color: var(--indigo-texto); }
+.pago-fila--pagado .chip-estado, .pago-fila--parcial .chip-estado { color: var(--green-texto); }
+.pago-fila--incumplido .chip-estado, .pago-fila--reprogramado .chip-estado { color: var(--pastel-label-2); }
+.pago-fila .chip-estado, .pagos-tabla .chip-estado { text-transform: none; letter-spacing: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); }
+.pago-fila__persona {
+    grid-area: persona; display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    min-width: 0; min-height: var(--celda-alto-min); padding: 0; border: 0; background: none;
+    color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.pago-fila__nombre { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 600; }
+.pago-fila__detalle { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); }
+.pago-fila__monto { grid-area: monto; justify-self: end; font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 700; white-space: nowrap; }
+.pago-fila__estado { grid-area: estado; justify-self: start; }
+.pago-fila > .pago-acciones { grid-area: acciones; justify-content: flex-start; }
+@media (min-width: 640px) {
+    .pago-fila { grid-template-columns: minmax(0, 1fr) minmax(96px, auto) 176px; grid-template-areas: "persona monto estado" "acciones acciones acciones"; gap: 4px 12px; }
+    .pago-fila__estado { justify-self: stretch; text-align: center; }
+    .pago-fila > .pago-acciones { justify-content: flex-end; }
+}
+/* Con ancho de sobra la botonera va en la misma línea. */
+@media (min-width: 1280px) {
+    .pago-fila { grid-template-columns: minmax(0, 1fr) minmax(96px, auto) 176px auto; grid-template-areas: "persona monto estado acciones"; gap: 12px; }
+}
+
+/* Tabla (desde 900 px) */
+.pagos-tabla-envoltorio { margin-top: 16px; overflow-x: auto; border: 1px solid var(--separator); border-radius: var(--radio-grupo); background: var(--bg-card); box-shadow: var(--sombra-sm); }
+.pagos-tabla { width: 100%; border-collapse: collapse; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--label); }
+.pagos-tabla th, .pagos-tabla td { padding: 4px 8px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--separator); }
+.pagos-tabla thead th { padding-top: 0; padding-bottom: 0; background: var(--bg-card-2); color: var(--label-2); font-size: var(--fs-footnote); font-weight: 600; white-space: nowrap; }
+.pagos-tabla thead th[aria-sort="ascending"], .pagos-tabla thead th[aria-sort="descending"] { color: var(--label); }
+.pagos-tabla .pagos-tabla__num { text-align: right; }
+.pagos-tabla td:first-child, .pagos-tabla .chip-estado { white-space: nowrap; }
+.pagos-tabla__orden { display: inline-flex; align-items: center; gap: 4px; min-height: var(--celda-alto-min); padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; cursor: pointer; }
+.pagos-tabla__orden::after { content: '\2195'; color: var(--label-2); }
+.pagos-tabla th[aria-sort="ascending"] .pagos-tabla__orden::after { content: '\2191'; color: var(--tint-texto); }
+.pagos-tabla th[aria-sort="descending"] .pagos-tabla__orden::after { content: '\2193'; color: var(--tint-texto); }
+.pagos-tabla__cliente { min-height: var(--celda-alto-min); padding: 0; border: 0; background: none; color: var(--tint-texto); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
+.pagos-tabla tbody tr:hover { background: var(--bg-grouped); }
+.pagos-tabla__fila--vencido td:first-child { box-shadow: inset 3px 0 0 var(--red); }
+.pagos-tabla__fila--hoy td:first-child { box-shadow: inset 3px 0 0 var(--orange); }
+.pagos-tabla__fila--proximo td:first-child { box-shadow: inset 3px 0 0 var(--indigo); }
+.pagos-tabla__fila--pagado td:first-child, .pagos-tabla__fila--parcial td:first-child { box-shadow: inset 3px 0 0 var(--green); }
+.pagos-tabla__fila--incumplido td:first-child, .pagos-tabla__fila--reprogramado td:first-child { box-shadow: inset 3px 0 0 var(--gray); }
+.pagos-tabla__fila--vencido .chip-estado { color: var(--red-texto); background: var(--pastel-red); }
+.pagos-tabla__fila--hoy .chip-estado { color: var(--orange-texto); background: var(--pastel-orange); }
+.pagos-tabla__fila--proximo .chip-estado { color: var(--indigo-texto); background: var(--pastel-indigo); }
+.pagos-tabla__fila--pagado .chip-estado, .pagos-tabla__fila--parcial .chip-estado { color: var(--green-texto); background: var(--pastel-green); }
+.pagos-tabla__fila--incumplido .chip-estado, .pagos-tabla__fila--reprogramado .chip-estado { color: var(--pastel-label-2); background: var(--pastel-gray); }
+.pagos-tabla tfoot th, .pagos-tabla tfoot td { padding-top: 12px; padding-bottom: 12px; background: var(--bg-card-2); border-bottom: 0; font-weight: 700; }
+
+/* =====================================================================
+   PAGOS · acciones rápidas, WhatsApp, avisos y reprogramado
+        (Fase 3 de docs/plans/2026-11-11-compromisos-visualizacion.md)
+   ===================================================================== */
+
+/* Botonera de un compromiso (app/vistas/pago_acciones.php) */
+.pago-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.pago-acciones__grupo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pago-acciones__grupo--principal { order: -1; }
+.pago-accion {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none;
+    min-height: var(--celda-alto-min); padding: 0 12px; box-sizing: border-box;
+    border: 0; border-radius: var(--radio-grupo); background: #fff; color: var(--pastel-label);
+    font: inherit; font-size: var(--fs-subhead); font-weight: 600; text-decoration: none; white-space: nowrap; cursor: pointer;
+}
+.pago-accion svg { width: 16px; height: 16px; flex: none; }
+.pago-accion--icono { width: var(--celda-alto-min); padding: 0; }
+.pago-accion--icono svg { width: 18px; height: 18px; }
+.pago-accion--llamar svg { color: var(--tint); }
+.pago-accion--whatsapp svg { color: var(--green); }
+.pago-accion--pago { background: var(--green); color: #fff; }
+.pago-accion--pago svg { color: #fff; }
+.pago-accion--pago:not(.pago-accion--icono) { padding: 0 16px; }
+.pago-accion:disabled { opacity: .55; cursor: not-allowed; }
+/* Tarjetas y panel: los botones se reparten el ancho, cada grupo en su línea. */
+.pago-acciones--texto .pago-acciones__grupo { flex: 1 1 100%; }
+.pago-acciones--texto .pago-accion { flex: 1 1 0; min-width: 0; padding: 0 8px; }
+
+/* Tabla: la botonera va en una sola línea (los textos de las otras columnas son los que se acomodan). */
+.pago-acciones--tabla, .pago-acciones--tabla .pago-acciones__grupo { flex-wrap: nowrap; gap: 4px; }
+/* Celulares angostos: los tres botones principales se reparten el ancho; Parcial y Reprogramar pierden el ícono. */
+@media (max-width: 420px) {
+    .pago-acciones--texto .pago-accion { padding: 0 6px; }
+    .pago-acciones--texto .pago-acciones__grupo--principal .pago-accion:not(.pago-accion--pago) svg { display: none; }
+}
+
+/* Último aviso por WhatsApp / motivo por el que no se puede avisar */
+.card-pastel__aviso, .compromiso-item__aviso { margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.pago-fila__aviso { max-width: 100%; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--pastel-label-2); }
+.pagos-tabla__aviso { display: block; max-width: 220px; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+
+/* Historial de reprogramaciones en la ficha */
+.compromiso-item__cadena { margin: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600; color: var(--pastel-label-2); }
+
+/* Aviso con acción ("Pago registrado · Deshacer") */
+.toast-accion {
+    position: fixed; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 90;
+    display: flex; align-items: center; gap: 12px; box-sizing: border-box; width: max-content; max-width: min(92vw, 460px);
+    padding: 6px 6px 6px 16px; border-radius: var(--radio-grupo);
+    background: var(--label); color: #fff; box-shadow: 0 6px 24px rgba(9, 30, 66, .28);
+}
+.toast-accion svg { width: 20px; height: 20px; flex: none; color: #8FE0CB; }
+.toast-accion__texto { flex: 1; font-size: var(--fs-subhead); line-height: var(--lh-subhead); font-weight: 600; }
+.toast-accion__boton {
+    min-height: var(--celda-alto-min); padding: 0 16px; border: 0; border-radius: var(--radio-chico);
+    background: rgba(255, 255, 255, .16); color: #fff; font: inherit; font-size: var(--fs-subhead); font-weight: 700; cursor: pointer;
+}
+@media (min-width: 1024px) { .toast-accion { bottom: 24px; } }
+
+/* Hoja compacta: Parcial, Reprogramar y Más */
+.sheet--compacta .sheet__header .btn-texto { min-height: var(--celda-alto-min); padding: 0 8px; }
+.pill--input input { height: 100%; }
+.pago-rapido-opciones { display: flex; flex-direction: column; gap: 8px; }
+.pago-rapido-opcion {
+    display: flex; align-items: flex-start; gap: 12px; min-height: var(--celda-alto-min); padding: 14px 16px; box-sizing: border-box;
+    border: 1px solid var(--separator); border-radius: var(--radio-grupo); background: var(--bg-card); color: var(--label);
+    font: inherit; text-align: left; cursor: pointer;
+}
+.pago-rapido-opcion svg { width: 20px; height: 20px; flex: none; margin-top: 2px; color: var(--label-2); }
+.pago-rapido-opcion strong, .pago-rapido-opcion small { display: block; }
+.pago-rapido-opcion small { margin-top: 2px; font-size: var(--fs-footnote); line-height: var(--lh-footnote); color: var(--label-2); }
+.pago-rapido-botones { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+
+/* =====================================================================
+   SAS IMPERIO · chip, sugerencia y bloque de la ficha
+        (Fase 4 de docs/plans/2026-11-11-compromisos-visualizacion.md)
+   ===================================================================== */
+/* Línea de SAS de la fila (chip + sugerencia): ocupa todo el ancho y solo existe cuando hay algo para mostrar. */
+.pago-fila__sas { grid-area: sas; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
+.pago-fila__sas .sas-sugerencia { flex: 1 1 320px; }
+.pago-fila--con-sas { grid-template-areas: "persona monto" "sas sas" "estado estado" "acciones acciones"; }
+@media (min-width: 640px) {
+    .pago-fila--con-sas { grid-template-areas: "persona monto estado" "sas sas sas" "acciones acciones acciones"; }
+}
+@media (min-width: 1280px) {
+    .pago-fila--con-sas { grid-template-areas: "persona monto estado acciones" "sas sas sas sas"; }
+}
+
+/* «SAS: 3 cuotas vencidas · 42 días». El estado se lee por el texto; el color solo lo refuerza. */
+.chip-sas {
+    display: inline-block; max-width: 100%; box-sizing: border-box;
+    padding: 2px 8px; border-radius: var(--radio-chico); background: #fff; color: var(--pastel-label-2);
+    font-size: var(--fs-footnote); line-height: var(--lh-footnote); font-weight: 600;
+}
+.chip-sas--vencido { color: var(--red-texto); }
+.chip-sas--aldia { color: var(--green-texto); }
+.pagos-tabla .chip-sas, .sas-dato .chip-sas { background: var(--bg-card-2); }
+.sas-dato .chip-sas { margin-left: 6px; }
+
+/* «SAS registró un pago de $X el 13/11 · ¿Marcar como pagado?» */
+.sas-sugerencia {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; box-sizing: border-box; max-width: 100%;
+    padding: 6px 6px 6px 10px; border: 1px solid var(--pastel-tint-borde); border-radius: var(--radio-grupo);
+    background: #fff; color: var(--pastel-label); font-size: var(--fs-footnote); line-height: var(--lh-footnote);
+}
+.sas-sugerencia svg { width: 16px; height: 16px; flex: none; color: var(--tint); }
+.sas-sugerencia__texto { flex: 1 1 170px; font-weight: 600; }
+.sas-sugerencia__boton {
+    min-height: var(--celda-alto-min); padding: 0 12px; border: 0; border-radius: var(--radio-chico);
+    background: var(--tint); color: #fff; font: inherit; font-size: var(--fs-subhead); font-weight: 600; white-space: nowrap; cursor: pointer;
+}
+.sas-sugerencia__boton:disabled { opacity: .55; cursor: not-allowed; }
+/* Tabla: la fila de SAS va debajo del compromiso, a todo el ancho; la del compromiso pierde su línea de abajo. */
+.pagos-tabla .pagos-tabla__sas td { padding-top: 0; padding-bottom: 8px; white-space: normal; }
+.pagos-tabla .pagos-tabla__grupo--con-sas > tr:first-child td { border-bottom: 0; }

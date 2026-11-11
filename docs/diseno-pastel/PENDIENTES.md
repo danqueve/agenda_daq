@@ -4,7 +4,8 @@ Fecha de revisión: 2026-10-08.
 
 ## Resultado de la revisión estática
 
-Las 15 referencias tienen una sección equivalente en `assets/css/pastel.css` y
+Las 15 referencias tienen una sección equivalente en `assets/css/pastel.css` (hoy repartido entre
+`components.css` y `pantallas/*.css`) y
 el marcado de sus pantallas usa las clases previstas. Se revisaron a nivel de
 código los tres puntos de corte del plan: 375 px, 768 px y 1280 px.
 

@@ -1,0 +1,54 @@
+/* =====================================================================
+   Pantalla Contactos: grilla de tarjetas y ficha anclada al costado en escritorio.
+   ===================================================================== */
+
+.contacts-load-more {
+    display: block;
+    margin: -8px auto 24px;
+    padding: 10px;
+}
+
+/* La lista de contactos usa un poco más de ancho en pantallas grandes. En
+   cualquier otra pestaña (Hoy, Agenda) la ficha de contacto se abre siempre
+   como sheet centrada y compacta (ver .sheet-backdrop/.sheet en components.css).
+   Solo en Contactos (clase .modo-contactos, ver regla siguiente) se ancla
+   al lado de la lista con position:fixed y bordes explícitos — evitando
+   a propósito depender de flex-stretch + min-height, que fue lo que antes
+   tapaba el header ("Cerrar"/"Editar") detrás de la barra superior fija. */
+@media (min-width: 1200px) {
+    .screen:has(.contact-list) { max-width: none; }
+
+    .screen:has(.contact-list) .screen__body {
+        width: min(680px, 42vw);
+        border-right: 1px solid var(--separator);
+        min-height: calc(100dvh - var(--topbar-height));
+    }
+
+    .modo-contactos .detail-backdrop {
+        background: transparent;
+        pointer-events: none;
+    }
+
+    .modo-contactos .detail-backdrop .contact-detail {
+        position: fixed;
+        top: var(--topbar-height);
+        right: 0;
+        bottom: 0;
+        left: auto;
+        width: min(420px, calc(100vw - var(--sidebar-width) - min(680px, 42vw)));
+        max-width: none;
+        max-height: none;
+        height: auto;
+        border-radius: 0;
+        border-left: 1px solid var(--separator);
+        box-shadow: var(--sombra-lg);
+        pointer-events: auto;
+    }
+}
+
+/* Tarjetas de Contactos (02-contactos.html): avatar más chico, menos
+   padding/gap y el chip de estado sin mayúsculas, distinto de las tarjetas
+   de recontacto de Hoy que comparten las mismas clases base. */
+.contact-list .card-pastel { padding: 16px; gap: 12px; }
+.contact-list .card-pastel .avatar { width: 40px; height: 40px; }
+.contact-list .chip-estado--estado { text-transform: none; letter-spacing: 0; font-size: var(--fs-footnote); line-height: var(--lh-footnote); }

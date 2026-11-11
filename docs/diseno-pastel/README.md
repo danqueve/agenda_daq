@@ -7,7 +7,7 @@ Esta carpeta es la fuente visual del diseño pastel para **toda** la app y susti
 | Archivo | Para qué |
 |---|---|
 | `referencias/00-login.html` … `06-ajustes.html` | Las 15 pantallas en HTML estático. Se abren con doble clic en el navegador. |
-| `assets/css/pastel.css` | Toda la capa visual (barra lateral, Hoy, formularios, Contactos, Ficha, Calendario, Notas, Ajustes y Login) escrita con los tokens de `tokens.css`. La copia original que traía esta carpeta se borró: la única fuente es la de `assets/css/`. |
+| `assets/css/components.css` y `assets/css/pantallas/*.css` | Toda la capa visual escrita con los tokens de `tokens.css`: lo genérico (barra lateral, formularios, hojas, tarjetas, filtros) en `components.css` y un archivo por pantalla en `pantallas/` (Hoy, Contactos, Calendario, Ficha, Notas, Ajustes, Pagos y Login). Antes era un solo `pastel.css`. La copia original que traía esta carpeta se borró: la única fuente es la de `assets/css/`. |
 | `../plans/2026-10-08-diseno-pastel-completo.md` | El plan en 11 fases (0 a 10) para Claude Code, partiendo de cero. |
 
 | # | Referencia | Fase del plan |
@@ -30,7 +30,7 @@ Esta carpeta es la fuente visual del diseño pastel para **toda** la app y susti
 Leé CLAUDE.md y docs/plans/2026-10-08-diseno-pastel-completo.md completo.
 Ejecutá SOLO la Fase 0. La fuente visual son los HTML de
 docs/diseno-pastel/referencias/: abrilos y copiá los valores exactos, no los
-aproximes. Usá las clases de assets/css/pastel.css y la tabla de colores del
+aproximes. Usá las clases de assets/css/components.css y assets/css/pantallas/ y la tabla de colores del
 plan; no pegues estilos inline en la app. No cambies endpoints ni lógica salvo
 que la fase lo pida. Al terminar, listá los archivos tocados y qué tengo que
 probar, y esperá mi OK.

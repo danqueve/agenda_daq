@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
     <link rel="stylesheet" href="assets/css/tokens.css">
     <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/pastel.css">
+    <link rel="stylesheet" href="assets/css/pantallas/login.css">
 </head>
 <body>
     <main class="login" aria-labelledby="login-titulo">

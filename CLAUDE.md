@@ -55,7 +55,8 @@ responde (o `SAS_DB_NAME` está vacío) la Agenda funciona igual, sin esos datos
 
 ## Diseño
 La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML exactas +
-`assets/css/pastel.css`). `docs/DESIGN.md` queda para voz, íconos y reglas generales.
+`assets/css/components.css` y `assets/css/pantallas/*.css`). `docs/DESIGN.md` queda para voz,
+íconos y reglas generales.
 
 ## Restricción de hosting (importante)
 En el VPS de producción todos los dominios sirven el mismo public_html y no se puede
@@ -77,7 +78,9 @@ agenda_daq/
 │                        #   etiquetas, usuarios, ajustes, push, sas_clientes, sas_resumen, sas_vinculo)
 ├── app/                 # config, db, auth, csrf, helpers, api, compromisos, push, sas (bloqueado)
 │   └── vistas/          #   partials de index.php (botonera de un compromiso, hoja de acciones rápidas)
-├── assets/css/          # tokens.css, base.css, components.css, pastel.css (carga en ese orden)
+├── assets/css/          # tokens.css, base.css, components.css (genéricos) y pantallas/*.css
+│   └── pantallas/       #   uno por pantalla: hoy, contactos, calendario, ficha, notas, ajustes,
+│                        #   pagos (carga en ese orden, después de components.css) y login
 ├── assets/js/           # app.js + un módulo por pantalla: pagos, contactos, seguimientos, panel,
 │                        #   notas, ajustes, pagos_rapido, sas, pwa
 ├── assets/icons/        # íconos de la app (PWA)

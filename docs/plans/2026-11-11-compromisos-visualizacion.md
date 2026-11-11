@@ -2,8 +2,8 @@
 
 > Una fase por vez. Al terminar cada una: listar los archivos tocados, qué probar, y esperar el OK
 > antes de seguir. Antes de empezar, leer `CLAUDE.md`, `docs/DESIGN.md` y `docs/diseno-pastel/README.md`.
-> Los cambios de diseño usan las clases de `assets/css/pastel.css` (única fuente del diseño pastel):
-> no se pegan estilos inline en la app.
+> Los cambios de diseño usan las clases de `assets/css/components.css` y `assets/css/pantallas/*.css`
+> (única fuente del diseño pastel): no se pegan estilos inline en la app.
 
 ## Problema
 
