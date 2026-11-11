@@ -29,7 +29,10 @@ declare(strict_types=1);
         </button>
     </template>
 </div>
-<div class="empty-state agenda-empty" x-show="!cargandoAgenda && !contactosDiaSeleccionado().length">
+<div
+    class="empty-state agenda-empty"
+    x-show="!cargandoAgenda && !contactosDiaSeleccionado().length && !pagosDia(diaSeleccionado).length"
+>
     <i data-lucide="calendar-days"></i>
-    <p class="body-text">Sin recontactos agendados</p>
+    <p class="body-text">Sin eventos agendados</p>
 </div>

@@ -129,8 +129,11 @@ function sas_buscar_clientes(PDO $sas, string $texto): array
     }
 
     $stmt = $sas->prepare(
-        'SELECT c.id, c.nombres, c.apellidos, c.dni, c.telefono, c.telefono_alt, c.localidad, c.estado
-         FROM ic_clientes c WHERE ' . implode(' AND ', $where) . '
+        'SELECT c.id, c.nombres, c.apellidos, c.dni, c.telefono, c.telefono_alt, c.localidad, c.estado,
+                u.nombre AS cobrador_nombre, u.apellido AS cobrador_apellido
+         FROM ic_clientes c
+         LEFT JOIN ic_usuarios u ON u.id = c.cobrador_id
+         WHERE ' . implode(' AND ', $where) . '
          ORDER BY c.apellidos, c.nombres LIMIT 8'
     );
     $stmt->execute($params);
@@ -147,10 +150,22 @@ function sas_buscar_clientes(PDO $sas, string $texto): array
             'celular_norm' => preg_match('/^549\d{10}$/', $norm) ? $norm : '',
             'localidad' => (string) ($fila['localidad'] ?? ''),
             'estado' => (string) ($fila['estado'] ?? ''),
+            'cobrador' => sas_nombre_cobrador($fila),
         ];
     }
 
     return $items;
+}
+
+/**
+ * Nombre del cobrador que SAS le asignó al cliente (ic_clientes.cobrador_id → ic_usuarios), a partir de una fila
+ * que trae `cobrador_nombre` y `cobrador_apellido` del LEFT JOIN. Null si no tiene.
+ */
+function sas_nombre_cobrador(array $fila): ?string
+{
+    $nombre = trim(((string) ($fila['cobrador_nombre'] ?? '')) . ' ' . ((string) ($fila['cobrador_apellido'] ?? '')));
+
+    return $nombre !== '' ? mb_substr($nombre, 0, 100) : null;
 }
 
 /**
@@ -406,18 +421,24 @@ function sas_dni_digitos(?string $dni): ?string
  * Carga una sola vez los clientes de SAS y los indexa por DNI y por celular, para comparar
  * muchos contactos sin una consulta por cada uno.
  *
- * @return array{dni: array<string, list<int>>, celular: array<string, list<int>>, datos: array<int, array{nombre: string, localidad: string, dni: string}>}
+ * @return array{dni: array<string, list<int>>, celular: array<string, list<int>>, datos: array<int, array{nombre: string, localidad: string, dni: string, cobrador: ?string}>}
  */
 function sas_indice_clientes(PDO $sas): array
 {
     $indice = ['dni' => [], 'celular' => [], 'datos' => []];
-    $stmt = $sas->query('SELECT id, nombres, apellidos, dni, telefono, telefono_alt, localidad FROM ic_clientes');
+    $stmt = $sas->query(
+        'SELECT c.id, c.nombres, c.apellidos, c.dni, c.telefono, c.telefono_alt, c.localidad,
+                u.nombre AS cobrador_nombre, u.apellido AS cobrador_apellido
+         FROM ic_clientes c
+         LEFT JOIN ic_usuarios u ON u.id = c.cobrador_id'
+    );
     foreach ($stmt as $fila) {
         $id = (int) $fila['id'];
         $indice['datos'][$id] = [
             'nombre' => trim(((string) $fila['nombres']) . ' ' . ((string) $fila['apellidos'])),
             'localidad' => (string) ($fila['localidad'] ?? ''),
             'dni' => sas_dni_digitos((string) ($fila['dni'] ?? '')) ?? '',
+            'cobrador' => sas_nombre_cobrador($fila),
         ];
         if (($dni = sas_dni_digitos((string) ($fila['dni'] ?? ''))) !== null) {
             $indice['dni'][$dni][] = $id;

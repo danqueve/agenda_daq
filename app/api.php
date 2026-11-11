@@ -6,6 +6,17 @@ require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/helpers.php';
 
+// Cualquier excepción no capturada en un endpoint responde JSON (el frontend
+// espera {ok, error}) y deja el detalle en el log de errores de PHP.
+set_exception_handler(static function (Throwable $error): void {
+    error_log(sprintf('Agenda API %s: %s en %s:%d', $_SERVER['SCRIPT_NAME'] ?? '', $error->getMessage(), $error->getFile(), $error->getLine()));
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+    echo json_encode(['ok' => false, 'error' => 'Error del servidor. Probá de nuevo; si sigue, revisá el log de PHP.'], JSON_UNESCAPED_UNICODE);
+});
+
 iniciar_sesion();
 requireLogin();
 

@@ -32,6 +32,7 @@ declare(strict_types=1);
         <span x-text="fechaPago(pago)"></span>
     </p>
     <p class="card-pastel__autor" x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"></p>
+    <p class="card-pastel__autor" x-show="pago.cobrador_nombre" x-text="`Cobrador: ${pago.cobrador_nombre}`"></p>
     <p class="card-pastel__aviso" x-show="avisoPagoTexto(pago)" x-text="avisoPagoTexto(pago)"></p>
     <?php require __DIR__ . '/pago_sas.php'; ?>
     <?php $variante = 'texto'; require __DIR__ . '/pago_acciones.php'; ?>

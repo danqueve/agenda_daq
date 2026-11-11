@@ -5,15 +5,20 @@
 -- y copiala en .env (SAS_DB_USER / SAS_DB_PASS).
 --
 -- Solo SELECT, y solo las columnas que usa la Agenda: no ve CUIL, direcciones,
--- coordenadas, token_acceso, mora ni usuarios de SAS. Ver docs/DEPLOY.md para
--- saber qué lee cada tabla y por qué.
+-- coordenadas, token_acceso ni mora; de los usuarios de SAS solo lee el nombre,
+-- para mostrar el cobrador asignado. Ver docs/DEPLOY.md para saber qué lee cada
+-- tabla y por qué.
 -- ============================================================
 
 CREATE USER IF NOT EXISTS 'agenda_sas_ro'@'localhost' IDENTIFIED BY 'CAMBIAR_POR_UNA_CLAVE_LARGA';
 
--- Buscar y vincular clientes (por DNI, celular o nombre).
-GRANT SELECT (id, nombres, apellidos, dni, telefono, telefono_alt, localidad, estado)
+-- Buscar y vincular clientes (por DNI, celular o nombre) y saber qué cobrador tienen.
+GRANT SELECT (id, nombres, apellidos, dni, telefono, telefono_alt, localidad, estado, cobrador_id)
       ON c2881399_credit.ic_clientes TO 'agenda_sas_ro'@'localhost';
+
+-- Nombre del cobrador asignado al cliente (ic_clientes.cobrador_id).
+GRANT SELECT (id, nombre, apellido)
+      ON c2881399_credit.ic_usuarios TO 'agenda_sas_ro'@'localhost';
 
 -- Créditos activos de un cliente (EN_CURSO y MOROSO).
 GRANT SELECT (id, cliente_id, estado)

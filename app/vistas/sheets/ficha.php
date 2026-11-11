@@ -278,6 +278,10 @@ declare(strict_types=1);
                             <span class="cell__label">Localidad</span>
                             <span class="cell__value" x-text="contactoActual?.localidad"></span>
                         </div>
+                        <div class="cell" x-show="contactoActual?.cobrador_nombre">
+                            <span class="cell__label">Cobrador</span>
+                            <span class="cell__value" x-text="contactoActual?.cobrador_nombre"></span>
+                        </div>
                         <div class="cell">
                             <span class="cell__label">Origen</span>
                             <span class="cell__value">

@@ -31,7 +31,7 @@ function contactosModule() {
         nuevoFormulario() {
             return {
                 id: null,
-                nombre: '', celular: '', dni: '', sas_cliente_id: null, consulta: '', producto_interes: '', origen: 'otro',
+                nombre: '', celular: '', dni: '', sas_cliente_id: null, cobrador_nombre: null, consulta: '', producto_interes: '', origen: 'otro',
                 localidad: '', provincia: '', proximo_contacto: '', etiquetas: [], masDatos: false,
                 conPago: false, pago: { monto: '', concepto: '', cuota: '', dia: '' },
             };
@@ -66,6 +66,7 @@ function contactosModule() {
             form.celular = cliente.telefono || form.celular;
             form.dni = cliente.dni || '';
             form.sas_cliente_id = cliente.id;
+            form.cobrador_nombre = cliente.cobrador || null;
             if (cliente.localidad) {
                 form.localidad = cliente.localidad;
                 form.masDatos = true;
@@ -79,6 +80,7 @@ function contactosModule() {
         quitarClienteSas() {
             this.formularioContacto.dni = '';
             this.formularioContacto.sas_cliente_id = null;
+            this.formularioContacto.cobrador_nombre = null;
         },
 
         // Compromiso de pago dentro de "Nueva consulta": el día se elige en un
@@ -222,8 +224,24 @@ function contactosModule() {
             return helpers.fechaHoraInput(date);
         },
 
-        asignarFechaRapida(dias) {
-            this.formularioContacto.proximo_contacto = helpers.fechaInputEnDias(dias);
+        // Pills de "Recontactar" en Nueva consulta: cada una queda marcada
+        // solo si la fecha elegida coincide con ella (antes "Mañana" se
+        // marcaba con cualquier fecha). Tocar la pill marcada la desmarca.
+        fechaRapidaValor(dias) {
+            return helpers.fechaInputEnDias(dias);
+        },
+
+        fechaRapidaElegida(dias) {
+            return this.formularioContacto.proximo_contacto === this.fechaRapidaValor(dias);
+        },
+
+        alternarFechaRapida(dias) {
+            this.formularioContacto.proximo_contacto = this.fechaRapidaElegida(dias) ? '' : this.fechaRapidaValor(dias);
+        },
+
+        fechaRecontactoElegidaAMano() {
+            const valor = this.formularioContacto.proximo_contacto;
+            return Boolean(valor) && ![1, 3, 7].some((dias) => valor === this.fechaRapidaValor(dias));
         },
 
         // El input type="date" del pill "Elegir…" solo da año/mes/día: se le

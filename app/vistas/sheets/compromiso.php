@@ -73,6 +73,36 @@ declare(strict_types=1);
                         </button>
                     </template>
                 </div>
+                <template x-if="sasHabilitado && !compromisoContactoNuevo && compromisoBusqueda.trim().length >= 3">
+                    <div>
+                        <p class="group__header footnote">en SAS Imperio</p>
+                        <div class="group form-group">
+                            <template x-for="cliente in compromisoSasResultados" :key="`sas-${cliente.id}`">
+                                <button type="button" class="cell" @click="elegirClienteSasCompromiso(cliente)">
+                                    <?php require __DIR__ . '/../parciales/sas_cliente_contenido.php'; ?>
+                                </button>
+                            </template>
+                            <p class="group__footer footnote" x-show="compromisoSasBuscando">Buscando…</p>
+                            <p
+                                class="group__footer footnote"
+                                x-show="compromisoSasMensaje"
+                                x-text="compromisoSasMensaje"
+                            ></p>
+                        </div>
+                    </div>
+                </template>
+                <div class="group form-group" x-show="compromisoContactoNuevo && compromisoForm.sas_cliente_id">
+                    <div class="cell">
+                        <span class="cell__content">
+                            <span class="cell__title">Cliente SAS Imperio</span>
+                            <span
+                                class="cell__subtitle"
+                                x-text="compromisoForm.dni ? `DNI ${compromisoForm.dni}` : 'Datos completados desde SAS'"
+                            ></span>
+                        </span>
+                        <button type="button" class="btn-texto" @click="quitarClienteSasCompromiso()">Quitar</button>
+                    </div>
+                </div>
                 <div class="group form-group" x-show="compromisoContactoNuevo">
                     <label class="cell form-cell">
                         <span class="cell__label">Nombre</span>
@@ -97,7 +127,7 @@ declare(strict_types=1);
                 <button
                     type="button"
                     class="btn-texto"
-                    @click="compromisoContactoNuevo = !compromisoContactoNuevo"
+                    @click="compromisoContactoNuevo = !compromisoContactoNuevo; quitarClienteSasCompromiso()"
                     x-text="compromisoContactoNuevo ? 'Buscar un contacto existente' : 'Es un contacto nuevo'"
                 ></button>
             </div>

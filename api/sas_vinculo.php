@@ -29,7 +29,8 @@ if (!$contacto->fetch()) {
 }
 
 if ($accion === 'desvincular') {
-    $db->prepare('UPDATE contactos SET sas_cliente_id = NULL WHERE id = :id')->execute(['id' => $contactoId]);
+    // El cobrador sale de SAS: sin vínculo, el dato quedaría viejo.
+    $db->prepare('UPDATE contactos SET sas_cliente_id = NULL, cobrador_nombre = NULL WHERE id = :id')->execute(['id' => $contactoId]);
     json_response(['ok' => true, 'data' => ['sas_cliente_id' => null]]);
 }
 
@@ -50,7 +51,12 @@ if ($sas === null) {
 }
 
 try {
-    $cliente = $sas->prepare('SELECT id, dni FROM ic_clientes WHERE id = :id');
+    $cliente = $sas->prepare(
+        'SELECT c.id, c.dni, u.nombre AS cobrador_nombre, u.apellido AS cobrador_apellido
+         FROM ic_clientes c
+         LEFT JOIN ic_usuarios u ON u.id = c.cobrador_id
+         WHERE c.id = :id'
+    );
     $cliente->execute(['id' => $sasId]);
     $cliente = $cliente->fetch();
 } catch (Throwable $error) {
@@ -70,7 +76,8 @@ if ($nombreOtro !== false) {
 
 $dni = substr(sas_dni_digitos((string) ($cliente['dni'] ?? '')) ?? '', 0, 15);
 $db->prepare(
-    "UPDATE contactos SET sas_cliente_id = :sas, dni = COALESCE(NULLIF(dni, ''), NULLIF(:dni, '')) WHERE id = :id"
-)->execute(['sas' => $sasId, 'dni' => $dni, 'id' => $contactoId]);
+    "UPDATE contactos SET sas_cliente_id = :sas, dni = COALESCE(NULLIF(dni, ''), NULLIF(:dni, '')), cobrador_nombre = :cobrador
+     WHERE id = :id"
+)->execute(['sas' => $sasId, 'dni' => $dni, 'cobrador' => sas_nombre_cobrador($cliente), 'id' => $contactoId]);
 
 json_response(['ok' => true, 'data' => ['sas_cliente_id' => $sasId]]);

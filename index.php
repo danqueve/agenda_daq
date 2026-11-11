@@ -36,6 +36,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/contactos.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/calendario.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/ficha.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/contacto.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/notas.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/ajustes.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/pagos.css')) ?>">

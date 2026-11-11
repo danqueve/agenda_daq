@@ -55,6 +55,9 @@ function pagosModule() {
         compromisoContactoNuevo: false,
         compromisoBusqueda: '',
         compromisoResultados: [],
+        compromisoSasResultados: [],
+        compromisoSasBuscando: false,
+        compromisoSasMensaje: '',
         guardandoCompromiso: false,
         // Hoja "Registrar pago"
         sheetPagoResolver: false,
@@ -364,7 +367,11 @@ function pagosModule() {
         },
 
         detallePagoFila(pago) {
-            return [pago.concepto || 'Sin concepto', pago.creado_por_nombre ? `Cargó: ${pago.creado_por_nombre}` : ''].filter(Boolean).join(' · ');
+            return [
+                pago.concepto || 'Sin concepto',
+                pago.creado_por_nombre ? `Cargó: ${pago.creado_por_nombre}` : '',
+                pago.cobrador_nombre ? `Cobrador: ${pago.cobrador_nombre}` : '',
+            ].filter(Boolean).join(' · ');
         },
 
         // "Vencido · 2 días" (pendiente o incumplido) o "Pagado · 2 días tarde" (cobrado después de la fecha).
@@ -520,7 +527,10 @@ function pagosModule() {
         // ---------- Nuevo / Editar compromiso ----------
 
         compromisoFormVacio() {
-            return { id: null, monto: '', concepto: '', cuota: '', fecha_compromiso: '', nota: '', nombre: '', celular: '' };
+            return {
+                id: null, monto: '', concepto: '', cuota: '', fecha_compromiso: '', nota: '', nombre: '', celular: '',
+                dni: '', sas_cliente_id: null, cobrador_nombre: null,
+            };
         },
 
         abrirCompromisoNuevo(contacto = null) {
@@ -531,6 +541,8 @@ function pagosModule() {
             this.compromisoContactoNuevo = false;
             this.compromisoBusqueda = '';
             this.compromisoResultados = [];
+            this.compromisoSasResultados = [];
+            this.compromisoSasMensaje = '';
             this.sheetFicha = false;
             this.sheetCompromiso = true;
             this.refrescarIconos();
@@ -558,14 +570,63 @@ function pagosModule() {
             const texto = this.compromisoBusqueda.trim();
             if (!texto) {
                 this.compromisoResultados = [];
+                this.compromisoSasResultados = [];
+                this.compromisoSasMensaje = '';
                 return;
             }
+            // Contactos de la Agenda y clientes de SAS se buscan en paralelo;
+            // si SAS falla, la búsqueda de la Agenda no se ve afectada.
+            await Promise.all([this.buscarAgendaCompromiso(texto), this.buscarSasCompromiso(texto)]);
+            this.refrescarIconos();
+        },
+
+        async buscarAgendaCompromiso(texto) {
             try {
                 const result = await this.api(`api/contactos.php?texto=${encodeURIComponent(texto)}&pagina=1`);
                 this.compromisoResultados = result.data.items.slice(0, 5);
             } catch (error) {
                 this.compromisoResultados = [];
             }
+        },
+
+        async buscarSasCompromiso(texto) {
+            this.compromisoSasMensaje = '';
+            if (!this.sasHabilitado || texto.length < 3) {
+                this.compromisoSasResultados = [];
+                return;
+            }
+            this.compromisoSasBuscando = true;
+            try {
+                const result = await this.api(`api/sas_clientes.php?q=${encodeURIComponent(texto)}`);
+                this.compromisoSasResultados = result.data.items;
+                if (!result.data.items.length) this.compromisoSasMensaje = 'Sin resultados en SAS Imperio';
+            } catch (error) {
+                this.compromisoSasResultados = [];
+                this.compromisoSasMensaje = navigator.onLine ? error.message : 'Sin conexión con SAS Imperio';
+            } finally {
+                this.compromisoSasBuscando = false;
+            }
+        },
+
+        // Un cliente de SAS se carga como contacto nuevo con sus datos ya
+        // completos; si su celular ya está en la Agenda, el backend usa ese.
+        elegirClienteSasCompromiso(cliente) {
+            this.compromisoContactoNuevo = true;
+            Object.assign(this.compromisoForm, {
+                nombre: cliente.nombre, celular: cliente.telefono || '',
+                dni: cliente.dni || '', sas_cliente_id: cliente.id,
+                cobrador_nombre: cliente.cobrador || null,
+            });
+            this.compromisoBusqueda = '';
+            this.compromisoResultados = [];
+            this.compromisoSasResultados = [];
+            this.compromisoSasMensaje = '';
+        },
+
+        quitarClienteSasCompromiso() {
+            this.compromisoForm.dni = '';
+            this.compromisoForm.sas_cliente_id = null;
+            this.compromisoForm.cobrador_nombre = null;
         },
 
         elegirContactoCompromiso(contacto) {
@@ -612,7 +673,7 @@ function pagosModule() {
                 if (this.compromisoContacto) {
                     payload.contacto_id = this.compromisoContacto.id;
                 } else if (this.compromisoContactoNuevo && form.nombre.trim() && form.celular.trim()) {
-                    payload.nuevo_contacto = { nombre: form.nombre.trim(), celular: form.celular.trim() };
+                    payload.nuevo_contacto = { nombre: form.nombre.trim(), celular: form.celular.trim(), dni: form.dni, sas_cliente_id: form.sas_cliente_id, cobrador_nombre: form.cobrador_nombre };
                 } else {
                     this.mostrarHud('Elegí quién paga o cargá un contacto nuevo', 'circle-alert');
                     return;

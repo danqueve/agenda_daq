@@ -33,6 +33,11 @@ declare(strict_types=1);
                 class="sheet-contact-name"
                 x-text="pagoRapido ? `${pagoRapido.contacto_nombre} · ${formatoMonto(pagoRapido.monto)}` : ''"
             ></p>
+            <p
+                class="sheet-contact-sub"
+                x-show="pagoRapido?.cobrador_nombre"
+                x-text="`Cobrador: ${pagoRapido?.cobrador_nombre}`"
+            ></p>
             <div class="pago-rapido-opciones" x-show="pagoRapidoModo === 'mas'">
                 <button
                     type="button"

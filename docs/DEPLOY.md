@@ -7,7 +7,7 @@ pasos a correr vos mismo en el panel y por SSH.
 
 Contexto importante (ver también `CLAUDE.md`): el VPS sirve **todos** los
 dominios desde el mismo `public_html` y no se puede asignar un document root
-distinto por dominio. Por eso Agenda IC vive en `public_html/agenda_daq/` y el
+distinto por dominio. Por eso Agenda IC vive en `public_html/agenda/` y el
 subdominio se enruta por `.htaccess` (paso 2), y por eso sus carpetas privadas
 (`app/`, `cron/`, `sql/`, `vendor/`, `storage/`, `docs/`, `.env`, `composer.*`,
 `.git`) quedan bloqueadas por el `.htaccess` propio del proyecto, que ya viaja
@@ -16,7 +16,7 @@ en el repo.
 **Antes de seguir, confirmá que el vhost de `public_html` tenga
 `AllowOverride All`** (o al menos `AllowOverride All` para `Options` y
 `FileInfo`/`AuthConfig`). Si está en `AllowOverride None` o restringido, el
-`.htaccess` del paso 2 **y** el `.htaccess` propio de `agenda_daq/` se ignoran
+`.htaccess` del paso 2 **y** el `.htaccess` propio de `agenda/` se ignoran
 en silencio: el subdominio no enruta, y peor, las carpetas privadas (`.env`,
 `app/`, `sql/`, etc.) quedan accesibles desde el navegador sin ningún aviso de
 error. Este VPS ya tuvo una caída por esto mismo con otro proyecto — no es un
@@ -28,7 +28,7 @@ riesgo teórico.
 
 1. En el panel de hosting, dar de alta el subdominio `agenda.imperiocomercial.com.ar`.
    No hace falta (ni conviene) crearle un document root propio: va a resolver
-   contra `public_html/agenda_daq/` por el bloque de `.htaccess` del paso 2.
+   contra `public_html/agenda/` por el bloque de `.htaccess` del paso 2.
 2. Emitir certificado SSL para ese subdominio (Let's Encrypt o el que use el
    panel). **Es obligatorio**: sin HTTPS no funcionan ni la instalación como
    PWA ni las notificaciones push (Service Workers y Web Push solo corren en
@@ -46,8 +46,8 @@ de en qué posición va:
 
 ```apache
 RewriteCond %{HTTP_HOST} ^agenda\.imperiocomercial\.com\.ar$ [NC]
-RewriteCond %{REQUEST_URI} !^/agenda_daq/
-RewriteRule ^(.*)$ /agenda_daq/$1 [L]
+RewriteCond %{REQUEST_URI} !^/agenda/
+RewriteRule ^(.*)$ /agenda/$1 [L]
 ```
 
 Puntos clave:
@@ -56,8 +56,8 @@ Puntos clave:
   de reescritura de los otros sitios (si una regla general matchea primero y
   corta con `[L]`, esta nunca se evalúa). Si ya hay bloques parecidos para
   otros subdominios, este puede ir junto a ellos.
-- La segunda condición (`!^/agenda_daq/`) evita un bucle de redirección: sin
-  ella, una vez reescrito a `/agenda_daq/...` la regla se volvería a aplicar
+- La segunda condición (`!^/agenda/`) evita un bucle de redirección: sin
+  ella, una vez reescrito a `/agenda/...` la regla se volvería a aplicar
   sobre esa misma URL.
 - No toca ningún otro `Directory`/`Location` del `.htaccess` compartido, así
   que no debería romper otros sitios — pero verificalo igual después (punto
@@ -69,7 +69,7 @@ Después de guardar el `.htaccess` compartido, probá:
   si todavía no clonaste el repo: eso también confirma que el *routing* ya
   funciona).
 - `https://agenda.imperiocomercial.com.ar/sw.js` y
-  `.../manifest.webmanifest` → deben servir los archivos de `agenda_daq/`, no
+  `.../manifest.webmanifest` → deben servir los archivos de `agenda/`, no
   un 404 ni el contenido de otro sitio.
 - Los demás dominios/subdominios de este VPS siguen respondiendo igual que
   antes de tocar el `.htaccess`.
@@ -95,8 +95,8 @@ Por SSH, parado en `public_html`:
 
 ```bash
 cd public_html
-git clone https://github.com/danqueve/agenda_daq.git
-# queda en public_html/agenda_daq
+git clone https://github.com/danqueve/agenda_daq.git agenda
+# queda en public_html/agenda (el repo se llama agenda_daq, la carpeta "agenda")
 ```
 
 Si el repo es privado, `git clone` por HTTPS va a pedir usuario/token. Para no
@@ -111,7 +111,7 @@ depender de eso en cada `git pull`, lo más prolijo es una **deploy key SSH**:
        User git
        IdentityFile ~/.ssh/agenda_daq_deploy
    ```
-4. Clonar con `git clone github-agenda-daq:danqueve/agenda_daq.git` (o, si ya
+4. Clonar con `git clone github-agenda-daq:danqueve/agenda_daq.git agenda` (o, si ya
    clonaste por HTTPS, `git remote set-url origin github-agenda-daq:danqueve/agenda_daq.git`).
 
 ### Composer con el binario de PHP 8.x correcto
@@ -124,13 +124,21 @@ tenga el panel y usarlo explícitamente:
 # Buscar binarios de PHP 8.x disponibles (los nombres varían según el panel):
 ls /opt/cpanel/ea-php8*/root/usr/bin/php 2>/dev/null   # cPanel/WHM (EasyApache)
 ls /usr/local/php8*/bin/php 2>/dev/null                # DirectAdmin / CloudLinux
+ls /opt/alt/php8*/usr/bin/php 2>/dev/null               # CloudLinux (alt-php)
+ls /opt/plesk/php/8*/bin/php 2>/dev/null                # Plesk
 whereis php8.3 php8.3-cli 2>/dev/null
+# Si ya hay cron de la agenda, la ruta de PHP 8 es la que usa:
+crontab -l -u c2881399 | grep -i php
 ```
+
+En este VPS **no** existe `/opt/cpanel/ea-php8*`. Cada versión de PHP vive en
+`/opt/php8-X/` (se ve con `ps -eo args | grep "php-fpm: master"`); el PHP 8.3 de
+consola es **`/opt/php8-3/bin/php`** y su log de errores `/var/log/php83-fpm.log`.
 
 Con la ruta encontrada (ejemplo: `/opt/cpanel/ea-php83/root/usr/bin/php`):
 
 ```bash
-cd public_html/agenda_daq
+cd public_html/agenda
 /opt/cpanel/ea-php83/root/usr/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader
 ```
 
@@ -142,7 +150,7 @@ punto 6.
 ## 5. Configuración, esquema y claves
 
 ```bash
-cd public_html/agenda_daq
+cd public_html/agenda
 cp .env.example .env
 ```
 
@@ -191,50 +199,111 @@ un contacto también se eliminan sus compromisos de pago.
 Crear tu usuario de la app (pide usuario y contraseña por consola, con el PHP 8.x explícito):
 
 ```bash
-/ruta/al/php8 cron/crear_usuario.php
+/opt/php8-3/bin/php cron/crear_usuario.php
 ```
 
 Generar las claves VAPID para push y pegarlas en `.env` (`VAPID_PUBLIC` y `VAPID_PRIVATE`):
 
 ```bash
-/ruta/al/php8 cron/generar_vapid.php
+/opt/php8-3/bin/php cron/generar_vapid.php
 ```
 
 ## 5b. Integración opcional con SAS Imperio (solo lectura)
 
 Permite buscar clientes de SAS Imperio por celular, DNI o apellido/nombre desde
-**Nueva consulta**, vincular contactos existentes y mostrar en cada compromiso lo que
-dice SAS (cuotas vencidas, saldo, último pago). Requiere que la base de SAS esté en el
-mismo servidor MySQL. **La Agenda nunca escribe en SAS**: toda consulta pasa por
-`SasDb::get()`, que además abre la sesión en `READ ONLY`. Si `SAS_DB_NAME` queda vacío
-o SAS no responde, la Agenda funciona igual, sin esos datos.
+**Nueva consulta** y **Pagos → Nuevo compromiso**, vincular contactos existentes y mostrar
+en cada compromiso lo que dice SAS (cuotas vencidas, saldo, último pago y el cobrador
+asignado). La base de SAS está en el mismo servidor MySQL. **La Agenda nunca escribe en
+SAS**: toda consulta pasa por `SasDb::get()`, que además abre la sesión en `READ ONLY`. Si
+`SAS_DB_NAME` queda vacío o SAS no responde, la Agenda funciona igual, sin esos datos.
 
-1. Crear el usuario de solo lectura con `sql/sas_usuario_solo_lectura.sql` (cambiar la
-   clave antes). Se ejecuta como root, en el servidor y también en local. Da `SELECT` solo
-   sobre estas columnas:
+Datos de producción:
+
+| Dato | Valor |
+|---|---|
+| Base de SAS | `c2881399_credit` (en `public_html/creditos/config/conexion.local.php`) |
+| Usuario de solo lectura | `c2881399_agendasas` |
+| Clave | solo en el `.env` de la agenda |
+
+`c2881399_sasro` es de **otro proyecto**: no usarlo ni cambiarle la clave.
+
+1. Permisos del usuario de solo lectura, con `sql/sas_usuario_solo_lectura.sql`. El script
+   llama al usuario `agenda_sas_ro`: en producción reemplazarlo por `c2881399_agendasas`.
+   Se ejecuta como root por SSH (`mysql` entra sin clave), en el servidor y también en local.
+   Se hace por SQL porque el panel solo da permisos sobre la base entera, no sobre una
+   tabla o columna; por eso este usuario no aparece en el panel.
+
+   - Si el usuario **no existe**, crearlo antes con una clave al azar:
+
+     ```bash
+     CLAVE=$(openssl rand -hex 20); echo "$CLAVE"
+     mysql -e "CREATE USER 'c2881399_agendasas'@'localhost' IDENTIFIED BY '$CLAVE';"
+     ```
+
+   - Si **ya existe** con `SELECT` sobre las tablas enteras (`ic_clientes`, `ic_usuarios`),
+     quitárselo para que quede solo lo que dice el script:
+
+     ```bash
+     mysql -e "REVOKE SELECT ON \`c2881399_credit\`.\`ic_clientes\` FROM 'c2881399_agendasas'@'localhost'; REVOKE SELECT ON \`c2881399_credit\`.\`ic_usuarios\` FROM 'c2881399_agendasas'@'localhost';"
+     ```
+
+   El script da `SELECT` solo sobre estas columnas:
 
    | Tabla | Columnas | Para qué |
    |---|---|---|
-   | `ic_clientes` | `id, nombres, apellidos, dni, telefono, telefono_alt, localidad, estado` | Buscar y vincular contactos por DNI, celular o nombre |
+   | `ic_clientes` | `id, nombres, apellidos, dni, telefono, telefono_alt, localidad, estado, cobrador_id` | Buscar y vincular contactos por DNI, celular o nombre, y saber qué cobrador tienen |
+   | `ic_usuarios` | `id, nombre, apellido` | Nombre del cobrador asignado |
    | `ic_creditos` | `id, cliente_id, estado` | Créditos activos (`EN_CURSO` y `MOROSO`) |
    | `ic_cuotas` | `id, credito_id, fecha_vencimiento, monto_cuota, saldo_pagado, estado` | Saldo, cuotas vencidas impagas y atraso de la más vieja |
    | `ic_pagos_confirmados` | `cuota_id, fecha_jornada, monto_total, revertido` | Último pago confirmado (sin los revertidos) |
    | `ic_pagos_temporales` | `cuota_id, fecha_registro, fecha_jornada, monto_total, estado` | Pagos informados por el cobrador que esperan aprobación |
 
-   No se lee CUIL, dirección, coordenadas, token de acceso, mora ni usuarios de SAS.
-   Verificar con `SHOW GRANTS FOR 'agenda_sas_ro'@'localhost';` (solo `SELECT`, por columnas).
+   No se lee CUIL, dirección, coordenadas, token de acceso ni mora; de los usuarios de SAS,
+   solo el nombre. Verificar con `SHOW GRANTS FOR 'c2881399_agendasas'@'localhost';` (solo
+   `SELECT`, por columnas).
 
-2. Completar en `.env`: `SAS_DB_HOST`, `SAS_DB_NAME`, `SAS_DB_USER`, `SAS_DB_PASS`
-   (en local, también con el usuario de solo lectura, no con `root`).
-3. Ejecutar `sql/migrations/006_contactos_sas.sql` (agrega `dni` y `sas_cliente_id` a
-   `contactos`) y `sql/migrations/008_sas_resumen_cache.sql` (caché del resumen, 10 minutos;
-   se puede vaciar sin perder nada) una sola vez.
-4. Vincular los contactos que ya existen (mismo PHP 8.x explícito que el resto de los cron):
+2. Probar: la lectura debe funcionar y la escritura debe dar `ERROR 1142 ... command denied`.
 
    ```bash
-   /ruta/al/php8 cron/vincular_sas.php            # --simular: muestra qué haría, no escribe
-   /ruta/al/php8 cron/vincular_sas.php --aplicar  # escribe sas_cliente_id (solo en la Agenda)
-   /ruta/al/php8 cron/vincular_sas.php --solo=12,15 --aplicar  # solo esos contactos de la Agenda
+   mysql -u c2881399_agendasas -p"$CLAVE" c2881399_credit -e "SELECT COUNT(*) FROM ic_clientes;"
+   mysql -u c2881399_agendasas -p"$CLAVE" c2881399_credit -e "UPDATE ic_clientes SET nombres = nombres WHERE id = 0;"
+   ```
+
+3. Completar en `public_html/agenda/.env` (y `chown c2881399:c2881399 .env` si se editó como root):
+
+   ```
+   SAS_DB_HOST=localhost
+   SAS_DB_NAME=c2881399_credit
+   SAS_DB_USER=c2881399_agendasas
+   SAS_DB_PASS=<la clave>
+   ```
+
+   Si `SAS_DB_NAME` queda vacío, el buscador no aparece. En local, también con el usuario de
+   solo lectura, no con `root`.
+
+4. Ejecutar una sola vez `sql/migrations/006_contactos_sas.sql` (agrega `dni` y
+   `sas_cliente_id` a `contactos`), `sql/migrations/008_sas_resumen_cache.sql` (caché del
+   resumen, 10 minutos; se puede vaciar sin perder nada) y
+   `sql/migrations/009_cobrador_nombre.sql` (agrega `cobrador_nombre` a `contactos`).
+
+5. Probar la conexión con PHP 8 (ver "Composer con el binario de PHP 8.x correcto"):
+
+   ```bash
+   cd public_html/agenda
+   /opt/php8-3/bin/php -r 'require "app/sas.php"; $p = SasDb::get(); echo $p ? "Conectado\n" : "NO conecta\n"; if ($p) print_r(sas_buscar_clientes($p, "Perez"));'
+   ```
+
+   Si la app muestra "No se pudo consultar SAS Imperio", el log de errores de
+   PHP (`/var/log/php83-fpm.log`) tiene la línea `SAS Imperio: no se pudo conectar: …`.
+   Los errores de los endpoints quedan ahí como `Agenda API …`:
+   `grep "Agenda API" /var/log/php83-fpm.log | tail -5`.
+
+6. Vincular los contactos que ya existen:
+
+   ```bash
+   /opt/php8-3/bin/php cron/vincular_sas.php            # --simular: muestra qué haría, no escribe
+   /opt/php8-3/bin/php cron/vincular_sas.php --aplicar  # escribe sas_cliente_id y el cobrador (solo en la Agenda)
+   /opt/php8-3/bin/php cron/vincular_sas.php --solo=12,15 --aplicar  # solo esos contactos de la Agenda
    ```
 
    Vincula solo si hay **una** coincidencia (primero DNI exacto, después celular). Si hay varias,
@@ -258,15 +327,15 @@ por SSH — en cPanel normalmente coincide con el usuario de la cuenta.)
 
 ## 7. Tareas programadas (crontab)
 
-`crontab -e` y agregar (reemplazando `/ruta/al/php8` por el binario de PHP 8.x
-del punto 4, y la ruta del proyecto si no es exactamente esta):
+`crontab -e` (como `c2881399`) y agregar, con el PHP 8.3 del punto 4
+(`/opt/php8-3/bin/php`) y la carpeta real del proyecto:
 
 ```cron
 # Recordatorios push, cada 10 minutos
-*/10 * * * * /ruta/al/php8 /home/usuario/public_html/agenda_daq/cron/push_recordatorios.php >> /dev/null 2>&1
+*/10 * * * * /opt/php8-3/bin/php /home/c2881399/public_html/agenda/cron/push_recordatorios.php >> /dev/null 2>&1
 
 # Backup diario de la base de datos, 3:30 AM hora de Argentina
-30 3 * * * /ruta/al/php8 /home/usuario/public_html/agenda_daq/cron/backup.php >> /dev/null 2>&1
+30 3 * * * /opt/php8-3/bin/php /home/c2881399/public_html/agenda/cron/backup.php >> /dev/null 2>&1
 ```
 
 No hace falta redirigir la salida a un log propio: ambos scripts ya escriben
@@ -314,11 +383,17 @@ gunzip -c storage/backups/c2881399_agenda_2026-01-15_033000.sql.gz | mysql -u c2
 ## 9. Flujo de actualización (cada vez que haya una fase nueva)
 
 ```bash
-cd public_html/agenda_daq
-git pull origin main
+cd /home/c2881399/public_html/agenda
+# Siempre como el usuario de la cuenta, NUNCA como root: un pull como root deja
+# archivos de root en .git y el próximo pull falla con "permisos insuficientes".
+sudo -u c2881399 git pull origin main
+# Si ya pasó: chown -R c2881399:c2881399 /home/c2881399/public_html/agenda
+
+# Si el pull trae una migración nueva en sql/migrations/, aplicarla:
+mysql c2881399_agenda < sql/migrations/00X_nombre.sql
 
 # Solo si composer.lock cambió en este pull:
-/ruta/al/php8 /usr/local/bin/composer install --no-dev --optimize-autoloader
+/opt/php8-3/bin/php /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 # Si cambiaron assets/css, assets/js o assets/vendor en este pull:
 # subir el número de CACHE_VERSION al principio de sw.js, para que el

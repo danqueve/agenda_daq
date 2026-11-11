@@ -190,6 +190,10 @@
     background: var(--separator);
 }
 
+.cell--avatar-offset:not(:last-child)::after {
+    left: 68px;
+}
+
 a.cell,
 button.cell {
     width: 100%;
@@ -536,6 +540,12 @@ button.cell:active {
     margin: -4px 0 14px;
     color: var(--label-2);
     font-size: var(--fs-subhead);
+    text-align: center;
+}
+.sheet-contact-sub {
+    margin: -10px 0 14px;
+    color: var(--label-3);
+    font-size: var(--fs-footnote);
     text-align: center;
 }
 

@@ -36,13 +36,16 @@ el nombre de quien lo hizo (`creado_por_usuario_id` + `creado_por_nombre`, que s
 - Credenciales y claves SOLO en `.env` (nunca en el repo). Incluir `.env.example`.
 
 ## Integración con SAS Imperio (opcional)
-Desde Nueva consulta se buscan clientes de SAS Imperio (celular, DNI, apellido/nombre) leyendo
-`ic_clientes` con un usuario MySQL de SOLO LECTURA (`app/sas.php`, `api/sas_clientes.php`).
-El contacto guarda `dni` y `sas_cliente_id` (migración `006_contactos_sas.sql`).
+Desde Nueva consulta y Pagos › Nuevo compromiso se buscan clientes de SAS Imperio (celular, DNI,
+apellido/nombre) leyendo `ic_clientes` con un usuario MySQL de SOLO LECTURA (`app/sas.php`, `api/sas_clientes.php`).
+El contacto guarda `dni`, `sas_cliente_id` (migración `006_contactos_sas.sql`) y `cobrador_nombre`, el cobrador
+que SAS le asignó (`ic_clientes.cobrador_id` → `ic_usuarios`, migración `009_cobrador_nombre.sql`).
 
-La Agenda **nunca escribe en SAS**: todo pasa por `SasDb::get()`, que usa el usuario `agenda_sas_ro`
+La Agenda **nunca escribe en SAS**: todo pasa por `SasDb::get()`, que usa un usuario de solo lectura
 (`sql/sas_usuario_solo_lectura.sql`, `SELECT` por columnas) y abre la sesión en `READ ONLY`. Si SAS no
 responde (o `SAS_DB_NAME` está vacío) la Agenda funciona igual, sin esos datos, y no se muestran errores técnicos.
+Producción: base `c2881399_credit`, usuario `c2881399_agendasas` (clave solo en `.env`; el script lo llama
+`agenda_sas_ro`). `c2881399_sasro` es de otro proyecto: no tocarlo. Ver `docs/DEPLOY.md` §5b.
 - **Resumen por cliente** (`sas_resumen_clientes()`): créditos activos y saldo, cuotas vencidas y atraso de la
   más vieja, último pago confirmado y pagos informados por el cobrador sin aprobar. Montos **sin mora**; atraso en
   **días hábiles** (lunes a sábado, sin feriados), como SAS. Se guarda 10 minutos en `sas_resumen_cache`
@@ -52,6 +55,8 @@ responde (o `SAS_DB_NAME` está vacío) la Agenda funciona igual, sin esos datos
   bloque «En SAS Imperio» en la ficha.
 - Vincular contactos: botón «Vincular con SAS» en la ficha (`api/sas_vinculo.php`) y `cron/vincular_sas.php`
   (simula por defecto; con `--aplicar` escribe solo en la base de la Agenda; vincula únicamente si hay UNA coincidencia).
+- Cobrador: se guarda al elegir un cliente de SAS (Nueva consulta, Nuevo compromiso) y al vincular (botón y
+  cron); se muestra en las tarjetas de compromiso, el Calendario, Pagos › Agenda, «Registrar pago» y la ficha.
 
 ## Diseño
 La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML exactas +
@@ -60,12 +65,14 @@ La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML e
 
 ## Restricción de hosting (importante)
 En el VPS de producción todos los dominios sirven el mismo public_html y no se puede
-asignar document root por dominio. La app vive en `public_html/agenda_daq/` y el
+asignar document root por dominio. La app vive en `public_html/agenda/` (el repo se llama `agenda_daq`, la carpeta en el VPS `agenda`) y el
 subdominio se enruta con `RewriteCond %{HTTP_HOST}` en el .htaccess compartido.
 Por eso las carpetas privadas quedan dentro del árbol web y DEBEN bloquearse por .htaccess:
 `app/`, `cron/`, `sql/`, `vendor/`, `storage/`, `docs/`, `.env`, `composer.*`, `.git`.
 
 El PHP CLI por defecto del VPS es 5.6: los cron y composer deben usar el binario de PHP 8.x explícito.
+PHP 8.3 de consola en el VPS: `/opt/php8-3/bin/php` (el pool FPM es `/opt/php8-3`, log en
+`/var/log/php83-fpm.log`). En el VPS, `git pull` siempre como `sudo -u c2881399`, nunca como root.
 
 ## Estructura
 agenda_daq/
@@ -83,8 +90,9 @@ agenda_daq/
 │       ├── sheets/      #     una hoja por archivo: contacto, ficha, compromiso, pago_rapido, seguimiento…
 │       └── parciales/   #     piezas que se repiten: pago_acciones, tarjeta_pago, pago_sas, pagos_tabla…
 ├── assets/css/          # tokens.css, base.css, components.css (genéricos) y pantallas/*.css
-│   └── pantallas/       #   uno por pantalla: hoy, contactos, calendario, ficha, notas, ajustes,
-│                        #   pagos (carga en ese orden, después de components.css) y login
+│   └── pantallas/       #   uno por pantalla u hoja grande: hoy, contactos, calendario, ficha, contacto
+│                        #   (Nueva consulta), notas, ajustes, pagos (carga en ese orden, después de
+│                        #   components.css) y login
 ├── assets/js/           # helpers.js (fechas, montos y conteos compartidos; se carga primero),
 │                        #   app.js + un módulo por pantalla: pagos, contactos, seguimientos, panel,
 │                        #   notas, ajustes, pagos_rapido, sas, pwa

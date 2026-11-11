@@ -121,7 +121,7 @@ declare(strict_types=1);
                                         <strong x-text="dia.numero"></strong>
                                         <span
                                             class="week-strip__dot"
-                                            x-show="eventosDia(dia.iso).length"
+                                            x-show="eventosDia(dia.iso).length || pagosDia(dia.iso).length"
                                             :class="{'week-strip__dot--selected': diaSeleccionado === dia.iso}"
                                         ></span>
                                     </button>
@@ -260,10 +260,7 @@ declare(strict_types=1);
                         class="calendario-panel__dia"
                         x-text="new Intl.DateTimeFormat('es-AR', {weekday:'long'}).format(desdeIso(diaSeleccionado))"
                     ></p>
-                    <p
-                        class="calendario-panel__titulo"
-                        x-text="contactosDiaSeleccionado().length === 1 ? '1 recontacto pendiente' : `${contactosDiaSeleccionado().length} recontactos pendientes`"
-                    ></p>
+                    <p class="calendario-panel__titulo" x-text="resumenDiaCalendario()"></p>
                 </div>
                 <div class="calendario-panel__lista">
                     <template
@@ -304,6 +301,11 @@ declare(strict_types=1);
                             <p
                                 class="compromiso-item__autor"
                                 x-text="`Cargó: ${pago.creado_por_nombre || 'Sin registrar'}`"
+                            ></p>
+                            <p
+                                class="compromiso-item__autor"
+                                x-show="pago.cobrador_nombre"
+                                x-text="`Cobrador: ${pago.cobrador_nombre}`"
                             ></p>
                             <p
                                 class="compromiso-item__aviso"

@@ -31,6 +31,11 @@ declare(strict_types=1);
                 class="sheet-contact-name"
                 x-text="pagoResolver ? `${pagoResolver.contacto_nombre} · ${formatoMonto(pagoResolver.monto)}` : ''"
             ></p>
+            <p
+                class="sheet-contact-sub"
+                x-show="pagoResolver?.cobrador_nombre"
+                x-text="`Cobrador: ${pagoResolver?.cobrador_nombre}`"
+            ></p>
             <div class="resultado-grid resultado-grid--tres" role="tablist" aria-label="Qué pasó con el pago">
                 <template
                     x-for="opcion in [{id: 'pagado', texto: 'Pagó'}, {id: 'parcial', texto: 'Pago parcial'}, {id: 'incumplido', texto: 'No pagó'}]"

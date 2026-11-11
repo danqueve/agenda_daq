@@ -12,6 +12,7 @@ const CON_VERSION = [
     './assets/css/pantallas/contactos.css',
     './assets/css/pantallas/calendario.css',
     './assets/css/pantallas/ficha.css',
+    './assets/css/pantallas/contacto.css',
     './assets/css/pantallas/notas.css',
     './assets/css/pantallas/ajustes.css',
     './assets/css/pantallas/pagos.css',

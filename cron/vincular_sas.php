@@ -123,14 +123,15 @@ if ($conflictos !== []) {
 
 if ($aplicar) {
     $vincular = $db->prepare(
-        "UPDATE contactos SET sas_cliente_id = :sas, dni = COALESCE(NULLIF(dni, ''), NULLIF(:dni, ''))
+        "UPDATE contactos SET sas_cliente_id = :sas, dni = COALESCE(NULLIF(dni, ''), NULLIF(:dni, '')), cobrador_nombre = :cobrador
          WHERE id = :id AND sas_cliente_id IS NULL"
     );
     $hechos = 0;
     $db->beginTransaction();
     try {
         foreach ($vinculables as $id => $v) {
-            $vincular->execute(['sas' => $v['sas_id'], 'dni' => substr($indice['datos'][$v['sas_id']]['dni'] ?? '', 0, 15), 'id' => $id]);
+            $datos = $indice['datos'][$v['sas_id']] ?? [];
+            $vincular->execute(['sas' => $v['sas_id'], 'dni' => substr($datos['dni'] ?? '', 0, 15), 'cobrador' => $datos['cobrador'] ?? null, 'id' => $id]);
             $hechos += $vincular->rowCount();
         }
         $db->commit();

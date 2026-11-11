@@ -35,7 +35,7 @@ $sinFecha = panel_contactos($db, "c.estado = 'pendiente' AND c.proximo_contacto 
 $stmtPagos = $db->query(
     'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . " AS situacion,
             k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm,
-            k.sas_cliente_id AS contacto_sas_cliente_id
+            k.sas_cliente_id AS contacto_sas_cliente_id, k.cobrador_nombre
      FROM compromisos c INNER JOIN contactos k ON k.id = c.contacto_id
      WHERE c.estado = 'pendiente' AND DATE(c.fecha_compromiso) <= CURDATE()
      ORDER BY c.fecha_compromiso ASC, c.id ASC"
