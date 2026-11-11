@@ -9,7 +9,16 @@ declare(strict_types=1);
 ?>
 <div class="filtro-pills pagos-filtros" role="tablist" aria-label="Estado de los compromisos">
     <template
-        x-for="opcion in [{id: 'pendientes', texto: 'Pendientes'}, {id: 'vencidos', texto: 'Vencidos'}, {id: 'hoy', texto: 'Para hoy'}, {id: 'proximos', texto: 'Próximos'}, {id: 'pagados', texto: 'Pagados'}, {id: 'incumplidos', texto: 'Incumplidos'}, {id: 'reprogramados', texto: 'Reprogramados'}, {id: 'todos', texto: 'Todos'}]"
+        x-for="opcion in [
+            {id: 'pendientes', texto: 'Pendientes'},
+            {id: 'vencidos', texto: 'Vencidos'},
+            {id: 'hoy', texto: 'Para hoy'},
+            {id: 'proximos', texto: 'Próximos'},
+            {id: 'pagados', texto: 'Pagados'},
+            {id: 'incumplidos', texto: 'Incumplidos'},
+            {id: 'reprogramados', texto: 'Reprogramados'},
+            {id: 'todos', texto: 'Todos'},
+        ]"
         :key="opcion.id"
     >
         <button

@@ -44,7 +44,10 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     <div class="app-shell" x-data="appShell()" x-init="init()" :class="{'modo-contactos': activo === 'contactos'}">
         <div class="banner" x-show="sinConexion" x-cloak>Sin conexión. Mostrando los últimos datos guardados.</div>
         <nav class="tabbar" aria-label="Navegación principal">
-            <button class="tabbar__brand" type="button" @click="activo = 'hoy'" aria-label="Ir al inicio de Agenda IC"><span class="tabbar__brand-mark"><i data-lucide="calendar-check-2"></i></span><span>Agenda IC</span></button>
+            <button class="tabbar__brand" type="button" @click="activo = 'hoy'" aria-label="Ir al inicio de Agenda IC">
+                <span class="tabbar__brand-mark"><i data-lucide="calendar-check-2"></i></span>
+                <span>Agenda IC</span>
+            </button>
             <div class="tabbar__items">
                 <template x-for="tab in tabs" :key="tab.id">
                     <button
@@ -72,8 +75,18 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                 <span class="tabbar__icon"><i data-lucide="settings"></i></span>
                 <span class="tabbar__label">Ajustes</span>
             </button>
-            <button class="tabbar__perfil" type="button" :aria-current="activo === 'ajustes' ? 'page' : null" @click="activo = 'ajustes'" aria-label="Ir a Ajustes">
-                <span class="avatar" style="background:var(--tint)" x-text='iniciales(<?= json_encode($usuarioNombre, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS) ?>)'></span>
+            <button
+                class="tabbar__perfil"
+                type="button"
+                :aria-current="activo === 'ajustes' ? 'page' : null"
+                @click="activo = 'ajustes'"
+                aria-label="Ir a Ajustes"
+            >
+                <span
+                    class="avatar"
+                    style="background:var(--tint)"
+                    x-text='iniciales(<?= json_encode($usuarioNombre, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS) ?>)'
+                ></span>
                 <span class="tabbar__perfil-nombre"><?= e($usuarioNombre) ?></span>
             </button>
         </nav>
@@ -105,8 +118,9 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
 
         <?php require __DIR__ . '/app/vistas/sheets/pago_resolver.php'; ?>
 
-<?php require __DIR__ . '/app/vistas/sheets/pago_rapido.php'; ?>
-<?php require __DIR__ . '/app/vistas/parciales/aviso_deshacer.php'; ?>
+        <?php require __DIR__ . '/app/vistas/sheets/pago_rapido.php'; ?>
+
+        <?php require __DIR__ . '/app/vistas/parciales/aviso_deshacer.php'; ?>
 
         <?php require __DIR__ . '/app/vistas/sheets/duplicado.php'; ?>
 
@@ -122,12 +136,31 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
 
         <?php require __DIR__ . '/app/vistas/sheets/eliminar_contacto.php'; ?>
 
-<?php require __DIR__ . '/app/vistas/sheets/sas_vincular.php'; ?>
-        <datalist id="conceptos-pagos"><template x-for="opcion in conceptoOpciones()" :key="opcion"><option :value="opcion"></option></template></datalist>
-        <div class="hud-capa" x-show="hudVisible" x-transition.opacity x-cloak><div class="hud"><i :data-lucide="hudIcono"></i><span x-text="hudTexto"></span></div></div>
+        <?php require __DIR__ . '/app/vistas/sheets/sas_vincular.php'; ?>
+
+        <datalist id="conceptos-pagos">
+            <template x-for="opcion in conceptoOpciones()" :key="opcion">
+                <option :value="opcion"></option>
+            </template>
+        </datalist>
+        <div class="hud-capa" x-show="hudVisible" x-transition.opacity x-cloak>
+            <div class="hud">
+                <i :data-lucide="hudIcono"></i>
+                <span x-text="hudTexto"></span>
+            </div>
+        </div>
     </div>
 
-    <script>window.APP_CONFIG = { sasHabilitado: <?= SasDb::habilitado() ? 'true' : 'false' ?>, csrf: <?= json_encode(csrf_token(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>, usuario: <?= json_encode(['id' => $usuarioId, 'nombre' => $usuarioNombre, 'rol' => $usuarioRol], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> };</script>
+    <script>
+        window.APP_CONFIG = {
+            sasHabilitado: <?= SasDb::habilitado() ? 'true' : 'false' ?>,
+            csrf: <?= json_encode(csrf_token(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
+            usuario: <?= json_encode(
+                ['id' => $usuarioId, 'nombre' => $usuarioNombre, 'rol' => $usuarioRol],
+                JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+            ) ?>,
+        };
+    </script>
     <script src="<?= e(asset('assets/vendor/alpine.min.js')) ?>" defer></script>
     <script src="<?= e(asset('assets/vendor/lucide/lucide.min.js')) ?>"></script>
     <script src="<?= e(asset('assets/js/helpers.js')) ?>"></script>

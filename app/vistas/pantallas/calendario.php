@@ -310,8 +310,8 @@ declare(strict_types=1);
                                 x-show="avisoPagoTexto(pago)"
                                 x-text="avisoPagoTexto(pago)"
                             ></p>
-<?php require __DIR__ . '/../parciales/pago_sas.php'; ?>
-<?php $variante = 'texto'; require __DIR__ . '/../parciales/pago_acciones.php'; ?>
+                            <?php require __DIR__ . '/../parciales/pago_sas.php'; ?>
+                            <?php $variante = 'texto'; require __DIR__ . '/../parciales/pago_acciones.php'; ?>
                         </div>
                     </template>
                 </div>
