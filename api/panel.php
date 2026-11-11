@@ -30,16 +30,26 @@ $hoy = panel_contactos($db, "c.estado <> 'cerrada' AND c.proximo_contacto >= NOW
 $proximos = panel_contactos($db, "c.estado <> 'cerrada' AND c.proximo_contacto >= DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND c.proximo_contacto < DATE_ADD(CURDATE(), INTERVAL 8 DAY)");
 $sinFecha = panel_contactos($db, "c.estado = 'pendiente' AND c.proximo_contacto IS NULL");
 
-// Pagos a cobrar: compromisos pendientes que vencen hoy o ya vencieron (por
-// día, no por hora), los más atrasados primero.
-$stmtPagos = $db->query(
+// "Míos": solo los compromisos que cargó quien mira el panel. Afecta a la cobranza (totales, tira de 14 días y lista
+// de pagos), no a los recontactos.
+$mios = api_string($_GET, 'mios', 1) === '1';
+$whereCobranza = $mios ? ['c.creado_por_usuario_id = :f_usuario'] : [];
+$paramsCobranza = $mios ? ['f_usuario' => usuario_actual_id() ?? 0] : [];
+
+// Pagos a cobrar: compromisos pendientes vencidos, de hoy y de los próximos 7 días (por día, no por hora), los más
+// atrasados primero. Hoy los agrupa por día; lo que queda más adelante se ve en Pagos.
+$stmtPagos = $db->prepare(
     'SELECT ' . COMPROMISO_COLUMNAS_SQL . ', ' . COMPROMISO_SITUACION_SQL . " AS situacion,
             k.nombre AS contacto_nombre, k.celular AS contacto_celular, k.celular_norm AS contacto_celular_norm,
             k.sas_cliente_id AS contacto_sas_cliente_id, k.cobrador_nombre
      FROM compromisos c INNER JOIN contactos k ON k.id = c.contacto_id
-     WHERE c.estado = 'pendiente' AND DATE(c.fecha_compromiso) <= CURDATE()
-     ORDER BY c.fecha_compromiso ASC, c.id ASC"
+     WHERE " . implode(' AND ', array_merge(
+        ["c.estado = 'pendiente'", 'DATE(c.fecha_compromiso) <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)'],
+        $whereCobranza
+    )) . '
+     ORDER BY c.fecha_compromiso ASC, c.id ASC'
 );
+$stmtPagos->execute($paramsCobranza);
 $compromisos = $stmtPagos->fetchAll();
 
 $agendados = panel_count($db, "SELECT COUNT(DISTINCT contacto_id) FROM (
@@ -69,50 +79,6 @@ foreach ($proximos as $contacto) {
     $porDia[$dia][] = $contacto;
 }
 
-// "Esta semana" del panel Hoy: estado por día (lunes a domingo) para los
-// puntos de la tira .semana-card. Pendientes cubre vencidos (días pasados
-// con algo sin resolver) y próximos (días futuros con algo agendado);
-// historial cubre días pasados ya resueltos (proximo_anterior = ese día).
-$hoyIso = date('Y-m-d');
-$diaSemanaIso = (int) date('N');
-$lunes = date('Y-m-d', strtotime("-" . ($diaSemanaIso - 1) . " days"));
-$domingo = date('Y-m-d', strtotime("+" . (7 - $diaSemanaIso) . " days"));
-
-$pendientesPorDia = [];
-$stmtPend = $db->prepare("SELECT DATE(proximo_contacto) AS dia, COUNT(DISTINCT id) AS cantidad
-    FROM contactos WHERE estado <> 'cerrada' AND DATE(proximo_contacto) BETWEEN :lunes AND :domingo
-    GROUP BY DATE(proximo_contacto)");
-$stmtPend->execute(['lunes' => $lunes, 'domingo' => $domingo]);
-foreach ($stmtPend->fetchAll() as $fila) {
-    $pendientesPorDia[$fila['dia']] = (int) $fila['cantidad'];
-}
-
-$historialPorDia = [];
-$stmtHist = $db->prepare("SELECT DATE(proximo_anterior) AS dia, COUNT(DISTINCT contacto_id) AS cantidad
-    FROM seguimientos WHERE tipo = 'recontacto' AND proximo_anterior IS NOT NULL
-      AND DATE(proximo_anterior) BETWEEN :lunes AND :domingo
-    GROUP BY DATE(proximo_anterior)");
-$stmtHist->execute(['lunes' => $lunes, 'domingo' => $domingo]);
-foreach ($stmtHist->fetchAll() as $fila) {
-    $historialPorDia[$fila['dia']] = (int) $fila['cantidad'];
-}
-
-$semana = [];
-for ($i = 0; $i < 7; $i++) {
-    $dia = date('Y-m-d', strtotime("{$lunes} +{$i} days"));
-    if ($dia === $hoyIso) {
-        $estado = 'hoy';
-        $cantidad = $pendientesPorDia[$dia] ?? 0;
-    } elseif ($dia < $hoyIso) {
-        $estado = isset($pendientesPorDia[$dia]) ? 'vencido' : (isset($historialPorDia[$dia]) ? 'hecho' : null);
-        $cantidad = $pendientesPorDia[$dia] ?? $historialPorDia[$dia] ?? 0;
-    } else {
-        $estado = isset($pendientesPorDia[$dia]) ? 'proximo' : null;
-        $cantidad = $pendientesPorDia[$dia] ?? 0;
-    }
-    $semana[] = ['iso' => $dia, 'estado' => $estado, 'cantidad' => $cantidad];
-}
-
 json_response([
     'ok' => true,
     'data' => [
@@ -122,7 +88,12 @@ json_response([
         'proximos' => $porDia,
         'sin_fecha' => $sinFecha,
         'compromisos' => $compromisos,
-        'semana' => $semana,
+        'cobranza' => [
+            'mios' => $mios,
+            'resumen' => compromisos_resumen($db, $whereCobranza, $paramsCobranza),
+            'cumplimiento' => compromisos_cumplimiento($db, $whereCobranza, $paramsCobranza),
+            'dias' => compromisos_tablero_dias($db, $whereCobranza, $paramsCobranza),
+        ],
         'contadores' => [
             'abiertos' => panel_count($db, "SELECT COUNT(*) FROM contactos WHERE estado <> 'cerrada'"),
             'cerrados_mes' => $cerradosMes,

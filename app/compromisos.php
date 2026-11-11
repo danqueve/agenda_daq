@@ -258,3 +258,81 @@ function compromisos_por_usuario(PDO $db): array
 
     return $salida;
 }
+
+/**
+ * Cumplimiento del mes sobre los compromisos que cumplen $where (alias `c`): de lo prometido para fechas del mes que
+ * ya llegaron, cuánto se cobró. Misma regla que compromisos_por_usuario(): un reprogramado no cuenta (cuenta el nuevo,
+ * en su fecha) y un parcial con el saldo agendado cuenta por lo que se pagó.
+ *
+ * @param list<string> $where
+ * @param array<string, mixed> $params
+ * @return array{prometido: string, cobrado: string, porcentaje: ?int} porcentaje es null si no hay nada prometido
+ */
+function compromisos_cumplimiento(PDO $db, array $where, array $params): array
+{
+    $condiciones = implode(' AND ', array_merge([COMPROMISO_MES_LLEGADO_SQL], $where));
+    $stmt = $db->prepare(
+        "SELECT COALESCE(SUM(IF(c.estado <> 'reprogramado', " . COMPROMISO_PROMETIDO_SQL . ", 0)), 0) AS prometido,
+                COALESCE(SUM(IF(c.estado IN ('pagado','parcial'), c.monto_pagado, 0)), 0) AS cobrado
+         FROM compromisos c WHERE {$condiciones}"
+    );
+    $stmt->execute($params);
+    $fila = $stmt->fetch();
+    $prometido = api_centavos($fila['prometido']);
+
+    return [
+        'prometido' => $fila['prometido'],
+        'cobrado' => $fila['cobrado'],
+        'porcentaje' => $prometido > 0 ? (int) round(api_centavos($fila['cobrado']) * 100 / $prometido) : null,
+    ];
+}
+
+/**
+ * Lo que falta cobrar y lo ya cobrado en cada uno de los 14 días del tablero de Hoy: esta semana y la siguiente, de
+ * lunes a domingo. $where y $params acotan como en compromisos_resumen() (alias `c`).
+ *
+ * Estado de cada día: «vencido» (pendientes en un día pasado), «hoy» o «proximo» (pendientes hoy o más adelante),
+ * «cobrado» (nada pendiente y algo cobrado), «resuelto» (solo incumplidos o reprogramados) o null (sin compromisos).
+ * `cantidad` y `monto` son lo pendiente; `cobrado`, lo recibido en pagados y parciales con fecha ese día.
+ *
+ * @param list<string> $where
+ * @param array<string, mixed> $params
+ * @return list<array{iso: string, estado: ?string, cantidad: int, monto: string, cobrado: string}>
+ */
+function compromisos_tablero_dias(PDO $db, array $where, array $params): array
+{
+    $hoy = date('Y-m-d');
+    $lunes = date('Y-m-d', strtotime('-' . ((int) date('N') - 1) . ' days'));
+    $condiciones = implode(' AND ', array_merge(['DATE(c.fecha_compromiso) BETWEEN :tablero_desde AND :tablero_hasta'], $where));
+    $stmt = $db->prepare(
+        "SELECT DATE(c.fecha_compromiso) AS dia, COUNT(*) AS total, SUM(c.estado = 'pendiente') AS pendientes,
+                COALESCE(SUM(IF(c.estado = 'pendiente', c.monto, 0)), 0) AS pendiente_monto,
+                COALESCE(SUM(IF(c.estado IN ('pagado','parcial'), c.monto_pagado, 0)), 0) AS cobrado
+         FROM compromisos c WHERE {$condiciones} GROUP BY dia"
+    );
+    $stmt->execute($params + ['tablero_desde' => $lunes, 'tablero_hasta' => date('Y-m-d', strtotime("{$lunes} +13 days"))]);
+    $porDia = [];
+    foreach ($stmt->fetchAll() as $fila) {
+        $porDia[$fila['dia']] = $fila;
+    }
+
+    $dias = [];
+    for ($i = 0; $i < 14; $i++) {
+        $iso = date('Y-m-d', strtotime("{$lunes} +{$i} days"));
+        $fila = $porDia[$iso] ?? null;
+        $pendientes = $fila === null ? 0 : (int) $fila['pendientes'];
+        $cobrado = $fila === null ? '0.00' : $fila['cobrado'];
+        $estado = null;
+        if ($pendientes > 0) {
+            $estado = $iso < $hoy ? 'vencido' : ($iso === $hoy ? 'hoy' : 'proximo');
+        } elseif ($fila !== null) {
+            $estado = api_centavos($cobrado) > 0 ? 'cobrado' : 'resuelto';
+        }
+        $dias[] = [
+            'iso' => $iso, 'estado' => $estado, 'cantidad' => $pendientes,
+            'monto' => $fila === null ? '0.00' : $fila['pendiente_monto'], 'cobrado' => $cobrado,
+        ];
+    }
+
+    return $dias;
+}
