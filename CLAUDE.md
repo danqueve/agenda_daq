@@ -70,14 +70,18 @@ El PHP CLI por defecto del VPS es 5.6: los cron y composer deben usar el binario
 ## Estructura
 agenda_daq/
 ├── .htaccess            # bloqueo de privados + headers de seguridad
-├── index.php            # shell de la app (requiere login)
+├── index.php            # cascarón de la app (requiere login): sesión, <head>, navegación y los require
+│                        #   de app/vistas/
 ├── login.php / logout.php
 ├── manifest.webmanifest
 ├── sw.js                # service worker (en la raíz para tener scope completo)
 ├── api/                 # endpoints JSON (compromisos, contactos, agenda, panel, seguimientos, notas,
 │                        #   etiquetas, usuarios, ajustes, push, sas_clientes, sas_resumen, sas_vinculo)
 ├── app/                 # config, db, auth, csrf, helpers, api, compromisos, push, sas (bloqueado)
-│   └── vistas/          #   partials de index.php (botonera de un compromiso, hoja de acciones rápidas)
+│   └── vistas/          #   el HTML de index.php, un archivo por pieza (regla en Convenciones):
+│       ├── pantallas/   #     hoy, contactos, calendario, notas, pagos, ajustes
+│       ├── sheets/      #     una hoja por archivo: contacto, ficha, compromiso, pago_rapido, seguimiento…
+│       └── parciales/   #     piezas que se repiten: pago_acciones, tarjeta_pago, pago_sas, pagos_tabla…
 ├── assets/css/          # tokens.css, base.css, components.css (genéricos) y pantallas/*.css
 │   └── pantallas/       #   uno por pantalla: hoy, contactos, calendario, ficha, notas, ajustes,
 │                        #   pagos (carga en ese orden, después de components.css) y login
@@ -104,8 +108,13 @@ agenda_daq/
   de quien cargó el original. Deshacer (`reabrir`) borra el nuevo si sigue pendiente.
 - Cumplimiento del mes (`por_usuario`): lo cobrado sobre lo prometido para fechas del mes que
   ya llegaron; un reprogramado no cuenta y un parcial con saldo agendado cuenta por lo pagado.
+- Vistas: cada pantalla y cada sheet en su propio archivo de `app/vistas/` (`pantallas/` o `sheets/`);
+  `index.php` solo los incluye. Lo que se repite va a `app/vistas/parciales/`, con las variables que recibe
+  documentadas con `@var` en su encabezado. Un atributo largo por línea, indentación de 4 espacios y
+  ningún archivo de vista de más de ~400 líneas. Al mover marcado no se cambian `x-data`, directivas ni
+  nombres de métodos de Alpine.
 - Acciones de un compromiso (Pagó, Parcial, Reprogramar, WhatsApp, Más): un solo partial,
-  `app/vistas/pago_acciones.php`, incluido en Hoy, Pagos (agenda, tabla, tarjetas) y el panel
+  `app/vistas/parciales/pago_acciones.php`, incluido en Hoy, Pagos (agenda, tabla, tarjetas) y el panel
   del día del Calendario. La lógica está en `assets/js/pagos_rapido.js`.
 - Plantillas de WhatsApp (antes del vencimiento / vence hoy / vencido): se guardan en `config`
   (`wa_plantilla_*`), solo las edita el admin; los textos por defecto viven en `app/compromisos.php`.

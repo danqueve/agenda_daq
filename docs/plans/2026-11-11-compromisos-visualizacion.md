@@ -115,16 +115,24 @@ Archivos: `app/sas.php`, `api/sas_resumen.php`, `api/sas_vinculo.php`, `cron/vin
    ubicable por pantalla.
 3. Sin cambios de funcionamiento ni de aspecto: el resultado se compara pantalla por pantalla.
 
+**Hecha (2026-11-11).** `index.php` quedó como cascarón y el HTML en `app/vistas/` (`pantallas/`, `sheets/`,
+`parciales/`); el CSS en `components.css` + `assets/css/pantallas/` (sin `pastel.css`, 57 clases sin uso
+borradas); `assets/js/helpers.js` junta fechas, montos y conteos que estaban repetidos; CSS y JS llevan
+`?v=APP_VERSION`, que también nombra el caché del service worker. Verificado contra el código previo a la
+fase corriendo las dos versiones a la vez: mismo DOM, textos, posiciones y estilos en 45 estados.
+Pendiente: `components.css` todavía repite reglas (la capa anterior y la pastel van una detrás de la otra)
+y `pagos.js` pasa de 400 líneas.
+
 ## Fase 6 — Control de calidad
 
 1. **Control visual a 375, 768 y 1280 px** de todas las pantallas y hojas, con datos reales y vacías.
 2. **Accesibilidad**: foco visible con teclado, Escape cierra hojas y detalles, áreas táctiles de 44 px o
    más, y el color siempre acompañado de texto.
-3. Actualizar el instructivo (`docs/manual/`) y subir `APP_VERSION` / `CACHE_VERSION`.
+3. Actualizar el instructivo (`docs/manual/`) y subir `APP_VERSION` (también nombra el caché del service worker).
 
 ---
 
 ## Cómo verificar cada fase
 
-`php -l` en los PHP tocados, `node --check` en los JS, balance de llaves en `pastel.css`, y recorrido en
+`php -l` en los PHP tocados, `node --check` en los JS, balance de llaves en `assets/css/`, y recorrido en
 el navegador con datos de prueba a 375, 768 y 1280 px. Los datos y usuarios de prueba se borran al terminar.
