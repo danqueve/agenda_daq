@@ -44,6 +44,16 @@ const helpers = (() => {
         // Sin decimales cuando son ",00"; si no, dos.
         decimalesMonto: (numero) => ({ minimumFractionDigits: Number.isInteger(numero) ? 0 : 2, maximumFractionDigits: 2 }),
         sumarMontos: (lista) => lista.reduce((suma, item) => suma + Number(item.monto), 0),
+        // Monto para una celda angosta: "$850", "$54k", "$1,2M". El importe completo va en el aria-label de la celda.
+        montoTira: (valor) => {
+            const numero = Math.round(Math.abs(Number(valor || 0)));
+            if (numero < 1000) return `$${numero}`;
+            const abreviar = (divisor, sufijo) => {
+                const parte = numero / divisor;
+                return `$${new Intl.NumberFormat('es-AR', { maximumFractionDigits: parte >= 100 ? 0 : 1 }).format(parte)}${sufijo}`;
+            };
+            return numero < 999500 ? abreviar(1000, 'k') : abreviar(1000000, 'M');
+        },
         // Cantidad de ítems de un mapa { "2026-11-14": [...] } que caen en el mes de mesIso.
         contarDelMes: (porDia, mesIso) => {
             const prefijo = mesIso.slice(0, 7);

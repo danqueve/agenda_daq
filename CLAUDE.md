@@ -95,7 +95,8 @@ agenda_daq/
 │                        #   components.css) y login
 ├── assets/js/           # helpers.js (fechas, montos y conteos compartidos; se carga primero),
 │                        #   app.js + un módulo por pantalla: pagos, contactos, seguimientos, panel,
-│                        #   notas, ajustes, pagos_rapido, sas, pwa
+│                        #   cobranza (Hoy: totales, tira de 14 días y pagos por día), notas, ajustes,
+│                        #   pagos_rapido, sas, pwa
 ├── assets/icons/        # íconos de la app (PWA)
 ├── assets/vendor/       # alpine.min.js, lucide (local)
 ├── cron/                # scripts CLI: push, vincular_sas (bloqueado)
@@ -141,6 +142,9 @@ agenda_daq/
 Hacer más visibles los compromisos de pago (Hoy como tablero de cobranza, Pagos con vistas y filtros,
 registro más rápido, datos de SAS, orden del código). Plan por fases, una por vez:
 `docs/plans/2026-11-11-compromisos-visualizacion.md`. Leelo antes de tocar Hoy, Pagos o el Calendario.
+Hechas las Fases 1 a 5; sigue la Fase 6 (control visual, accesibilidad, tests, manual y deploy).
+Hoy es un tablero de cobranza (filtro Todos | Míos, totales, tira de 14 días y pagos agrupados por día) y los
+recontactos quedan como segundo plano. Para revisar la app con volumen, `sql/seed_demo.sql` (solo local).
 
 ## Nota de desarrollo local
 Este repo se desarrolla en la carpeta `C:\wamp64\www\agenda` (no `agenda_daq`), reutilizando una

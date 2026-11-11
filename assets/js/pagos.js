@@ -403,6 +403,15 @@ function pagosModule() {
             return numero < 999500 ? `$${escala(1000)} mil` : `$${escala(1000000)} M`;
         },
 
+        // Importe para una tarjeta de totales (2 columnas en el celular): hasta ~12 caracteres entran. Si el importe es más
+        // largo se muestran los pesos sin centavos y, si todavía no entra, abreviado ("$123 M"); el exacto va en el title.
+        formatoMontoTarjeta(valor) {
+            const completo = this.formatoMonto(valor);
+            if (completo.length <= 12) return completo;
+            const entero = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(Number(valor || 0));
+            return entero.length <= 12 ? entero : this.formatoMontoCompacto(valor);
+        },
+
         // Dinero en pesos argentinos, sin decimales cuando son ",00".
         formatoMonto(valor) {
             const numero = Number(valor || 0);

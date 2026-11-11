@@ -3,6 +3,7 @@ function appShell() {
         ...contactosModule(),
         ...seguimientosModule(),
         ...panelModule(),
+        ...cobranzaModule(),
         ...ajustesModule(),
         ...notasModule(),
         ...pagosModule(),
@@ -31,6 +32,7 @@ function appShell() {
             this.formularioContacto = this.nuevoFormulario();
             this.cargarEtiquetas();
             this.cargarContactos(true);
+            this.iniciarCobranza();
             this.iniciarPanel();
             this.iniciarAjustes();
             this.iniciarNotas();

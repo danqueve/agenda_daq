@@ -39,8 +39,26 @@ son parte del plan.
    subtotal por día, además de los vencidos y los de hoy que ya se ven.
 4. **Filtro Todos | Míos** (los cargados por mí), usando `creado_por_usuario_id`.
 
-Archivos probables: `api/panel.php` (montos por día y totales), `assets/js/panel.js`, `assets/js/pagos.js`,
-`index.php` (sección Hoy), `assets/css/pastel.css`.
+**Hecha (2026-11-11), después de las Fases 2 a 5.** Hoy empieza por la cobranza y deja los recontactos como
+segundo plano:
+
+- Título con **Todos | Míos** (se recuerda en el navegador); afecta a los totales, la tira y la lista de pagos, no a
+  los recontactos.
+- Las cuatro tarjetas de totales de Pagos (vencidos, para hoy, próximos 7 días, cobrado del mes) reemplazan a las
+  de recontactos, con la barra de **cumplimiento del mes** en «Cobrado». Es el mismo parcial que usa Pagos
+  (`cobranza_totales.php`); un importe que no entra en la tarjeta se muestra sin centavos o abreviado, con el exacto
+  en el `title`.
+- **Tira de 14 días**: esta semana y la siguiente, de lunes a domingo, en dos filas de 7 (cada celda mide 44 px o
+  más a 375 px). Cada día lleva su importe abreviado (`$54k`, `$1,2M`), el color de su estado y un `aria-label`
+  completo; hoy lleva un aro. Tocarlo abre el Calendario en ese día.
+- **Pagos a cobrar agrupados**: Vencidos, Hoy, Mañana, «Vie 14 nov»… con subtotal, hasta 7 días adelante y un enlace
+  a Pagos para el resto. Las tarjetas son las de siempre (`tarjeta_pago.php`).
+- El anillo del día y los recontactos pasan abajo; las pastillas de Recontactos muestran cuántos hay.
+
+Archivos: `api/panel.php` (clave `cobranza`, `?mios=1`), `app/compromisos.php` (`compromisos_resumen`,
+`compromisos_cumplimiento`, `compromisos_por_usuario` y `compromisos_tablero_dias`), `assets/js/cobranza.js`,
+`app/vistas/pantallas/hoy.php` y los parciales `cobranza_totales`, `hoy_tira` y `hoy_pagos`,
+`assets/css/pantallas/hoy.css`. Se quitó la tira «Esta semana» de recontactos (`panel.semana`).
 
 ## Fase 2 — Pagos con vistas, filtros y exportación
 

@@ -168,6 +168,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     <script src="<?= e(asset('assets/js/contactos.js')) ?>"></script>
     <script src="<?= e(asset('assets/js/seguimientos.js')) ?>"></script>
     <script src="<?= e(asset('assets/js/panel.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/cobranza.js')) ?>"></script>
     <script src="<?= e(asset('assets/js/ajustes.js')) ?>"></script>
     <script src="<?= e(asset('assets/js/notas.js')) ?>"></script>
     <script src="<?= e(asset('assets/js/pagos.js')) ?>"></script>

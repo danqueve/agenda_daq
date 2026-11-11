@@ -32,40 +32,7 @@ declare(strict_types=1);
     </header>
     <div class="screen__body">
         <p class="error-inline" x-show="errorPagos" x-text="errorPagos"></p>
-        <div class="stat-card-grid stat-card-grid--montos">
-            <div class="stat-card stat-card--vencido">
-                <div class="stat-card__cabecera">
-                    <span class="stat-card__etiqueta">Vencidos</span>
-                    <span class="stat-card__icono"><i data-lucide="alert-circle"></i></span>
-                </div>
-                <strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().vencidos.monto)"></strong>
-                <p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenVisiblePagos().vencidos.cantidad)"></p>
-            </div>
-            <div class="stat-card stat-card--hoy">
-                <div class="stat-card__cabecera">
-                    <span class="stat-card__etiqueta">Para hoy</span>
-                    <span class="stat-card__icono"><i data-lucide="clock"></i></span>
-                </div>
-                <strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().hoy.monto)"></strong>
-                <p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenVisiblePagos().hoy.cantidad)"></p>
-            </div>
-            <div class="stat-card stat-card--proximo">
-                <div class="stat-card__cabecera">
-                    <span class="stat-card__etiqueta">Próximos 7 días</span>
-                    <span class="stat-card__icono"><i data-lucide="calendar-days"></i></span>
-                </div>
-                <strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().proximos.monto)"></strong>
-                <p class="stat-card__ayuda" x-text="cantidadPagosTexto(resumenVisiblePagos().proximos.cantidad)"></p>
-            </div>
-            <div class="stat-card stat-card--concreto">
-                <div class="stat-card__cabecera">
-                    <span class="stat-card__etiqueta">Cobrado</span>
-                    <span class="stat-card__icono"><i data-lucide="check"></i></span>
-                </div>
-                <strong class="stat-card__numero tabular" x-text="formatoMonto(resumenVisiblePagos().cobrado_mes)"></strong>
-                <p class="stat-card__ayuda">Este mes</p>
-            </div>
-        </div>
+        <?php $resumen = 'resumenVisiblePagos()'; $cumplimiento = null; require __DIR__ . '/../parciales/cobranza_totales.php'; ?>
         <p class="pagos-nota" x-show="pagosResumenFiltrado" x-cloak>
             <i data-lucide="filter"></i>
             <span>Estos totales cuentan solo lo que cumple el filtro de fechas, de quién lo cargó y de concepto.</span>

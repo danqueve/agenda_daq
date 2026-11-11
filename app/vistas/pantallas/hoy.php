@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 /**
- * Pantalla «Hoy»: anillo del día, tira de la semana, pagos a cobrar y recontactos. Lógica en assets/js/panel.js,
- * pagos*.js, sas.js y seguimientos.js.
+ * Pantalla «Hoy», un tablero de cobranza: totales, tira de 14 días y pagos a cobrar agrupados por día (con el filtro
+ * Todos | Míos); después, como segundo plano, el anillo del día y los recontactos. Lógica en assets/js/cobranza.js,
+ * panel.js, pagos*.js, sas.js y seguimientos.js.
  */
 ?>
 <section class="screen" x-show="activo === 'hoy'">
@@ -31,7 +32,49 @@ declare(strict_types=1);
     </header>
     <div class="screen__body">
         <p class="error-inline" x-show="errorPanel" x-text="errorPanel"></p>
-        <div class="hoy-resumen" x-show="!errorPanel">
+        <div class="hoy-cobranza" x-show="!errorPanel">
+            <div class="segmented hoy-alcance" role="tablist" aria-label="Qué compromisos ver">
+                <button
+                    type="button"
+                    class="segmented__option"
+                    role="tab"
+                    :aria-selected="!hoyMios"
+                    @click="elegirAlcanceHoy(false)"
+                >
+                    Todos
+                </button>
+                <button
+                    type="button"
+                    class="segmented__option"
+                    role="tab"
+                    :aria-selected="hoyMios"
+                    @click="elegirAlcanceHoy(true)"
+                >
+                    Míos
+                </button>
+            </div>
+            <?php $resumen = 'panel.cobranza.resumen'; $cumplimiento = 'panel.cobranza.cumplimiento'; require __DIR__ . '/../parciales/cobranza_totales.php'; ?>
+            <?php require __DIR__ . '/../parciales/hoy_tira.php'; ?>
+            <?php require __DIR__ . '/../parciales/hoy_pagos.php'; ?>
+        </div>
+        <div class="seccion-cabecera">
+            <h2>Recontactos</h2>
+            <div class="filtro-pills" role="group" aria-label="Filtrar recontactos">
+                <template
+                    x-for="opcion in [{id: '', texto: 'Todos'}, {id: 'vencido', texto: 'Vencidos'}, {id: 'hoy', texto: 'Para hoy'}, {id: 'proximo', texto: 'Próximos'}]"
+                    :key="opcion.id"
+                >
+                    <button
+                        class="filtro-pill"
+                        type="button"
+                        :aria-selected="filtroRecontactos === opcion.id"
+                        @click="filtroRecontactos = opcion.id"
+                        x-text="`${opcion.texto} ${conteoRecontactos(opcion.id)}`"
+                    ></button>
+                </template>
+            </div>
+        </div>
+        <div class="hoy-anillo" x-show="!errorPanel">
             <div class="anillo-dia anillo-dia--pastel">
                 <div class="anillo-dia__grafico" aria-label="Progreso de recontactos de hoy">
                     <svg viewBox="0 0 110 110" aria-hidden="true">
@@ -60,111 +103,6 @@ declare(strict_types=1);
                     <p class="anillo-dia__mensaje" x-text="mensajeAnillo()"></p>
                     <p class="anillo-dia__ayuda">Registrá un recontacto y el anillo avanza.</p>
                 </div>
-            </div>
-            <div class="semana-card">
-                <div class="semana-card__cabecera">
-                    <p class="semana-card__titulo">Esta semana</p>
-                    <button type="button" class="semana-card__ver" @click="activo = 'agenda'">Ver calendario</button>
-                </div>
-                <div class="semana-card__dias">
-                    <template x-for="dia in semanaConLabel()" :key="dia.iso">
-                        <button
-                            type="button"
-                            class="semana-dia"
-                            :class="dia.estado ? `semana-dia--${dia.estado}` : ''"
-                            @click="irACalendarioDia(dia.iso)"
-                        >
-                            <span class="semana-dia__letra" x-text="dia.letra"></span>
-                            <span class="semana-dia__num tabular" x-text="dia.numero"></span>
-                            <span class="semana-dia__punto"></span>
-                        </button>
-                    </template>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card-grid" x-show="!errorPanel">
-            <div class="stat-card stat-card--vencido">
-                <div class="stat-card__cabecera">
-                    <span class="stat-card__etiqueta">Vencidos</span>
-                    <span class="stat-card__icono"><i data-lucide="alert-circle"></i></span>
-                </div>
-                <strong class="stat-card__numero tabular" x-text="panel.vencidos?.length || 0"></strong>
-                <p class="stat-card__ayuda">Necesitan atención</p>
-            </div>
-            <div class="stat-card stat-card--hoy">
-                <div class="stat-card__cabecera">
-                    <span class="stat-card__etiqueta">Para hoy</span>
-                    <span class="stat-card__icono"><i data-lucide="clock"></i></span>
-                </div>
-                <strong class="stat-card__numero tabular" x-text="panel.hoy?.length || 0"></strong>
-                <p class="stat-card__ayuda">Agendados para hoy</p>
-            </div>
-            <div class="stat-card stat-card--proximo">
-                <div class="stat-card__cabecera">
-                    <span class="stat-card__etiqueta">Próximos días</span>
-                    <span class="stat-card__icono"><i data-lucide="calendar-days"></i></span>
-                </div>
-                <strong class="stat-card__numero tabular" x-text="Object.values(panel.proximos || {}).flat().length"></strong>
-                <p class="stat-card__ayuda">Esta semana</p>
-            </div>
-            <div class="stat-card stat-card--concreto">
-                <div class="stat-card__cabecera">
-                    <span class="stat-card__etiqueta">Concretaron</span>
-                    <span class="stat-card__icono"><i data-lucide="check"></i></span>
-                </div>
-                <strong class="stat-card__numero tabular" x-text="panel.contadores?.cerrados_mes?.concreto || 0"></strong>
-                <p class="stat-card__ayuda">Este mes</p>
-            </div>
-        </div>
-        <section class="hoy-pagos" x-show="!errorPanel && panel.compromisos?.length">
-            <div class="seccion-cabecera">
-                <h2>Pagos a cobrar</h2>
-                <span
-                    class="hoy-pagos__total tabular"
-                    x-text="`${formatoMonto(totalPagosHoy())} · ${cantidadPagosTexto(panel.compromisos.length)}`"
-                ></span>
-            </div>
-            <div class="card-pastel-grid">
-                <template x-for="pago in panel.compromisos" :key="`hp-${pago.id}`">
-                    <?php $montoExpresion = 'formatoMonto(pago.monto)'; require __DIR__ . '/../parciales/tarjeta_pago.php'; ?>
-                </template>
-            </div>
-        </section>
-        <div class="seccion-cabecera">
-            <h2>Recontactos</h2>
-            <div class="filtro-pills" role="group" aria-label="Filtrar recontactos">
-                <button
-                    class="filtro-pill"
-                    type="button"
-                    :aria-selected="filtroRecontactos === ''"
-                    @click="filtroRecontactos = ''"
-                >
-                    Todos
-                </button>
-                <button
-                    class="filtro-pill"
-                    type="button"
-                    :aria-selected="filtroRecontactos === 'vencido'"
-                    @click="filtroRecontactos = 'vencido'"
-                >
-                    Vencidos
-                </button>
-                <button
-                    class="filtro-pill"
-                    type="button"
-                    :aria-selected="filtroRecontactos === 'hoy'"
-                    @click="filtroRecontactos = 'hoy'"
-                >
-                    Para hoy
-                </button>
-                <button
-                    class="filtro-pill"
-                    type="button"
-                    :aria-selected="filtroRecontactos === 'proximo'"
-                    @click="filtroRecontactos = 'proximo'"
-                >
-                    Próximos
-                </button>
             </div>
         </div>
         <section class="card-pastel-grid" aria-label="Recontactos">

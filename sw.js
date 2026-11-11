@@ -22,6 +22,7 @@ const CON_VERSION = [
     './assets/js/contactos.js',
     './assets/js/seguimientos.js',
     './assets/js/panel.js',
+    './assets/js/cobranza.js',
     './assets/js/ajustes.js',
     './assets/js/notas.js',
     './assets/js/pagos.js',

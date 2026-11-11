@@ -1,6 +1,21 @@
 function panelModule() {
     return {
-        panel: { anillo: { agendados_hoy: 0, hechos_hoy: 0 }, vencidos: [], hoy: [], proximos: {}, sin_fecha: [], compromisos: [], semana: [], contadores: {} },
+        panel: {
+            anillo: { agendados_hoy: 0, hechos_hoy: 0 },
+            vencidos: [], hoy: [], proximos: {}, sin_fecha: [], compromisos: [], contadores: {},
+            cobranza: {
+                mios: false,
+                resumen: {
+                    pendientes: 0,
+                    vencidos: { monto: '0.00', cantidad: 0 },
+                    hoy: { monto: '0.00', cantidad: 0 },
+                    proximos: { monto: '0.00', cantidad: 0 },
+                    cobrado_mes: '0.00',
+                },
+                cumplimiento: { prometido: '0.00', cobrado: '0.00', porcentaje: null },
+                dias: [],
+            },
+        },
         cargandoPanel: false,
         errorPanel: '',
         filtroRecontactos: '',
@@ -217,15 +232,9 @@ function panelModule() {
             ];
         },
 
-        // Tira "Esta semana" de la pantalla Hoy: le agrega a panel.semana
-        // (iso/estado/cantidad, ya calculado por api/panel.php) la letra del
-        // día y el número, que son de presentación y no hace falta pedirlos.
-        semanaConLabel() {
-            return (this.panel.semana || []).map((dia) => ({
-                ...dia,
-                letra: helpers.capitalizar(helpers.formatoFecha(this.desdeIso(dia.iso), { weekday: 'short' })).replace('.', ''),
-                numero: this.desdeIso(dia.iso).getDate(),
-            }));
+        // Cantidad de recontactos de cada pastilla de Hoy ('' = todos); coincide con lo que muestra la lista.
+        conteoRecontactos(estado) {
+            return this.tarjetasHoy().filter((item) => !estado || item.estado === estado).length;
         },
 
         irACalendarioDia(iso) {
@@ -260,7 +269,7 @@ function panelModule() {
             this.cargandoPanel = true;
             this.errorPanel = '';
             try {
-                const result = await this.api('api/panel.php');
+                const result = await this.api(this.hoyMios ? 'api/panel.php?mios=1' : 'api/panel.php');
                 this.panel = result.data;
                 this.cargarResumenesSasDe(this.panel.compromisos);
                 this.badgeHoy = result.data.vencidos.length + result.data.hoy.length;
