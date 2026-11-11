@@ -148,7 +148,8 @@
 }
 
 /* Tabla (desde 900 px) */
-.pagos-tabla-envoltorio { margin-top: 16px; overflow-x: auto; border: 1px solid var(--separator); border-radius: var(--radio-grupo); background: var(--bg-card); box-shadow: var(--sombra-sm); }
+/* position: relative: el texto sr-only de las columnas es absoluto y, sin esto, se posiciona contra la página y la ensancha. */
+.pagos-tabla-envoltorio { position: relative; margin-top: 16px; overflow-x: auto; border: 1px solid var(--separator); border-radius: var(--radio-grupo); background: var(--bg-card); box-shadow: var(--sombra-sm); }
 .pagos-tabla { width: 100%; border-collapse: collapse; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--label); }
 .pagos-tabla th, .pagos-tabla td { padding: 4px 8px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--separator); }
 .pagos-tabla thead th { padding-top: 0; padding-bottom: 0; background: var(--bg-card-2); color: var(--label-2); font-size: var(--fs-footnote); font-weight: 600; white-space: nowrap; }
@@ -171,6 +172,10 @@
 .pagos-tabla__fila--proximo .chip-estado { color: var(--indigo-texto); background: var(--pastel-indigo); }
 .pagos-tabla__fila--pagado .chip-estado, .pagos-tabla__fila--parcial .chip-estado { color: var(--green-texto); background: var(--pastel-green); }
 .pagos-tabla__fila--incumplido .chip-estado, .pagos-tabla__fila--reprogramado .chip-estado { color: var(--pastel-label-2); background: var(--pastel-gray); }
+/* La columna de acciones queda fija a la derecha al desplazar la tabla (a 1280 px ocupa más que el ancho disponible). */
+.pagos-tabla th:last-child:not([colspan]), .pagos-tabla td:last-child:not([colspan]) { position: sticky; right: 0; background: var(--bg-card); box-shadow: -1px 0 0 var(--separator); }
+.pagos-tabla thead th:last-child { background: var(--bg-card-2); }
+.pagos-tabla tbody tr:hover td:last-child:not([colspan]) { background: var(--bg-grouped); }
 .pagos-tabla tfoot th, .pagos-tabla tfoot td { padding-top: 12px; padding-bottom: 12px; background: var(--bg-card-2); border-bottom: 0; font-weight: 700; }
 
 /* =====================================================================
