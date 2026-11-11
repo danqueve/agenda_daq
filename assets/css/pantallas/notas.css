@@ -38,14 +38,19 @@
     font-size: var(--fs-subhead);
 }
 .nota-composer__vincular svg { width: 15px; height: 15px; }
+@media (max-width: 1023px) {
+    .nota-composer__vincular { min-height: var(--celda-alto-min); }
+}
 
 /* Selector de color (puntos) */
-.color-dots { display: flex; gap: 8px; }
+.color-dots { display: flex; gap: 16px; }
 .color-dot {
     width: 28px; height: 28px; border-radius: 50%;
     border: 1px solid rgba(47, 56, 79, .15);
     cursor: pointer;
+    position: relative;
 }
+.color-dot::after { content: ""; position: absolute; inset: -8px; }
 .color-dot--celeste { background: var(--pastel-tint); }
 .color-dot--durazno { background: var(--pastel-orange); }
 .color-dot--lavanda { background: var(--pastel-indigo); }

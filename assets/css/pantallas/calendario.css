@@ -81,6 +81,9 @@
 /* Tira semanal (vista Semana y celular) */
 .week-strip__days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .week-strip__day { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; border: 0; border-radius: 10px; background: transparent; color: var(--label); }
+.week-strip__day { min-height: 58px; }
+.week-strip__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--indigo); }
+.week-strip__dot--selected { background: #fff; }
 .week-strip__day--selected, .week-strip__day--today.week-strip__day--selected { background: var(--tint); color: #fff; }
 .calendario-pagos { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 
@@ -124,6 +127,8 @@
     display: flex; align-items: center; justify-content: center;
     background: #fff; color: var(--pastel-label-2); cursor: pointer;
 }
+.cal-detalle__cerrar { position: relative; }
+.cal-detalle__cerrar::after { content: ""; position: absolute; inset: -4px; }
 .cal-detalle__persona { display: flex; align-items: center; gap: 12px; }
 .cal-detalle__persona-texto { flex: 1; min-width: 0; }
 .cal-detalle__detalle { display: flex; flex-direction: column; gap: 16px; }
@@ -152,6 +157,9 @@
     border: 1px solid var(--separator); border-radius: var(--radio-chico);
     background: var(--bg-card); color: var(--label);
     font-size: var(--fs-subhead); cursor: pointer;
+}
+@media (max-width: 1023px) {
+    .repro-pill { min-height: var(--celda-alto-min); }
 }
 .repro-pill[aria-checked="true"] { border-color: var(--indigo); background: var(--pastel-indigo); color: var(--indigo-texto); font-weight: 700; }
 

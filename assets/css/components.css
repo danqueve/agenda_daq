@@ -1317,3 +1317,15 @@ button.card-pastel { cursor: pointer; font: inherit; }
     transition: background-color .3s var(--curva-ios), border-color .3s var(--curva-ios), box-shadow .3s var(--curva-ios);
 }
 .card-pastel:active, .nota-card:active, .cal-item:active { filter: brightness(.97); }
+
+/* =====================================================================
+   Áreas táctiles (Fase 6): 44 px de alto o más para todo lo que se toca.
+   Los botones de texto (Cancelar, Guardar, Quitar…) miden 16 px de alto: crecen con un pseudo-elemento, sin mover
+   nada del diseño. El resto sube a 44 px en celular y tablet (la barra lateral de escritorio empieza en 1024 px).
+   ===================================================================== */
+.btn-texto { position: relative; min-width: var(--celda-alto-min); }
+.btn-texto::after { content: ""; position: absolute; inset: -14px 0; }
+@media (max-width: 1023px) {
+    .segmented__option, .pill, .tag, .card-pastel__persona { min-height: var(--celda-alto-min); }
+    .segmented__option { min-width: var(--celda-alto-min); }
+}

@@ -133,7 +133,7 @@
     color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .pago-fila__nombre { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 600; }
-.pago-fila__detalle { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); }
+.pago-fila__detalle { max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow-wrap: anywhere; font-size: var(--fs-subhead); line-height: var(--lh-subhead); color: var(--pastel-label-2); }
 .pago-fila__monto { grid-area: monto; justify-self: end; font-size: var(--fs-headline); line-height: var(--lh-headline); font-weight: 700; white-space: nowrap; }
 .pago-fila__estado { grid-area: estado; justify-self: start; }
 .pago-fila > .pago-acciones { grid-area: acciones; justify-content: flex-start; }

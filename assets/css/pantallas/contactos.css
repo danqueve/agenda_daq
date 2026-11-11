@@ -6,6 +6,7 @@
     display: block;
     margin: -8px auto 24px;
     padding: 10px;
+    min-height: var(--celda-alto-min);
 }
 
 /* La lista de contactos usa un poco más de ancho en pantallas grandes. En

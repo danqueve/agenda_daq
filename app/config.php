@@ -27,6 +27,6 @@ define('VAPID_PRIVATE', $_ENV['VAPID_PRIVATE'] ?? '');
 define('VAPID_SUBJECT', $_ENV['VAPID_SUBJECT'] ?? '');
 
 // Subirla en cada cambio de CSS o JS: va como ?v= en los <link> y <script> (asset()) y nombra el caché del service worker.
-define('APP_VERSION', '37');
+define('APP_VERSION', '38');
 
 date_default_timezone_set(APP_TZ);

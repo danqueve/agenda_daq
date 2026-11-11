@@ -37,6 +37,7 @@
 
 /* Interruptor (toggle) en verde */
 .toggle { width: 51px; height: 31px; border-radius: 16px; background: var(--separator); position: relative; transition: background .3s var(--curva-ios); }
+.toggle::after { content: ""; position: absolute; inset: -7px 0; }
 .toggle[aria-checked="true"] { background: var(--green); }
 .toggle__perilla { position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.2); transition: left .3s var(--curva-ios); }
 .toggle[aria-checked="true"] .toggle__perilla { left: 22px; }
