@@ -159,17 +159,12 @@ function pagosRapidoModule() {
 
         // Pills de fecha: siempre se cuentan desde hoy, a las 9:00 como el resto de la app.
         pagoRapidoFechaDias(dias) {
-            const fecha = new Date();
-            fecha.setDate(fecha.getDate() + dias);
-            fecha.setHours(9, 0, 0, 0);
-            this.pagoRapidoForm.fecha = this.fechaInput(fecha);
+            this.pagoRapidoForm.fecha = helpers.fechaInputEnDias(dias);
         },
 
         pagoRapidoDiaElegido(dias) {
             if (!this.pagoRapidoForm.fecha) return false;
-            const fecha = new Date();
-            fecha.setDate(fecha.getDate() + dias);
-            return this.pagoRapidoForm.fecha.slice(0, 10) === this.fechaInput(fecha).slice(0, 10);
+            return this.pagoRapidoForm.fecha.slice(0, 10) === this.fechaIso(helpers.enDias(dias));
         },
 
         pagoRapidoFechaPropia() {
@@ -219,17 +214,15 @@ function pagosRapidoModule() {
             return { proximo: 'antes', hoy: 'hoy', vencido: 'vencido' }[pago.situacion] || '';
         },
 
+        // "$45.000": sin el espacio que pone el formato de moneda, para el texto del mensaje.
         formatoMontoWhatsapp(valor) {
             const numero = Number(valor || 0);
-            return `$${new Intl.NumberFormat('es-AR', { minimumFractionDigits: Number.isInteger(numero) ? 0 : 2, maximumFractionDigits: 2 }).format(numero)}`;
+            return `$${new Intl.NumberFormat('es-AR', helpers.decimalesMonto(numero)).format(numero)}`;
         },
 
         // "viernes 14/11"
         fechaWhatsapp(fechaSql) {
-            const fecha = new Date(String(fechaSql).replace(' ', 'T'));
-            const pad = (valor) => String(valor).padStart(2, '0');
-            const dia = new Intl.DateTimeFormat('es-AR', { weekday: 'long' }).format(fecha);
-            return `${dia} ${pad(fecha.getDate())}/${pad(fecha.getMonth() + 1)}`;
+            return helpers.diaConFecha(helpers.desdeSql(fechaSql), 'long');
         },
 
         whatsappDatos(pago) {
@@ -278,7 +271,7 @@ function pagosRapidoModule() {
         },
 
         tiempoRelativoPago(fechaSql) {
-            const minutos = Math.max(Math.floor((Date.now() - new Date(String(fechaSql).replace(' ', 'T')).getTime()) / 60000), 0);
+            const minutos = Math.max(Math.floor((Date.now() - helpers.desdeSql(fechaSql).getTime()) / 60000), 0);
             if (minutos < 1) return 'hace un momento';
             if (minutos < 60) return `hace ${minutos} min`;
             if (minutos < 1440) return `hace ${Math.floor(minutos / 60)} h`;

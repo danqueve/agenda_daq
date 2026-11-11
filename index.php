@@ -130,6 +130,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     <script>window.APP_CONFIG = { sasHabilitado: <?= SasDb::habilitado() ? 'true' : 'false' ?>, csrf: <?= json_encode(csrf_token(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>, usuario: <?= json_encode(['id' => $usuarioId, 'nombre' => $usuarioNombre, 'rol' => $usuarioRol], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> };</script>
     <script src="<?= e(asset('assets/vendor/alpine.min.js')) ?>" defer></script>
     <script src="<?= e(asset('assets/vendor/lucide/lucide.min.js')) ?>"></script>
+    <script src="<?= e(asset('assets/js/helpers.js')) ?>"></script>
     <script src="<?= e(asset('assets/js/contactos.js')) ?>"></script>
     <script src="<?= e(asset('assets/js/seguimientos.js')) ?>"></script>
     <script src="<?= e(asset('assets/js/panel.js')) ?>"></script>

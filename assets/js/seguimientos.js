@@ -62,7 +62,7 @@ function seguimientosModule() {
 
         fichaProximoVencido(contacto) {
             if (!contacto || contacto.estado === 'cerrada' || !contacto.proximo_contacto) return false;
-            return new Date(contacto.proximo_contacto.replace(' ', 'T')) < new Date();
+            return helpers.desdeSql(contacto.proximo_contacto) < new Date();
         },
 
         // El selector de Estado de la ficha no crea endpoints nuevos: abre el
@@ -106,10 +106,7 @@ function seguimientosModule() {
         },
 
         asignarFechaSeguimiento(dias) {
-            const date = new Date();
-            date.setDate(date.getDate() + dias);
-            date.setHours(9, 0, 0, 0);
-            this.formularioSeguimiento.proximo_contacto = this.fechaInput(date);
+            this.formularioSeguimiento.proximo_contacto = helpers.fechaInputEnDias(dias);
         },
 
         async guardarSeguimiento() {

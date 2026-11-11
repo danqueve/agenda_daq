@@ -91,9 +91,7 @@ function contactosModule() {
         },
 
         diaPagoConsulta(dias) {
-            const date = new Date();
-            date.setDate(date.getDate() + dias);
-            return this.fechaInput(date).slice(0, 10);
+            return helpers.fechaIso(helpers.enDias(dias));
         },
 
         async api(url, options = {}) {
@@ -188,7 +186,7 @@ function contactosModule() {
 
         fechaRelativa(value) {
             if (!value) return '';
-            const fecha = new Date(value.replace(' ', 'T'));
+            const fecha = helpers.desdeSql(value);
             const dias = Math.floor((new Date().setHours(0, 0, 0, 0) - fecha.setHours(0, 0, 0, 0)) / 86400000);
             if (dias <= 0) return 'hoy';
             if (dias === 1) return 'hace 1 día';
@@ -221,15 +219,11 @@ function contactosModule() {
         },
 
         fechaInput(date) {
-            const part = (number) => String(number).padStart(2, '0');
-            return `${date.getFullYear()}-${part(date.getMonth() + 1)}-${part(date.getDate())}T${part(date.getHours())}:${part(date.getMinutes())}`;
+            return helpers.fechaHoraInput(date);
         },
 
         asignarFechaRapida(dias) {
-            const date = new Date();
-            date.setDate(date.getDate() + dias);
-            date.setHours(9, 0, 0, 0);
-            this.formularioContacto.proximo_contacto = this.fechaInput(date);
+            this.formularioContacto.proximo_contacto = helpers.fechaInputEnDias(dias);
         },
 
         // El input type="date" del pill "Elegir…" solo da año/mes/día: se le
@@ -373,20 +367,19 @@ function contactosModule() {
 
         fechaCorta(value) {
             if (!value) return 'Sin fecha';
-            const date = new Date(value.replace(' ', 'T'));
-            const hoy = new Date();
-            if (date.toDateString() === hoy.toDateString()) return new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit' }).format(date);
-            return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short' }).format(date);
+            const date = helpers.desdeSql(value);
+            if (helpers.esMismoDia(date, new Date())) return helpers.horaCorta(date);
+            return helpers.formatoFecha(date, { day: 'numeric', month: 'short' });
         },
 
         fechaLarga(value) {
             if (!value) return 'Sin fecha programada';
-            return new Intl.DateTimeFormat('es-AR', { dateStyle: 'long', timeStyle: 'short' }).format(new Date(value.replace(' ', 'T')));
+            return helpers.formatoFecha(helpers.desdeSql(value), { dateStyle: 'long', timeStyle: 'short' });
         },
 
         fechaSoloDia(value) {
             if (!value) return '';
-            return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long' }).format(new Date(value.replace(' ', 'T')));
+            return helpers.formatoFecha(helpers.desdeSql(value), { day: 'numeric', month: 'long' });
         },
 
         etiquetaOrigen(origen) {

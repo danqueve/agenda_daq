@@ -175,14 +175,10 @@ function pagosModule() {
             const dia = (fecha) => this.fechaIso(fecha);
             if (id === 'semana') {
                 const lunes = this.desdeIso(this.inicioSemana(hoy));
-                const domingo = new Date(lunes);
-                domingo.setDate(lunes.getDate() + 6);
-                return [dia(lunes), dia(domingo)];
+                return [dia(lunes), dia(helpers.enDias(6, lunes))];
             }
             if (id === 'quince') {
-                const fin = new Date(hoy);
-                fin.setDate(hoy.getDate() + 14);
-                return [dia(hoy), dia(fin)];
+                return [dia(hoy), dia(helpers.enDias(14, hoy))];
             }
             if (id === 'mes') {
                 return [dia(new Date(hoy.getFullYear(), hoy.getMonth(), 1)), dia(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0))];
@@ -345,22 +341,17 @@ function pagosModule() {
             for (const grupo of grupos.values()) {
                 if (!grupo.cantidad) {
                     grupo.cantidad = grupo.items.length;
-                    grupo.monto = grupo.items.reduce((suma, pago) => suma + Number(pago.monto), 0);
+                    grupo.monto = helpers.sumarMontos(grupo.items);
                 }
             }
             return [...grupos.values()];
         },
 
         tituloDiaPago(dia, hoy) {
-            const fecha = this.desdeIso(dia);
-            const texto = new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'short' })
-                .format(fecha).replace(',', '').replace('.', '');
-            const titulo = texto.charAt(0).toUpperCase() + texto.slice(1);
-            const vecino = (dias) => {
-                const otro = new Date();
-                otro.setDate(otro.getDate() + dias);
-                return this.fechaIso(otro);
-            };
+            const texto = helpers.formatoFecha(this.desdeIso(dia), { weekday: 'long', day: 'numeric', month: 'short' })
+                .replace(',', '').replace('.', '');
+            const titulo = helpers.capitalizar(texto);
+            const vecino = (dias) => this.fechaIso(helpers.enDias(dias));
             if (dia === hoy) return `Hoy · ${titulo}`;
             if (dia === vecino(1)) return `Mañana · ${titulo}`;
             if (dia === vecino(-1)) return `Ayer · ${titulo}`;
@@ -389,10 +380,7 @@ function pagosModule() {
         // ---------- Tabla ----------
 
         fechaTablaPago(pago) {
-            const fecha = new Date(pago.fecha_compromiso.replace(' ', 'T'));
-            const dia = new Intl.DateTimeFormat('es-AR', { weekday: 'short' }).format(fecha).replace('.', '');
-            const pad = (valor) => String(valor).padStart(2, '0');
-            return `${dia} ${pad(fecha.getDate())}/${pad(fecha.getMonth() + 1)}`;
+            return helpers.diaConFecha(helpers.desdeSql(pago.fecha_compromiso), 'short');
         },
 
         atrasoTablaPago(pago) {
@@ -411,10 +399,7 @@ function pagosModule() {
         // Dinero en pesos argentinos, sin decimales cuando son ",00".
         formatoMonto(valor) {
             const numero = Number(valor || 0);
-            return new Intl.NumberFormat('es-AR', {
-                style: 'currency', currency: 'ARS',
-                minimumFractionDigits: Number.isInteger(numero) ? 0 : 2, maximumFractionDigits: 2,
-            }).format(numero);
+            return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', ...helpers.decimalesMonto(numero) }).format(numero);
         },
 
         // Color de la tarjeta: rosa vencido, durazno hoy, lavanda próximo,
@@ -436,10 +421,10 @@ function pagosModule() {
 
         fechaPago(pago) {
             const resuelto = ['pagado', 'parcial', 'incumplido', 'reprogramado'].includes(pago.situacion);
-            const fecha = new Date((resuelto && pago.fecha_resolucion ? pago.fecha_resolucion : pago.fecha_compromiso).replace(' ', 'T'));
+            const fecha = helpers.desdeSql(resuelto && pago.fecha_resolucion ? pago.fecha_resolucion : pago.fecha_compromiso);
             if (pago.situacion === 'hoy') return 'Hoy';
-            const texto = new Intl.DateTimeFormat('es-AR', { weekday: 'short', day: 'numeric', month: 'short' }).format(fecha).replace('.', '');
-            return resuelto ? `Registrado el ${texto}` : texto.charAt(0).toUpperCase() + texto.slice(1);
+            const texto = helpers.formatoFecha(fecha, { weekday: 'short', day: 'numeric', month: 'short' }).replace('.', '');
+            return resuelto ? `Registrado el ${texto}` : helpers.capitalizar(texto);
         },
 
         montoPagoTexto(pago) {
@@ -454,7 +439,7 @@ function pagosModule() {
         // ---------- Hoy y Calendario ----------
 
         totalPagosHoy() {
-            return (this.panel.compromisos || []).reduce((suma, pago) => suma + Number(pago.monto), 0);
+            return helpers.sumarMontos(this.panel.compromisos || []);
         },
 
         pagosDia(iso) {
@@ -462,10 +447,7 @@ function pagosModule() {
         },
 
         pagosDelMes() {
-            const prefijo = this.mesVisible.slice(0, 7);
-            return Object.entries(this.agenda.pagos_por_dia || {})
-                .filter(([dia]) => dia.startsWith(prefijo))
-                .reduce((total, [, items]) => total + items.length, 0);
+            return helpers.contarDelMes(this.agenda.pagos_por_dia, this.mesVisible);
         },
 
         // Lo que hay para cobrar un día: solo pendientes. "vencido" si el día ya pasó.
@@ -473,7 +455,7 @@ function pagosModule() {
             const pendientes = this.pagosDia(iso).filter((pago) => pago.estado === 'pendiente');
             return {
                 cantidad: pendientes.length,
-                monto: pendientes.reduce((suma, pago) => suma + Number(pago.monto), 0),
+                monto: helpers.sumarMontos(pendientes),
                 vencido: pendientes.length > 0 && iso < this.fechaIso(new Date()),
             };
         },
@@ -506,7 +488,7 @@ function pagosModule() {
 
         // Lectura de pantalla de la celda: el color solo no alcanza.
         etiquetaCeldaCalendario(dia) {
-            const partes = [new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(this.desdeIso(dia.iso))];
+            const partes = [this.tituloDia(dia.iso)];
             const cobro = this.cobroDia(dia.iso);
             if (cobro.cantidad) {
                 partes.push(`${this.formatoMonto(cobro.monto)} a cobrar en ${cobro.cantidad === 1 ? '1 pago' : `${cobro.cantidad} pagos`}${cobro.vencido ? ' vencidos' : ''}`);
@@ -594,10 +576,7 @@ function pagosModule() {
 
         // Mañana a las 9:00 es el mismo atajo que usa el resto de la app.
         asignarFechaCompromiso(dias) {
-            const date = new Date();
-            date.setDate(date.getDate() + dias);
-            date.setHours(9, 0, 0, 0);
-            this.compromisoForm.fecha_compromiso = this.fechaInput(date);
+            this.compromisoForm.fecha_compromiso = helpers.fechaInputEnDias(dias);
         },
 
         // El input type="date" de "Elegir…" solo trae el día: se le suma 9:00.
@@ -613,9 +592,7 @@ function pagosModule() {
 
         pagosEsManana(valor) {
             if (!valor) return false;
-            const manana = new Date();
-            manana.setDate(manana.getDate() + 1);
-            return valor.slice(0, 10) === this.fechaInput(manana).slice(0, 10);
+            return valor.slice(0, 10) === this.fechaIso(helpers.enDias(1));
         },
 
         async guardarCompromiso() {
@@ -716,10 +693,7 @@ function pagosModule() {
         },
 
         asignarFechaPagoResolver(dias) {
-            const date = new Date();
-            date.setDate(date.getDate() + dias);
-            date.setHours(9, 0, 0, 0);
-            this.pagoResolverForm.fecha = this.fechaInput(date);
+            this.pagoResolverForm.fecha = helpers.fechaInputEnDias(dias);
         },
 
         elegirFechaPagoResolver(valor) {

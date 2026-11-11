@@ -24,12 +24,11 @@ function panelModule() {
         },
 
         fechaIso(date) {
-            const pad = (value) => String(value).padStart(2, '0');
-            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+            return helpers.fechaIso(date);
         },
 
         desdeIso(value) {
-            return new Date(`${value}T12:00:00`);
+            return helpers.desdeIso(value);
         },
 
         primerDiaMes(date) {
@@ -97,17 +96,13 @@ function panelModule() {
         },
 
         tituloMes() {
-            const texto = new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric' }).format(this.desdeIso(this.mesVisible));
-            return texto.charAt(0).toUpperCase() + texto.slice(1);
+            return helpers.capitalizar(helpers.formatoFecha(this.desdeIso(this.mesVisible), { month: 'long', year: 'numeric' }));
         },
 
         // Cantidad de recontactos agendados dentro del mes calendario que se
         // está mirando (no de toda la grilla, que incluye días de relleno).
         eventosDelMes() {
-            const prefijo = this.mesVisible.slice(0, 7);
-            return Object.entries(this.agenda.por_dia || {})
-                .filter(([dia]) => dia.startsWith(prefijo))
-                .reduce((total, [, items]) => total + items.length, 0);
+            return helpers.contarDelMes(this.agenda.por_dia, this.mesVisible);
         },
 
         eventosDia(iso) {
@@ -126,7 +121,7 @@ function panelModule() {
                 const iso = this.fechaIso(day);
                 return {
                     iso,
-                    letra: new Intl.DateTimeFormat('es-AR', { weekday: 'narrow' }).format(day),
+                    letra: helpers.formatoFecha(day, { weekday: 'narrow' }),
                     numero: day.getDate(),
                     esHoy: iso === hoyIso,
                 };
@@ -143,7 +138,7 @@ function panelModule() {
         },
 
         tituloDiaSeleccionado() {
-            return new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(this.desdeIso(this.diaSeleccionado));
+            return this.tituloDia(this.diaSeleccionado);
         },
 
         contactosDiaSeleccionado() {
@@ -178,12 +173,9 @@ function panelModule() {
 
         fechaEventoCalendario(evento) {
             if (!evento?.fecha_evento) return '';
-            const fecha = new Date(evento.fecha_evento.replace(' ', 'T'));
-            const hoy = new Date();
-            const esHoy = fecha.toDateString() === hoy.toDateString();
-            const diaTexto = esHoy ? 'Hoy' : new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric' }).format(fecha);
-            const hora = new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit' }).format(fecha);
-            return `${diaTexto} · ${hora}`;
+            const fecha = helpers.desdeSql(evento.fecha_evento);
+            const diaTexto = helpers.esMismoDia(fecha, new Date()) ? 'Hoy' : helpers.formatoFecha(fecha, { weekday: 'long', day: 'numeric' });
+            return `${diaTexto} · ${helpers.horaCorta(fecha)}`;
         },
 
         async marcarEventoCalendarioHecho() {
@@ -244,7 +236,7 @@ function panelModule() {
         semanaConLabel() {
             return (this.panel.semana || []).map((dia) => ({
                 ...dia,
-                letra: new Intl.DateTimeFormat('es-AR', { weekday: 'short' }).format(this.desdeIso(dia.iso)).replace(/^./, (c) => c.toUpperCase()).replace('.', ''),
+                letra: helpers.capitalizar(helpers.formatoFecha(this.desdeIso(dia.iso), { weekday: 'short' })).replace('.', ''),
                 numero: this.desdeIso(dia.iso).getDate(),
             }));
         },
@@ -264,7 +256,7 @@ function panelModule() {
         },
 
         tituloDia(day) {
-            return new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(this.desdeIso(day));
+            return helpers.diaLargo(this.desdeIso(day));
         },
 
         async cargarPanel() {

@@ -17,6 +17,7 @@ const CON_VERSION = [
     './assets/css/pantallas/pagos.css',
     './assets/css/pantallas/login.css',
     './assets/js/app.js',
+    './assets/js/helpers.js',
     './assets/js/contactos.js',
     './assets/js/seguimientos.js',
     './assets/js/panel.js',

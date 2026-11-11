@@ -53,19 +53,17 @@ function notasModule() {
 
         fechaNotaFijada(value) {
             if (!value) return '';
-            const texto = new Intl.DateTimeFormat('es-AR', { weekday: 'short', day: 'numeric', month: 'long' }).format(new Date(value.replace(' ', 'T')));
-            return texto.charAt(0).toUpperCase() + texto.slice(1);
+            return helpers.capitalizar(helpers.formatoFecha(helpers.desdeSql(value), { weekday: 'short', day: 'numeric', month: 'long' }));
         },
 
         fechaNotaReciente(value) {
             if (!value) return '';
-            const fecha = new Date(value.replace(' ', 'T'));
+            const fecha = helpers.desdeSql(value);
             const hoy = new Date();
             const dias = Math.round((hoy.setHours(0, 0, 0, 0) - new Date(fecha).setHours(0, 0, 0, 0)) / 86400000);
             if (dias === 0) return 'Hoy';
             if (dias === 1) return 'Ayer';
-            const texto = new Intl.DateTimeFormat('es-AR', { weekday: 'short', day: 'numeric' }).format(fecha);
-            return texto.charAt(0).toUpperCase() + texto.slice(1);
+            return helpers.capitalizar(helpers.formatoFecha(fecha, { weekday: 'short', day: 'numeric' }));
         },
 
         async crearNotaRapida() {
@@ -210,9 +208,7 @@ function notasModule() {
                 fecha.setHours(fecha.getHours() + 3);
                 recordarEn = this.fechaInput(fecha);
             } else if (opcion === 'manana') {
-                fecha.setDate(fecha.getDate() + 1);
-                fecha.setHours(9, 0, 0, 0);
-                recordarEn = this.fechaInput(fecha);
+                recordarEn = helpers.fechaInputEnDias(1);
             }
             try {
                 const result = await this.api(`api/notas.php?id=${this.notaActual.id}`, {
@@ -245,8 +241,7 @@ function notasModule() {
 
         textoGuardadoNota() {
             if (!this.notaActual?.actualizado_en) return '';
-            const hora = new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit' }).format(new Date(this.notaActual.actualizado_en.replace(' ', 'T')));
-            return `Guardado · editada ${hora}`;
+            return `Guardado · editada ${helpers.horaCorta(helpers.desdeSql(this.notaActual.actualizado_en))}`;
         },
     };
 }

@@ -81,7 +81,8 @@ agenda_daq/
 ├── assets/css/          # tokens.css, base.css, components.css (genéricos) y pantallas/*.css
 │   └── pantallas/       #   uno por pantalla: hoy, contactos, calendario, ficha, notas, ajustes,
 │                        #   pagos (carga en ese orden, después de components.css) y login
-├── assets/js/           # app.js + un módulo por pantalla: pagos, contactos, seguimientos, panel,
+├── assets/js/           # helpers.js (fechas, montos y conteos compartidos; se carga primero),
+│                        #   app.js + un módulo por pantalla: pagos, contactos, seguimientos, panel,
 │                        #   notas, ajustes, pagos_rapido, sas, pwa
 ├── assets/icons/        # íconos de la app (PWA)
 ├── assets/vendor/       # alpine.min.js, lucide (local)

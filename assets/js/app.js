@@ -27,12 +27,7 @@ function appShell() {
         ],
 
         init() {
-            const formateador = new Intl.DateTimeFormat('es-AR', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-            });
-            this.fechaHoy = formateador.format(new Date());
+            this.fechaHoy = helpers.diaLargo(new Date());
             this.formularioContacto = this.nuevoFormulario();
             this.cargarEtiquetas();
             this.cargarContactos(true);
