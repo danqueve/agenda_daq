@@ -3,448 +3,1637 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Instructivo · Agenda IC</title>
+<title>Agenda IC · Instructivo</title>
 <style>
-@font-face { font-family: "Public Sans"; font-weight: 400; src: url("../../assets/vendor/fonts/publicsans-400.woff2") format("woff2"); }
-@font-face { font-family: "Public Sans"; font-weight: 600; src: url("../../assets/vendor/fonts/publicsans-600.woff2") format("woff2"); }
-@font-face { font-family: "Public Sans"; font-weight: 700; src: url("../../assets/vendor/fonts/publicsans-700.woff2") format("woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 400; font-display: swap; src: url("../../assets/vendor/fonts/publicsans-400.woff2") format("woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 500; font-display: swap; src: url("../../assets/vendor/fonts/publicsans-500.woff2") format("woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 600; font-display: swap; src: url("../../assets/vendor/fonts/publicsans-600.woff2") format("woff2"); }
+@font-face { font-family: "Public Sans"; font-weight: 700; font-display: swap; src: url("../../assets/vendor/fonts/publicsans-700.woff2") format("woff2"); }
 
 :root {
-    --label: #2f384f; --label-2: #4a5a6b; --separator: #dee2e6; --tint: #0a6ccc; --tint-texto: #0b63b8;
-    --pastel-tint: #e4f1ff; --pastel-tint-borde: #c9e3ff;
-    --pastel-red: #fde8ef; --red-texto: #b3204f; --pastel-orange: #fdeee4; --orange-texto: #a4501f;
-    --pastel-indigo: #eee9f7; --indigo-texto: #522c8f; --pastel-green: #e2f1ee; --green-texto: #1f6b5f;
-    --pastel-gray: #eef1f4;
+    color-scheme: light;
+    --bg: #F6F8FB;
+    --card: #FFFFFF;
+    --card-2: #F0F4F7;
+    --label: #2F384F;
+    --label-2: #4A5A6B;
+    --label-3: #6B7785;
+    --separator: #DEE2E6;
+    --tint: #0A6CCC;
+    --marca: #F76707;
+
+    --rosa: #FDE8EF;      --rosa-borde: #F8CFDC;     --rosa-texto: #B3204F;
+    --durazno: #FDEEE4;   --durazno-borde: #F8D9C4;  --durazno-texto: #A4501F;
+    --lavanda: #EEE9F7;   --lavanda-borde: #DCD2EE;  --lavanda-texto: #522C8F;
+    --menta: #E2F1EE;     --menta-borde: #C4E2DC;    --menta-texto: #1F6B5F;
+    --gris: #EEF1F4;      --gris-borde: #DDE2E8;     --gris-texto: #4A5A6B;
+    --celeste: #E4F1FF;   --celeste-borde: #C9E3FF;  --celeste-texto: #0B63B8;
+
+    --radio: 14px;
+    --sombra: 0 1px 2px rgba(47, 56, 79, .06), 0 4px 16px rgba(47, 56, 79, .06);
 }
+
 * { box-sizing: border-box; }
-html { background: #f6f8fb; }
+
+html { scroll-behavior: smooth; }
+
 body {
-    margin: 0 auto; max-width: 860px; padding: 40px 32px 80px;
-    font-family: "Public Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
-    font-size: 14.5px; line-height: 1.6; color: var(--label); background: #fff;
+    margin: 0;
+    background: var(--bg);
+    color: var(--label);
+    font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
 }
-h1, h2, h3 { line-height: 1.25; letter-spacing: -0.02em; }
-h2 { font-size: 24px; margin: 0 0 6px; padding-top: 8px; }
-h3 { font-size: 16px; margin: 26px 0 6px; }
-p { margin: 0 0 10px; }
-ul, ol { margin: 0 0 12px; padding-left: 22px; }
-li { margin-bottom: 4px; }
-strong { font-weight: 600; }
-.ui { font-weight: 600; color: var(--tint-texto); white-space: nowrap; }
+
+a { color: var(--tint); }
+
+/* ---------- Estructura ---------- */
 
 .portada {
-    min-height: 92vh; display: flex; flex-direction: column; justify-content: center; gap: 18px;
-    padding: 48px; border-radius: 12px; background: var(--pastel-tint); border: 1px solid var(--pastel-tint-borde);
-}
-.portada__marca { display: flex; align-items: center; gap: 14px; font-size: 20px; font-weight: 700; }
-.portada__icono { width: 52px; height: 52px; border-radius: 12px; background: #fff; display: grid; place-items: center; color: var(--tint); }
-.portada h1 { font-size: 44px; margin: 24px 0 0; letter-spacing: -0.04em; }
-.portada__sub { font-size: 18px; color: var(--label-2); max-width: 520px; }
-.portada__meta { margin-top: 32px; font-size: 13px; color: var(--label-2); }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.chip { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 4px; }
-
-.indice { margin: 48px 0; }
-.indice ol { columns: 2; column-gap: 32px; }
-.indice a { color: var(--label); text-decoration: none; }
-
-section { margin-top: 56px; }
-.seccion-num { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tint-texto); }
-.intro { font-size: 15.5px; color: var(--label-2); margin-bottom: 18px; }
-
-figure { margin: 18px 0 22px; }
-figure img { display: block; width: 100%; border: 1px solid var(--separator); border-radius: 8px; box-shadow: 0 2px 8px rgba(9,30,66,.06); }
-figcaption { margin-top: 8px; font-size: 12.5px; color: var(--label-2); }
-.par-movil { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; justify-items: center; }
-.par-movil figure { max-width: 270px; margin: 0; }
-
-.paso { counter-reset: paso; list-style: none; padding: 0; }
-.paso li { counter-increment: paso; position: relative; padding-left: 36px; margin-bottom: 10px; }
-.paso li::before {
-    content: counter(paso); position: absolute; left: 0; top: 1px; width: 24px; height: 24px; border-radius: 50%;
-    background: var(--tint); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center;
-}
-.nota {
-    margin: 14px 0; padding: 12px 16px; border-radius: 8px; font-size: 13.5px;
-    background: var(--pastel-orange); border: 1px solid #f8d9c4;
-}
-.nota--info { background: var(--pastel-tint); border-color: var(--pastel-tint-borde); }
-
-table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 13.5px; }
-th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--separator); vertical-align: top; }
-th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--label-2); }
-.muestra { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 8px; border: 1px solid rgba(47,56,79,.15); }
-
-.boton-imprimir {
-    position: fixed; right: 24px; bottom: 24px; padding: 12px 20px; border: 0; border-radius: 8px;
-    background: var(--tint); color: #fff; font: inherit; font-weight: 600; cursor: pointer;
-    box-shadow: 0 8px 16px rgba(9,30,66,.14);
+    background: linear-gradient(135deg, var(--celeste) 0%, var(--lavanda) 55%, var(--rosa) 100%);
+    border-bottom: 1px solid var(--separator);
+    padding: 48px 16px 40px;
 }
 
-@page { size: A4; margin: 16mm 15mm 18mm; }
+.portada__dentro,
+.pagina {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.portada__marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.portada__marca svg { width: 34px; height: 34px; }
+
+.portada h1 {
+    font-size: clamp(30px, 6vw, 46px);
+    line-height: 1.12;
+    margin: 18px 0 10px;
+    letter-spacing: -.01em;
+}
+
+.portada p {
+    margin: 0;
+    max-width: 640px;
+    color: var(--label-2);
+    font-size: 18px;
+}
+
+.portada__datos {
+    margin-top: 18px !important;
+    font-size: 14px !important;
+    color: var(--label-3) !important;
+}
+
+.pagina {
+    padding: 32px 16px 80px;
+    display: grid;
+    gap: 40px;
+}
+
+@media (min-width: 1100px) {
+    .pagina { grid-template-columns: 250px minmax(0, 1fr); }
+    .indice { position: sticky; top: 24px; align-self: start; max-height: calc(100vh - 48px); overflow-y: auto; }
+}
+
+.contenido { max-width: 860px; min-width: 0; }
+
+/* ---------- Índice ---------- */
+
+.indice {
+    background: var(--card);
+    border: 1px solid var(--separator);
+    border-radius: var(--radio);
+    padding: 18px 18px 14px;
+    font-size: 15px;
+}
+
+.indice h2 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--label-3);
+}
+
+.indice ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: indice;
+}
+
+.indice li { counter-increment: indice; }
+
+.indice a {
+    display: flex;
+    gap: 8px;
+    padding: 5px 0;
+    color: var(--label);
+    text-decoration: none;
+    line-height: 1.35;
+}
+
+.indice a::before {
+    content: counter(indice);
+    flex: 0 0 22px;
+    color: var(--label-3);
+    font-variant-numeric: tabular-nums;
+}
+
+.indice a:hover,
+.indice a:focus-visible { color: var(--tint); }
+
+/* ---------- Texto ---------- */
+
+section.capitulo { padding-top: 8px; }
+
+section.capitulo + section.capitulo {
+    margin-top: 56px;
+    border-top: 1px solid var(--separator);
+    padding-top: 40px;
+}
+
+h2.capitulo__titulo {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-size: 28px;
+    line-height: 1.2;
+    margin: 0 0 14px;
+    scroll-margin-top: 20px;
+}
+
+.capitulo__numero {
+    flex: 0 0 auto;
+    display: inline-grid;
+    place-items: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 8px;
+    border-radius: 12px;
+    background: var(--lavanda);
+    color: var(--lavanda-texto);
+    font-size: 18px;
+    font-weight: 700;
+    transform: translateY(-3px);
+}
+
+h3 {
+    font-size: 20px;
+    line-height: 1.3;
+    margin: 32px 0 8px;
+    scroll-margin-top: 20px;
+}
+
+h4 { font-size: 16px; margin: 20px 0 4px; }
+
+p { margin: 0 0 12px; }
+
+.entrada {
+    font-size: 18px;
+    color: var(--label-2);
+    margin-bottom: 18px;
+}
+
+ul, ol { padding-left: 22px; margin: 0 0 14px; }
+
+li { margin-bottom: 4px; }
+
+b, strong { font-weight: 600; }
+
+/* Nombre de un botón o rótulo de la app */
+.btn {
+    display: inline-block;
+    padding: 0 7px;
+    border: 1px solid var(--separator);
+    border-radius: 7px;
+    background: var(--card);
+    font-weight: 600;
+    font-size: .92em;
+    line-height: 1.55;
+    white-space: nowrap;
+}
+
+.ruta { font-weight: 600; white-space: nowrap; }
+
+.chip {
+    display: inline-block;
+    padding: 0 8px;
+    border-radius: 999px;
+    border: 1px solid;
+    font-size: .82em;
+    font-weight: 700;
+    letter-spacing: .03em;
+    line-height: 1.7;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.chip--rosa { background: var(--rosa); border-color: var(--rosa-borde); color: var(--rosa-texto); }
+.chip--durazno { background: var(--durazno); border-color: var(--durazno-borde); color: var(--durazno-texto); }
+.chip--lavanda { background: var(--lavanda); border-color: var(--lavanda-borde); color: var(--lavanda-texto); }
+.chip--menta { background: var(--menta); border-color: var(--menta-borde); color: var(--menta-texto); }
+.chip--gris { background: var(--gris); border-color: var(--gris-borde); color: var(--gris-texto); }
+.chip--celeste { background: var(--celeste); border-color: var(--celeste-borde); color: var(--celeste-texto); }
+
+/* ---------- Cajas ---------- */
+
+.caja {
+    border: 1px solid var(--separator);
+    border-radius: var(--radio);
+    background: var(--card);
+    padding: 16px 18px;
+    margin: 18px 0;
+}
+
+.caja > :last-child { margin-bottom: 0; }
+
+.caja__titulo {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.caja--tip { background: var(--menta); border-color: var(--menta-borde); }
+.caja--tip .caja__titulo { color: var(--menta-texto); }
+.caja--ojo { background: var(--durazno); border-color: var(--durazno-borde); }
+.caja--ojo .caja__titulo { color: var(--durazno-texto); }
+.caja--info { background: var(--celeste); border-color: var(--celeste-borde); }
+.caja--info .caja__titulo { color: var(--celeste-texto); }
+
+.rutina {
+    background: var(--card);
+    border: 1px solid var(--separator);
+    border-radius: 18px;
+    box-shadow: var(--sombra);
+    padding: 22px 22px 10px;
+    margin: 0 0 40px;
+}
+
+.rutina h2 { margin: 0 0 4px; font-size: 22px; }
+
+.rutina > p { color: var(--label-2); }
+
+.rutina ol {
+    list-style: none;
+    padding: 0;
+    counter-reset: rutina;
+    display: grid;
+    gap: 10px;
+    margin: 14px 0;
+}
+
+@media (min-width: 720px) {
+    .rutina ol { grid-template-columns: repeat(5, 1fr); }
+}
+
+.rutina li {
+    counter-increment: rutina;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+.rutina li::before {
+    content: counter(rutina);
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    margin-bottom: 6px;
+    border-radius: 50%;
+    background: var(--tint);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* ---------- Figuras ---------- */
+
+figure.fig {
+    margin: 22px 0 26px;
+    break-inside: avoid;
+}
+
+.fig__marco {
+    background: var(--card);
+    border: 1px solid var(--separator);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+    line-height: 0;
+}
+
+.fig img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.fig--media { max-width: 500px; }
+.fig--angosta { max-width: 380px; }
+.fig--alta { max-width: 430px; }
+.fig--ancha { max-width: 760px; }
+.fig--movil { max-width: 280px; }
+
+.fig--movil .fig__marco { border-radius: 22px; }
+
+figcaption {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--label-2);
+}
+
+.fig__titulo {
+    display: block;
+    color: var(--label);
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.fig__titulo span { color: var(--label-3); font-weight: 500; }
+
+.figuras-fila {
+    display: grid;
+    gap: 22px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    align-items: start;
+    margin: 22px 0 26px;
+}
+
+.figuras-fila figure.fig { margin: 0; }
+
+/* Capturas angostas sueltas: la leyenda va al costado en pantallas anchas */
+@media (min-width: 900px) {
+    .capitulo > figure.fig--alta,
+    .capitulo > figure.fig--angosta,
+    .capitulo > figure.fig--media {
+        display: grid;
+        grid-template-columns: minmax(0, var(--fig-ancho)) minmax(0, 1fr);
+        gap: 24px;
+        align-items: start;
+        max-width: none;
+    }
+
+    .capitulo > figure.fig--alta { --fig-ancho: 400px; }
+    .capitulo > figure.fig--angosta { --fig-ancho: 350px; }
+    .capitulo > figure.fig--media { --fig-ancho: 440px; }
+
+    .capitulo > figure.fig--alta figcaption,
+    .capitulo > figure.fig--angosta figcaption,
+    .capitulo > figure.fig--media figcaption { margin-top: 2px; }
+}
+
+.figuras-fila .fig--movil { max-width: 300px; }
+
+ol.leyenda {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: leyenda;
+    display: grid;
+    gap: 6px;
+}
+
+ol.leyenda li {
+    position: relative;
+    min-height: 24px;
+    padding-left: 33px;
+    margin: 0;
+}
+
+ol.leyenda li::before {
+    content: attr(data-n);
+    position: absolute;
+    left: 0;
+    top: -1px;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--marca);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1;
+}
+
+ol.leyenda li b { color: var(--label); }
+
+/* ---------- Tablas ---------- */
+
+.tabla-envoltorio {
+    overflow-x: auto;
+    margin: 16px 0 20px;
+    border: 1px solid var(--separator);
+    border-radius: var(--radio);
+    background: var(--card);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    line-height: 1.45;
+}
+
+th, td {
+    text-align: left;
+    vertical-align: top;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--separator);
+}
+
+tr:last-child td { border-bottom: 0; }
+
+th {
+    background: var(--card-2);
+    font-size: 13px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--label-2);
+}
+
+td:first-child { font-weight: 600; }
+
+/* ---------- Ejemplos ---------- */
+
+.ejemplo {
+    background: var(--card);
+    border: 1px solid var(--separator);
+    border-left: 5px solid var(--tint);
+    border-radius: var(--radio);
+    padding: 16px 18px 6px;
+    margin: 18px 0;
+    break-inside: avoid;
+}
+
+.ejemplo h3 { margin: 0 0 4px; font-size: 18px; }
+
+.ejemplo__caso {
+    color: var(--label-2);
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.ejemplo ol li { margin-bottom: 6px; }
+
+/* ---------- Preguntas ---------- */
+
+details.pregunta {
+    background: var(--card);
+    border: 1px solid var(--separator);
+    border-radius: var(--radio);
+    margin: 10px 0;
+    padding: 0 18px;
+}
+
+details.pregunta summary {
+    cursor: pointer;
+    padding: 14px 0;
+    font-weight: 600;
+    list-style-position: outside;
+    margin-left: 4px;
+}
+
+details.pregunta[open] summary { border-bottom: 1px solid var(--separator); margin-bottom: 12px; }
+
+details.pregunta > :last-child { margin-bottom: 14px; }
+
+.pie {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--separator);
+    color: var(--label-3);
+    font-size: 14px;
+}
+
+@media (max-width: 599px) {
+    body { font-size: 15.5px; }
+    .portada { padding: 32px 16px 28px; }
+    .portada p { font-size: 16px; }
+    h2.capitulo__titulo { font-size: 24px; }
+    .entrada { font-size: 16.5px; }
+    th, td { padding: 9px 10px; }
+}
+
+/* ---------- Impresión y PDF ---------- */
+
+@page { size: A4; margin: 15mm 14mm 16mm; }
+
 @media print {
-    html, body { background: #fff; }
-    body { max-width: none; padding: 0; font-size: 11pt; }
-    .boton-imprimir { display: none; }
-    .portada { min-height: 255mm; break-after: page; }
-    .indice { break-after: page; margin: 0; }
-    section { margin-top: 0; break-before: page; }
-    figure, table, .nota, .par-movil { break-inside: avoid; }
-    h2, h3 { break-after: avoid; }
-    figure img { box-shadow: none; }
+    body { background: #fff; font-size: 10.5pt; line-height: 1.5; }
+    .portada { background: none; border: 0; padding: 0 0 8mm; }
+    .portada h1 { font-size: 30pt; }
+    .pagina { display: block; padding: 0; max-width: none; }
+    .indice { border: 0; padding: 0; margin-bottom: 8mm; break-after: page; font-size: 11pt; }
+    .indice ol { columns: 2; column-gap: 10mm; }
+    .contenido { max-width: none; }
+    .rutina { box-shadow: none; break-inside: avoid; }
+    .rutina ol { grid-template-columns: repeat(5, 1fr); }
+    section.capitulo + section.capitulo { margin-top: 10mm; padding-top: 6mm; }
+    h2.capitulo__titulo, h3, h4 { break-after: avoid; }
+    .fig__marco { box-shadow: none; }
+    figure.fig { margin: 4mm 0 5mm; }
+    .fig img { max-height: 125mm; width: auto; max-width: 100%; }
+    .capitulo > figure.fig--alta,
+    .capitulo > figure.fig--angosta,
+    .capitulo > figure.fig--media {
+        display: grid;
+        grid-template-columns: var(--fig-ancho-impreso) minmax(0, 1fr);
+        gap: 6mm;
+        align-items: start;
+        max-width: none;
+    }
+    .capitulo > figure.fig--alta { --fig-ancho-impreso: 72mm; }
+    .capitulo > figure.fig--angosta { --fig-ancho-impreso: 68mm; }
+    .capitulo > figure.fig--media { --fig-ancho-impreso: 82mm; }
+    .fig--ancha { max-width: 150mm; }
+    .figuras-fila { grid-template-columns: repeat(2, 1fr); gap: 6mm; }
+    .figuras-fila .fig img { max-height: 110mm; }
+    .figuras-fila--movil { grid-template-columns: repeat(4, 1fr); gap: 4mm; }
+    .figuras-fila--movil figcaption { font-size: 8.5pt; }
+    .ejemplo, .caja, tr, details.pregunta { break-inside: avoid; }
+    details.pregunta summary { list-style: none; }
+    details.pregunta summary::-webkit-details-marker { display: none; }
     a { color: inherit; text-decoration: none; }
-    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 </style>
 </head>
 <body>
 
-<button class="boton-imprimir" type="button" onclick="window.print()">Imprimir / Guardar PDF</button>
-
-<div class="portada">
-    <div class="portada__marca">
-        <span class="portada__icono">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+<header class="portada">
+    <div class="portada__dentro">
+        <span class="portada__marca">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#0A6CCC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+            Agenda IC
         </span>
-        Agenda IC
+        <h1>Instructivo para el equipo</h1>
+        <p>Cómo cargar, cobrar y seguir los compromisos de pago de los clientes, y cómo atender las consultas, desde la compu, la tablet o el celular.</p>
+        <p class="portada__datos">Imperio Comercial · Actualizado en noviembre de 2026 · Las capturas usan datos de prueba: los nombres, montos y cobradores son inventados.</p>
     </div>
-    <h1>Instructivo de uso</h1>
-    <p class="portada__sub">Cómo cargar consultas, agendar recontactos y seguir a cada cliente desde la computadora o el celular.</p>
-    <div class="chips">
-        <span class="chip" style="background:var(--pastel-red);color:var(--red-texto)">Vencidos</span>
-        <span class="chip" style="background:var(--pastel-orange);color:var(--orange-texto)">Para hoy</span>
-        <span class="chip" style="background:var(--pastel-indigo);color:var(--indigo-texto)">Próximos</span>
-        <span class="chip" style="background:var(--pastel-green);color:var(--green-texto)">Concretados</span>
-    </div>
-    <p class="portada__meta">Imperio Comercial · agenda.imperiocomercial.com.ar · Versión 24 · Noviembre 2026</p>
-</div>
+</header>
 
-<nav class="indice">
-    <h2>Contenido</h2>
+<div class="pagina">
+
+<nav class="indice" aria-label="Índice">
+    <h2>Índice</h2>
     <ol>
         <li><a href="#que-es">Qué es Agenda IC</a></li>
         <li><a href="#ingresar">Ingresar e instalar la app</a></li>
-        <li><a href="#hoy">La pantalla Hoy</a></li>
-        <li><a href="#pagos">Pagos y compromisos</a></li>
-        <li><a href="#nueva">Cargar una nueva consulta</a></li>
-        <li><a href="#contactos">Contactos</a></li>
-        <li><a href="#ficha">La ficha del contacto</a></li>
-        <li><a href="#recontacto">Registrar un recontacto</a></li>
+        <li><a href="#organizacion">Cómo está organizada</a></li>
+        <li><a href="#hoy">Hoy: el tablero de cobranza</a></li>
+        <li><a href="#tarjeta">La tarjeta de un compromiso</a></li>
+        <li><a href="#registrar">Registrar un pago</a></li>
+        <li><a href="#nuevo-compromiso">Cargar un compromiso nuevo</a></li>
+        <li><a href="#whatsapp">Recordatorios por WhatsApp</a></li>
+        <li><a href="#pagos">La pantalla Pagos</a></li>
+        <li><a href="#sas">Datos de SAS Imperio</a></li>
+        <li><a href="#consulta">Cargar una consulta</a></li>
+        <li><a href="#contactos">Contactos y la ficha</a></li>
+        <li><a href="#recontactos">Recontactos</a></li>
         <li><a href="#calendario">Calendario</a></li>
         <li><a href="#notas">Notas</a></li>
-        <li><a href="#ajustes">Ajustes</a></li>
-        <li><a href="#equipo">Usuarios y roles</a></li>
-        <li><a href="#celular">Usarla en el celular</a></li>
-        <li><a href="#colores">Qué significa cada color</a></li>
+        <li><a href="#ajustes">Ajustes y notificaciones</a></li>
+        <li><a href="#roles">Usuarios y roles</a></li>
+        <li><a href="#colores">Estados y colores</a></li>
+        <li><a href="#ejemplos">Ejemplos paso a paso</a></li>
         <li><a href="#preguntas">Preguntas frecuentes</a></li>
     </ol>
 </nav>
 
-<section id="que-es">
-    <p class="seccion-num">1</p>
-    <h2>Qué es Agenda IC</h2>
-    <p class="intro">Agenda IC es la agenda de consultas de Imperio Comercial. Sirve para anotar a cada cliente que pregunta por un producto y para no olvidarse de volver a contactarlo en el momento justo.</p>
-    <p>El circuito es siempre el mismo:</p>
-    <ol class="paso">
-        <li><strong>Cargás la consulta</strong>: nombre, celular, qué busca y cuándo volver a llamarlo.</li>
-        <li><strong>La app te avisa</strong> ese día en la pantalla <span class="ui">Hoy</span> y, si las activaste, con una notificación en el celular.</li>
-        <li><strong>Lo contactás</strong> con un toque (llamada o WhatsApp) y <strong>registrás qué pasó</strong>.</li>
-        <li>Si hay que volver a hablar, lo <strong>reagendás</strong>; si compró o no le interesa, <strong>lo cerrás</strong>.</li>
+<main class="contenido">
+
+<div class="rutina">
+    <h2>Tu día en cinco pasos</h2>
+    <p>Si recién empezás, con esto alcanza. El resto del instructivo explica cada paso en detalle.</p>
+    <ol>
+        <li>Abrí <b>Hoy</b> y mirá cuánto hay <b>vencido</b> y <b>para hoy</b>.</li>
+        <li>Recorré <b>Pagos a cobrar</b> de arriba hacia abajo: primero lo más atrasado.</li>
+        <li>Mandá el <b>WhatsApp</b> o llamá. Cuando el cliente paga, tocá <b>Pagó</b>, <b>Parcial</b> o <b>Reprogramar</b>.</li>
+        <li>Si alguien te promete un pago, cargalo como <b>compromiso nuevo</b> con monto y fecha.</li>
+        <li>Antes de irte, fijate que no quede nada <b>para hoy</b> sin registrar.</li>
     </ol>
-    <p>Funciona en la computadora, en el celular y en la tablet, y se puede instalar como una app más. No manda emails: todos los avisos se ven en la app o llegan como notificación.</p>
+</div>
+
+<!-- 1 -->
+<section class="capitulo" aria-labelledby="que-es">
+    <h2 class="capitulo__titulo" id="que-es"><span class="capitulo__numero">1</span>Qué es Agenda IC</h2>
+    <p class="entrada">Agenda IC es la herramienta del equipo para seguir la cobranza de Imperio Comercial. Lo central son los <b>compromisos de pago</b>.</p>
+    <p>Un compromiso es una promesa de pago: cuando un cliente te dice «el viernes te pago $30.000 de la cuota 5», eso se carga en la app con el <b>monto</b>, el <b>concepto</b> y la <b>fecha</b>. Ese día el pago aparece en la pantalla Hoy, en Pagos y en el Calendario, y te llega un aviso al celular. Cuando el cliente paga (o no paga), lo registrás con un toque.</p>
+    <p>La app también guarda las <b>consultas</b>: personas que preguntan por un producto. Cargás el nombre, el celular, qué busca y cuándo volver a llamarlo. A eso le decimos <b>recontacto</b>.</p>
+
+    <div class="caja caja--info">
+        <span class="caja__titulo">Lo que conviene saber desde el principio</span>
+        <ul>
+            <li><b>Todo el equipo ve lo mismo.</b> Los contactos, los compromisos y las notas son compartidos.</li>
+            <li><b>Todo queda firmado.</b> Cada compromiso muestra quién lo cargó («Cargó: Laura Gómez») y quién registró el pago.</li>
+            <li><b>No manda emails.</b> Los avisos están en la pantalla Hoy y en las notificaciones del celular o de la compu.</li>
+            <li><b>Lee datos de SAS Imperio, pero nunca los cambia.</b> Muestra las cuotas vencidas, el saldo y el cobrador del cliente. Nada de lo que hagas en la Agenda modifica SAS.</li>
+        </ul>
+    </div>
+
+    <h3>Palabras que vas a ver</h3>
+    <div class="tabla-envoltorio">
+        <table>
+            <thead><tr><th>Palabra</th><th>Qué quiere decir</th></tr></thead>
+            <tbody>
+                <tr><td>Contacto</td><td>La persona: un cliente que debe o alguien que consultó. Tiene una ficha con todos sus datos.</td></tr>
+                <tr><td>Compromiso</td><td>Una promesa de pago: monto, concepto (cuota, saldo, entrega…) y fecha. Un compromiso es un solo pago.</td></tr>
+                <tr><td>Vencido</td><td>Un compromiso pendiente cuya fecha ya pasó.</td></tr>
+                <tr><td>Reprogramado</td><td>El cliente avisó que paga otro día. No cuenta como incumplido.</td></tr>
+                <tr><td>Saldo</td><td>Lo que falta cobrar después de un pago parcial.</td></tr>
+                <tr><td>Recontacto</td><td>La próxima vez que hay que llamar a alguien que consultó.</td></tr>
+                <tr><td>Cumplimiento</td><td>De lo que los clientes prometieron pagar este mes (para días que ya llegaron), qué parte se cobró.</td></tr>
+            </tbody>
+        </table>
+    </div>
 </section>
 
-<section id="ingresar">
-    <p class="seccion-num">2</p>
-    <h2>Ingresar e instalar la app</h2>
-    <p class="intro">Entrá desde el navegador a <strong>agenda.imperiocomercial.com.ar</strong> con tu usuario y contraseña. Los usuarios los crea un administrador desde Ajustes.</p>
-    <figure>
-        <img src="img/01-login.png" alt="Pantalla de inicio de sesión">
-        <figcaption>Pantalla de ingreso. El ojo al lado de la contraseña la muestra u oculta.</figcaption>
+<!-- 2 -->
+<section class="capitulo" aria-labelledby="ingresar">
+    <h2 class="capitulo__titulo" id="ingresar"><span class="capitulo__numero">2</span>Ingresar e instalar la app</h2>
+    <p class="entrada">Entrá a <b>agenda.imperiocomercial.com.ar</b> desde cualquier navegador, con el usuario y la contraseña que te dio el administrador.</p>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/01-login.jpg" width="1280" height="800" alt="Pantalla de ingreso con los campos Usuario y Contraseña y el botón Ingresar"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 1 <span>· Pantalla de ingreso</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Usuario.</b> Tu nombre de usuario, tal como te lo dio el administrador.</li>
+                <li data-n="2"><b>Contraseña.</b> El ojito de la derecha la muestra o la oculta, para revisar lo que escribiste.</li>
+                <li data-n="3"><b>Ingresar.</b> También podés apretar Enter.</li>
+            </ol>
+        </figcaption>
     </figure>
-    <p>La sesión queda guardada en ese dispositivo, así que no hace falta volver a ingresar cada vez. Si te equivocás de contraseña varias veces seguidas, el ingreso se bloquea unos minutos por seguridad.</p>
+
+    <ul>
+        <li><b>La sesión queda abierta</b> en ese dispositivo hasta 90 días: no tenés que ingresar cada vez que abrís la app. Para salir, andá a <span class="ruta">Ajustes › Cerrar sesión</span>.</li>
+        <li>Si la contraseña se escribe mal <b>5 veces seguidas</b>, el ingreso se bloquea 15 minutos y aparece «Demasiados intentos. Esperá 15 minutos y probá de nuevo».</li>
+        <li>Si usás una compu compartida, cerrá la sesión al terminar.</li>
+    </ul>
 
     <h3>Instalarla como app</h3>
-    <ul>
-        <li><strong>Android (Chrome):</strong> en <span class="ui">Ajustes › Instalar en Android</span>, o desde el menú de Chrome › <em>Instalar app</em>.</li>
-        <li><strong>iPhone o iPad (Safari):</strong> tocá <em>Compartir</em> › <em>Agregar a inicio</em>.</li>
-        <li><strong>Computadora (Chrome o Edge):</strong> el ícono de instalar en la barra de direcciones.</li>
-    </ul>
-    <p>Instalada se abre a pantalla completa, sin la barra del navegador, y en el iPhone es la única forma de recibir notificaciones.</p>
-</section>
-
-<section id="hoy">
-    <p class="seccion-num">3</p>
-    <h2>La pantalla Hoy</h2>
-    <p class="intro">Es la primera pantalla que ves al entrar. Junta todo lo que tenés que hacer: lo que se te pasó, lo de hoy y lo que viene.</p>
-    <figure>
-        <img src="img/02-hoy.png" alt="Pantalla Hoy">
-        <figcaption>Pantalla Hoy con los datos de la base local: seis recontactos vencidos.</figcaption>
-    </figure>
-    <h3>Qué muestra</h3>
-    <ul>
-        <li><strong>Anillo del día:</strong> cuántos recontactos de hoy ya registraste sobre el total agendado. Cada vez que registrás uno, el anillo avanza.</li>
-        <li><strong>Esta semana:</strong> los siete días con un punto de color. Tocá un día para verlo en el Calendario.</li>
-        <li><strong>Resumen:</strong> cuatro tarjetas con los <em>Vencidos</em>, los <em>Para hoy</em>, los <em>Próximos días</em> y los que <em>Concretaron</em> en el mes.</li>
-        <li><strong>Recontactos:</strong> una tarjeta por cliente, ordenadas primero los vencidos, después los de hoy y después los próximos. Con los botones de arriba (<span class="ui">Todos</span>, <span class="ui">Vencidos</span>, <span class="ui">Para hoy</span>, <span class="ui">Próximos</span>) filtrás la lista.</li>
-    </ul>
-    <h3>Las acciones de cada tarjeta</h3>
-    <ul>
-        <li><span class="ui">Llamar</span> abre el teléfono con el número cargado.</li>
-        <li><span class="ui">WhatsApp</span> abre un chat con ese cliente.</li>
-        <li><span class="ui">Posponer</span> corre el recontacto: si era para hoy lo pasa una hora más tarde; si estaba vencido, lo deja para mañana a las 9:00.</li>
-        <li>Tocando el nombre se abre la <a href="#ficha">ficha del contacto</a>.</li>
-    </ul>
-    <p>Cada tarjeta indica también quién la cargó (<em>Cargó: …</em>). El número rojo sobre <span class="ui">Hoy</span>, en el menú, es la suma de vencidos y pendientes del día.</p>
-</section>
-
-<section id="pagos">
-    <p class="seccion-num">4</p>
-    <h2>Pagos y compromisos</h2>
-    <p class="intro">Registrá las promesas de pago de clientes que deben dinero y sabé qué cobrar hoy, qué está vencido y qué ya se cobró.</p>
-    <h3>Cargar un compromiso</h3>
-    <ol class="paso">
-        <li>Entrá en <span class="ui">Pagos</span> o abrí la ficha del contacto y tocá <span class="ui">Pago</span>.</li>
-        <li>Elegí un contacto existente. Si es un deudor nuevo, seleccioná <span class="ui">Nuevo contacto</span> y completá nombre y celular.</li>
-        <li>Ingresá el <strong>Monto</strong>, el <strong>Concepto</strong> y la <strong>Fecha</strong>. Si elegís solo un día, queda agendado a las 9:00.</li>
-        <li>Tocá <span class="ui">Guardar</span>. El compromiso aparece en Pagos, Hoy, Calendario y la ficha del contacto.</li>
-    </ol>
-    <h3>Registrar qué pasó</h3>
-    <ul>
-        <li><span class="ui">Pagó</span>: marca el compromiso como pagado.</li>
-        <li><span class="ui">Pago parcial</span>: registra lo recibido y permite agendar el saldo.</li>
-        <li><span class="ui">No pagó</span>: marca el compromiso como incumplido y permite reprogramarlo.</li>
-        <li><span class="ui">Deshacer</span> vuelve un compromiso resuelto a pendiente, siempre que el nuevo saldo o reprogramación todavía no haya sido registrado.</li>
-    </ul>
-    <p>Los vencidos se muestran en rosa, los de hoy en durazno, los futuros en lavanda, los pagados o parciales en menta y los incumplidos en gris. La app manda un push el día del cobro y el resumen diario también incluye los pagos pendientes.</p>
-</section>
-
-<section id="nueva">
-    <p class="seccion-num">5</p>
-    <h2>Cargar una nueva consulta</h2>
-    <p class="intro">Cada vez que un cliente pregunta por algo, tocá <span class="ui">Nueva consulta</span> (arriba a la derecha en Hoy y en Contactos).</p>
-    <figure>
-        <img src="img/03-nueva-consulta.png" alt="Hoja de Nueva consulta">
-        <figcaption>Hoja de nueva consulta con el recontacto agendado para mañana.</figcaption>
-    </figure>
-    <ol class="paso">
-        <li>Completá <strong>Nombre</strong> y <strong>Celular</strong>. El celular se puede escribir como venga (con 0, con 15, con espacios): la app lo ordena sola.</li>
-        <li>Escribí la <strong>Consulta</strong>: qué busca, en cuántas cuotas, lo que te dijo.</li>
-        <li>En <strong>Recontactar</strong> elegí <span class="ui">Mañana</span> (queda a las 9:00) o tocá <span class="ui">Elegir…</span> para abrir el calendario y marcar otro día. Debajo aparece la fecha elegida.</li>
-        <li>Si querés sumar datos, abrí <span class="ui">Más datos</span>: producto, origen (WhatsApp, Instagram, Facebook, llamada, local, referido u otro), localidad, provincia y etiquetas.</li>
-        <li>Tocá <span class="ui">Guardar</span>.</li>
-    </ol>
-    <div class="nota"><strong>Si el número ya existe</strong>, la app avisa <em>«Este número ya está cargado»</em> y ofrece <span class="ui">Agregar consulta</span>: la nueva consulta se suma al historial del cliente existente en vez de crear uno repetido.</div>
-    <p>Si no elegís fecha de recontacto, el contacto queda como <strong>Nuevo</strong>; con fecha, pasa a <strong>En seguimiento</strong>.</p>
-</section>
-
-<section id="contactos">
-    <p class="seccion-num">6</p>
-    <h2>Contactos</h2>
-    <p class="intro">La lista completa de clientes, con un buscador y filtros por estado.</p>
-    <figure>
-        <img src="img/04-contactos.png" alt="Pantalla Contactos">
-        <figcaption>Contactos: arriba el total y cuántos están en seguimiento.</figcaption>
-    </figure>
-    <ul>
-        <li><strong>Buscar:</strong> por nombre, por celular, por producto o por algo escrito en la consulta.</li>
-        <li><strong>Filtros:</strong> <span class="ui">Todos</span>, <span class="ui">Nuevos</span>, <span class="ui">En seguimiento</span>, <span class="ui">Concretaron</span> y <span class="ui">Cerrados</span>.</li>
-        <li>Cada tarjeta muestra nombre y celular, el producto, el estado, quién lo cargó, el origen (con su ícono) y hace cuánto se cargó. Tocala para abrir la ficha.</li>
-        <li>Al final de la lista, <span class="ui">Cargar más contactos</span> trae los siguientes.</li>
-    </ul>
-</section>
-
-<section id="ficha">
-    <p class="seccion-num">7</p>
-    <h2>La ficha del contacto</h2>
-    <p class="intro">Todo lo que sabés de un cliente en un solo lugar. Se abre tocando su nombre en cualquier pantalla.</p>
-    <figure>
-        <img src="img/05-ficha.png" alt="Ficha del contacto">
-        <figcaption>Ficha abierta al lado de la lista. El color de arriba depende del estado del cliente.</figcaption>
-    </figure>
-    <ul>
-        <li><strong>Arriba:</strong> nombre, estado, celular, desde cuándo es cliente, quién lo cargó y sus etiquetas.</li>
-        <li><strong>Acciones:</strong> <span class="ui">Llamar</span>, <span class="ui">WhatsApp</span>, <span class="ui">Recontacto</span>, <span class="ui">Nota</span> y <span class="ui">Pago</span> (cargar un compromiso).</li>
-        <li><strong>Próximo recontacto:</strong> cuándo toca volver a hablarle, con <span class="ui">Posponer</span> (lo pasa a mañana a las 9:00) y <span class="ui">Hecho</span> (registrar el recontacto). Se pone rosa si la fecha ya pasó.</li>
-        <li><strong>Historial:</strong> cada consulta, llamada, mensaje y nota, con su fecha.</li>
-        <li><strong>Estado:</strong> Nuevo, En seguimiento, Concretó o Cerrado. Al elegir <em>Concretó</em> o <em>Cerrado</em> se abre el registro para cerrarlo con el motivo; si el cliente estaba cerrado, elegir <em>Nuevo</em> o <em>En seguimiento</em> lo reabre.</li>
-        <li><span class="ui">Editar</span> (arriba a la derecha) cambia los datos; <span class="ui">Eliminar contacto</span> (al final) borra el contacto, su historial y sus compromisos de pago, previa confirmación.</li>
-    </ul>
-</section>
-
-<section id="recontacto">
-    <p class="seccion-num">8</p>
-    <h2>Registrar un recontacto</h2>
-    <p class="intro">Después de hablar con un cliente, registrá cómo te fue. Así el historial queda completo y el anillo del día avanza.</p>
-    <figure>
-        <img src="img/06-registrar-recontacto.png" alt="Hoja de registrar recontacto">
-        <figcaption>Hoja «Registrar recontacto».</figcaption>
-    </figure>
-    <ol class="paso">
-        <li>Elegí el resultado: <span class="ui">Atendió</span>, <span class="ui">No atendió</span> o <span class="ui">Mensaje</span>.</li>
-        <li>Si querés, escribí una nota con lo que te dijo.</li>
-        <li>Elegí qué sigue:
-            <ul>
-                <li><span class="ui">Reagendar</span>: marcá cuándo volver a llamarlo (mañana, en 3 días, en una semana o elegí la fecha).</li>
-                <li><span class="ui">Cerrar</span>: elegí el motivo, <em>Concretó</em>, <em>No interesa</em> o <em>Sin respuesta</em>.</li>
-            </ul>
-        </li>
-        <li>Tocá <span class="ui">Guardar</span>.</li>
-    </ol>
-    <p>Si el contacto ya estaba cerrado, la misma hoja sirve para <strong>reabrirlo</strong>: escribís el motivo (opcional) y la nueva fecha.</p>
-</section>
-
-<section id="calendario">
-    <p class="seccion-num">9</p>
-    <h2>Calendario</h2>
-    <p class="intro">Todos los recontactos del mes en una grilla, con el detalle del día al costado.</p>
-    <figure>
-        <img src="img/07-calendario.png" alt="Calendario mensual">
-        <figcaption>Vista Mes. Cada día muestra hasta dos recontactos y «+N más» si hay otros.</figcaption>
-    </figure>
-    <ul>
-        <li>Con <span class="ui">Mes</span>, <span class="ui">Semana</span> y <span class="ui">Día</span> cambiás la vista; con las flechas pasás de mes y <span class="ui">Hoy</span> vuelve al día actual.</li>
-        <li>Tocá un día para ver a la derecha todos sus recontactos.</li>
-        <li>Los colores indican el estado (ver la <a href="#colores">tabla de colores</a>).</li>
-    </ul>
-    <h3>Abrir un recontacto</h3>
-    <p>Tocá cualquier recontacto (en la grilla o en la lista del día) y se abre su detalle arriba del panel:</p>
-    <figure>
-        <img src="img/08-calendario-detalle.png" alt="Detalle de un recontacto en el calendario">
-        <figcaption>Detalle de un recontacto vencido, con las opciones para reprogramarlo.</figcaption>
-    </figure>
-    <ul>
-        <li><span class="ui">Llamar</span> y <span class="ui">WhatsApp</span> para contactarlo directo.</li>
-        <li><strong>Reprogramar</strong> en un toque: <span class="ui">Hoy +1 h</span>, <span class="ui">Mañana 9:00</span> o <span class="ui">En 3 días</span>. El calendario se actualiza solo.</li>
-        <li><span class="ui">Marcar hecho</span> abre el registro del recontacto; <span class="ui">Abrir ficha</span> lleva a la ficha completa.</li>
-        <li>La tecla <strong>Escape</strong> o la cruz cierran el detalle.</li>
-    </ul>
-</section>
-
-<section id="notas">
-    <p class="seccion-num">10</p>
-    <h2>Notas</h2>
-    <p class="intro">Un anotador para lo que no es de un cliente puntual (promos, requisitos, ideas) o para recordatorios sueltos.</p>
-    <figure>
-        <img src="img/09-notas.png" alt="Pantalla Notas">
-        <figcaption>Notas con dos fijadas arriba y las recientes debajo.</figcaption>
-    </figure>
-    <h3>Crear una nota</h3>
-    <ol class="paso">
-        <li>Escribí en <strong>Nueva nota</strong>.</li>
-        <li>Elegí un color (celeste, durazno, lavanda, menta o rosa).</li>
-        <li>Si es de un cliente, tocá <span class="ui">Vincular contacto</span> y buscalo.</li>
-        <li>Tocá <span class="ui">Guardar</span>.</li>
-    </ol>
-    <h3>Editar una nota</h3>
-    <figure>
-        <img src="img/10-nota-abierta.png" alt="Nota abierta">
-        <figcaption>Nota abierta, vinculada a un contacto.</figcaption>
-    </figure>
-    <ul>
-        <li>Lo que escribís <strong>se guarda solo</strong>: abajo dice <em>Guardado · editada HH:MM</em>.</li>
-        <li>El pin la <strong>fija</strong> arriba de todo; los puntos de color le cambian el color.</li>
-        <li>Si está vinculada a un cliente, <span class="ui">Abrir ficha</span> lleva a su ficha.</li>
-        <li><strong>Recordarme</strong> te manda una notificación <em>más tarde hoy</em> o <em>mañana a las 9:00</em>; <em>Sin recordatorio</em> lo quita.</li>
-        <li><span class="ui">Eliminar</span> la borra (pide confirmación). <span class="ui">Listo</span> la cierra.</li>
-    </ul>
-    <p>El buscador de arriba busca en el título y el texto de todas las notas.</p>
-</section>
-
-<section id="ajustes">
-    <p class="seccion-num">11</p>
-    <h2>Ajustes</h2>
-    <p class="intro">En la computadora se entra tocando tu nombre, abajo a la izquierda; en el celular, desde la pestaña <span class="ui">Ajustes</span>.</p>
-    <figure>
-        <img src="img/11-ajustes.png" alt="Pantalla Ajustes">
-        <figcaption>Ajustes de un usuario administrador (incluye el grupo «Equipo»).</figcaption>
-    </figure>
-    <table>
-        <thead><tr><th>Opción</th><th>Para qué sirve</th></tr></thead>
-        <tbody>
-            <tr><td><strong>Instalar</strong></td><td>Instala la app en el dispositivo (aparece solo si todavía no está instalada).</td></tr>
-            <tr><td><strong>Notificaciones</strong></td><td>Activa los avisos en este dispositivo. Hay que aceptar el permiso que pide el navegador.</td></tr>
-            <tr><td><strong>Resumen diario</strong></td><td>La hora a la que llega cada mañana un aviso con los recontactos, los vencidos y los pagos a cobrar. Tocalo para cambiarla, ver los dispositivos activos o mandar una notificación de prueba.</td></tr>
-            <tr><td><strong>Etiquetas</strong></td><td>Crear, renombrar, cambiar de color o borrar las etiquetas que usás para clasificar contactos.</td></tr>
-            <tr><td><strong>Equipo</strong></td><td>Solo administradores: alta y baja de usuarios (ver la sección siguiente).</td></tr>
-            <tr><td><strong>Cambiar contraseña</strong></td><td>Pide la actual y la nueva dos veces. Al cambiarla se cierran las sesiones guardadas en otros dispositivos.</td></tr>
-            <tr><td><strong>Cerrar sesión en todos los dispositivos</strong></td><td>Útil si perdiste un celular: los demás dispositivos tendrán que volver a ingresar.</td></tr>
-            <tr><td><strong>Cerrar sesión</strong></td><td>Sale de la cuenta en este dispositivo.</td></tr>
-        </tbody>
-    </table>
-</section>
-
-<section id="equipo">
-    <p class="seccion-num">12</p>
-    <h2>Usuarios y roles</h2>
-    <p class="intro">Varias personas pueden usar la agenda, cada una con su usuario. Todos ven y trabajan sobre los mismos contactos, y cada carga queda firmada con el nombre de quien la hizo.</p>
-    <table>
-        <thead><tr><th>Rol</th><th>Qué puede hacer</th></tr></thead>
-        <tbody>
-            <tr><td><strong>Admin</strong></td><td>Todo lo de la agenda, y además crear y eliminar usuarios desde <span class="ui">Ajustes › Equipo</span>.</td></tr>
-            <tr><td><strong>Supervisor</strong></td><td>Todo lo de la agenda: cargar, registrar, reagendar, cerrar, notas. No ve el grupo Equipo.</td></tr>
-        </tbody>
-    </table>
-    <h3>Dar de alta un usuario (solo Admin)</h3>
-    <ol class="paso">
-        <li>En <span class="ui">Ajustes › Equipo</span> completá <strong>Nombre completo</strong> (es el que aparece en «Cargó: …»).</li>
-        <li><strong>Usuario</strong>: el que va a usar para ingresar (letras, números, punto, guion o guion bajo).</li>
-        <li><strong>Contraseña</strong> y <strong>Repetir</strong>: solo números, mínimo 10 dígitos.</li>
-        <li>Elegí el <strong>Rol</strong> y tocá <span class="ui">Agregar usuario</span>.</li>
-    </ol>
-    <p>El tacho de basura al lado de cada usuario lo elimina. No se puede eliminar la propia cuenta ni el último administrador. Lo que cargó un usuario eliminado conserva su nombre.</p>
-</section>
-
-<section id="celular">
-    <p class="seccion-num">13</p>
-    <h2>Usarla en el celular</h2>
-    <p class="intro">En el celular el menú pasa abajo, con cinco pestañas: Hoy, Contactos, Calendario, Pagos y Ajustes. Notas se abre desde Ajustes. Todo lo demás funciona igual.</p>
-    <div class="par-movil">
-        <figure><img src="img/12-movil-hoy.png" alt="Hoy en el celular"><figcaption>Hoy en el celular.</figcaption></figure>
-        <figure><img src="img/13-movil-ficha.png" alt="Ficha en el celular"><figcaption>Ficha de un contacto.</figcaption></figure>
+    <p>Agenda IC se instala como una aplicación más: queda un ícono en la pantalla de inicio, se abre a pantalla completa y carga más rápido.</p>
+    <div class="tabla-envoltorio">
+        <table>
+            <thead><tr><th>Dispositivo</th><th>Cómo se instala</th></tr></thead>
+            <tbody>
+                <tr><td>Android (Chrome)</td><td>Menú <b>⋮</b> › <b>Instalar app</b> (o «Agregar a la pantalla principal»). También desde <span class="ruta">Ajustes › Instalar en Android</span>.</td></tr>
+                <tr><td>iPhone o iPad (Safari)</td><td>Botón <b>Compartir</b> (el cuadrado con la flecha) › <b>Agregar a inicio</b>.</td></tr>
+                <tr><td>Compu (Chrome o Edge)</td><td>El ícono de instalar al final de la barra de direcciones.</td></tr>
+            </tbody>
+        </table>
     </div>
-    <div class="par-movil" style="margin-top:24px">
-        <figure><img src="img/14-movil-calendario.png" alt="Calendario en el celular"><figcaption>Calendario: la lista del día elegido.</figcaption></figure>
-        <figure><img src="img/15-movil-recontacto.png" alt="Recontacto abierto en el celular"><figcaption>Al tocar un recontacto: Llamar, WhatsApp, Posponer, Ver ficha o Marcar hecho.</figcaption></figure>
+    <div class="caja caja--ojo">
+        <span class="caja__titulo">En iPhone, primero agregala a Inicio</span>
+        <p>El iPhone solo deja recibir notificaciones si la app está agregada a la pantalla de inicio. Agregala y después activá las notificaciones desde <span class="ruta">Ajustes › Notificaciones</span> (ver <a href="#ajustes">sección 16</a>).</p>
     </div>
-    <div class="nota nota--info">Sin conexión, la app sigue abriendo y muestra los últimos datos guardados, con un aviso arriba. Para cargar o registrar algo hace falta conexión.</div>
+    <p><b>Sin internet</b> podés mirar lo último que se cargó en pantalla, pero para registrar un pago o cargar algo nuevo necesitás conexión.</p>
 </section>
 
-<section id="colores">
-    <p class="seccion-num">14</p>
-    <h2>Qué significa cada color</h2>
-    <p class="intro">Los colores son siempre los mismos en toda la app, y siempre van acompañados de una palabra.</p>
-    <table>
-        <thead><tr><th>Color</th><th>Significa</th></tr></thead>
-        <tbody>
-            <tr><td><span class="muestra" style="background:var(--pastel-red)"></span>Rosa</td><td>Vencido: la fecha de recontacto o de cobro ya pasó.</td></tr>
-            <tr><td><span class="muestra" style="background:var(--pastel-orange)"></span>Durazno</td><td>Para hoy, o en seguimiento. También posponer.</td></tr>
-            <tr><td><span class="muestra" style="background:var(--pastel-indigo)"></span>Lavanda</td><td>Próximos días, o reprogramado.</td></tr>
-            <tr><td><span class="muestra" style="background:var(--pastel-green)"></span>Menta</td><td>Concretó, hecho o guardado.</td></tr>
-            <tr><td><span class="muestra" style="background:var(--pastel-tint)"></span>Celeste</td><td>Contacto nuevo, la acción principal o la app.</td></tr>
-            <tr><td><span class="muestra" style="background:var(--pastel-gray)"></span>Gris</td><td>Cerrado o sin respuesta.</td></tr>
-        </tbody>
-    </table>
+<!-- 3 -->
+<section class="capitulo" aria-labelledby="organizacion">
+    <h2 class="capitulo__titulo" id="organizacion"><span class="capitulo__numero">3</span>Cómo está organizada</h2>
+    <p class="entrada">La app tiene cinco pantallas: <b>Hoy</b>, <b>Contactos</b>, <b>Calendario</b>, <b>Pagos</b> y <b>Notas</b>, más <b>Ajustes</b>.</p>
+    <div class="tabla-envoltorio">
+        <table>
+            <thead><tr><th>Pantalla</th><th>Para qué sirve</th></tr></thead>
+            <tbody>
+                <tr><td>Hoy</td><td>El tablero del día: cuánto hay para cobrar, la tira de los próximos 14 días, los pagos a cobrar y los recontactos.</td></tr>
+                <tr><td>Contactos</td><td>Todos los clientes e interesados, con buscador. Desde acá abrís la ficha de cada uno.</td></tr>
+                <tr><td>Calendario</td><td>Los pagos y los recontactos por mes, semana o día.</td></tr>
+                <tr><td>Pagos</td><td>Todos los compromisos, con filtros, tres formas de verlos, exportación a Excel y el cumplimiento por usuario.</td></tr>
+                <tr><td>Notas</td><td>Anotaciones del equipo, con colores y recordatorio.</td></tr>
+                <tr><td>Ajustes</td><td>Instalar la app, notificaciones, etiquetas, plantillas de WhatsApp, equipo y contraseña.</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p><b>En la compu</b>, las pantallas están en el menú de la izquierda; abajo de todo está tu nombre, que lleva a Ajustes. <b>En el celular</b>, están en la barra de abajo: Hoy, Contactos, Calendario, Pagos y Ajustes (Notas se abre desde Ajustes).</p>
+    <p>Los <b>numeritos rojos</b> sobre Hoy y Pagos avisan cuánto hay atrasado o para hoy: en Hoy cuentan los recontactos y en Pagos, los compromisos.</p>
+
+    <h3>En el celular</h3>
+    <div class="figuras-fila figuras-fila--movil">
+        <figure class="fig fig--movil">
+            <div class="fig__marco"><img src="img/36-movil-hoy.jpg" width="780" height="1688" alt="Pantalla Hoy en el celular con los totales y la barra de navegación"></div>
+            <figcaption>
+                <span class="fig__titulo">Figura 2 <span>· Hoy en el celular</span></span>
+                <ol class="leyenda">
+                    <li data-n="1"><b>Todos / Míos.</b> Cambia entre lo de todo el equipo y lo que cargaste vos.</li>
+                    <li data-n="2"><b>Totales</b> de cobranza, en dos filas.</li>
+                    <li data-n="3"><b>Barra de navegación.</b> El botón azul <b>+</b> de arriba carga una consulta.</li>
+                </ol>
+            </figcaption>
+        </figure>
+        <figure class="fig fig--movil">
+            <div class="fig__marco"><img src="img/37-movil-tira.jpg" width="780" height="1688" alt="Tira de los próximos 14 días y pagos a cobrar en el celular"></div>
+            <figcaption>
+                <span class="fig__titulo">Figura 3 <span>· La tira de 14 días y los pagos</span></span>
+                Bajando aparecen la tira de días y las tarjetas de cada pago.
+            </figcaption>
+        </figure>
+        <figure class="fig fig--movil">
+            <div class="fig__marco"><img src="img/38-movil-pagos.jpg" width="780" height="1688" alt="Pantalla Pagos en el celular"></div>
+            <figcaption>
+                <span class="fig__titulo">Figura 4 <span>· Pagos en el celular</span></span>
+                Los mismos filtros que en la compu, en una columna.
+            </figcaption>
+        </figure>
+        <figure class="fig fig--movil">
+            <div class="fig__marco"><img src="img/39-movil-ficha.jpg" width="780" height="1688" alt="Ficha de un contacto en el celular"></div>
+            <figcaption>
+                <span class="fig__titulo">Figura 5 <span>· La ficha en el celular</span></span>
+                La ficha se abre de abajo hacia arriba y se cierra con <b>Cerrar</b>.
+            </figcaption>
+        </figure>
+    </div>
 </section>
 
-<section id="preguntas">
-    <p class="seccion-num">15</p>
-    <h2>Preguntas frecuentes</h2>
-    <h3>No me llegan las notificaciones.</h3>
-    <p>Revisá en <span class="ui">Ajustes</span> que <em>Notificaciones</em> esté activado en ese dispositivo y que el navegador tenga permiso. En iPhone, la app tiene que estar instalada desde Safari (<em>Compartir › Agregar a inicio</em>). En <span class="ui">Resumen diario</span> podés mandar una notificación de prueba.</p>
-    <h3>Cargué un cliente que ya existía.</h3>
-    <p>Si el celular coincide, la app lo detecta y te ofrece agregar la consulta al cliente existente. Si se cargó con otro número, podés eliminar el repetido desde su ficha.</p>
-    <h3>¿Cómo saco un cliente de la lista de pendientes?</h3>
-    <p>Registrá el recontacto y elegí <span class="ui">Cerrar</span> con el motivo, o cambiale el estado a <em>Concretó</em> o <em>Cerrado</em> desde la ficha. Ya no aparece en Hoy, pero sigue en Contactos.</p>
-    <h3>Me equivoqué de fecha al reagendar.</h3>
-    <p>Abrí la ficha y volvé a registrar o posponer; también podés reprogramarlo desde el Calendario.</p>
-    <h3>¿Cómo registro un pago parcial?</h3>
-    <p>Abrí el compromiso desde <span class="ui">Pagos</span>, <span class="ui">Hoy</span>, <span class="ui">Calendario</span> o la ficha. Elegí <span class="ui">Pago parcial</span>, ingresá lo recibido y, si querés, agendá el saldo para otra fecha.</p>
-    <h3>¿Qué pasa si elimino un contacto?</h3>
-    <p>Se eliminan también su historial, etiquetas, avisos y compromisos de pago. La acción pide confirmación y no se puede deshacer.</p>
-    <h3>Olvidé mi contraseña.</h3>
-    <p>La app no tiene recuperación de contraseña. Pedile a un administrador que elimine tu usuario y te cree uno nuevo desde <span class="ui">Ajustes › Equipo</span>; lo que ya cargaste conserva tu nombre.</p>
+<!-- 4 -->
+<section class="capitulo" aria-labelledby="hoy">
+    <h2 class="capitulo__titulo" id="hoy"><span class="capitulo__numero">4</span>Hoy: el tablero de cobranza</h2>
+    <p class="entrada">Hoy es la primera pantalla que ves al entrar. Arriba están los números de la cobranza y abajo, la lista de lo que hay que cobrar.</p>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/02-hoy.jpg" width="1280" height="900" alt="Pantalla Hoy con los totales de cobranza y la tira de los próximos 14 días"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 6 <span>· La pantalla Hoy en la compu</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Todos / Míos.</b> «Todos» muestra los compromisos de todo el equipo; «Míos», solo los que cargaste vos. La app recuerda lo que elegiste en ese dispositivo.</li>
+                <li data-n="2"><b>Vencidos.</b> Lo pendiente cuya fecha ya pasó: monto total y cantidad de compromisos.</li>
+                <li data-n="3"><b>Para hoy.</b> Lo que vence hoy. Un pago de hoy sigue «para hoy» hasta la medianoche.</li>
+                <li data-n="4"><b>Próximos 7 días.</b> Lo que vence en la semana que viene.</li>
+                <li data-n="5"><b>Cobrado y Cumplimiento.</b> Lo que se cobró este mes y qué parte representa de lo prometido para los días del mes que ya llegaron.</li>
+                <li data-n="6"><b>Próximos 14 días.</b> Esta semana y la que viene, desde el lunes. Cada día muestra cuánto hay para cobrar: <b>$54k</b> son 54 mil pesos y <b>$1,2M</b>, 1,2 millones. Tocá un día para verlo en el Calendario.</li>
+                <li data-n="7"><b>El día de hoy</b>, con un borde azul.</li>
+                <li data-n="8"><b>Ver calendario</b> abre el Calendario completo.</li>
+                <li data-n="9"><b>Nueva consulta</b> carga una persona que pregunta por un producto. Al lado, <b>Buscar contacto</b> encuentra a cualquier cliente.</li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <p>Los colores de la tira son los mismos de toda la app: <span class="chip chip--rosa">Vencido</span> <span class="chip chip--durazno">Para hoy</span> <span class="chip chip--lavanda">Próximo</span> <span class="chip chip--menta">Cobrado</span>. Un día en verde quiere decir que ese día ya está todo cobrado.</p>
+
+    <h3>Pagos a cobrar</h3>
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/03-hoy-pagos.jpg" width="1280" height="900" alt="Lista de pagos a cobrar agrupada por día, con subtotales"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 7 <span>· Pagos a cobrar, agrupados por día</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Pagos a cobrar.</b> Los compromisos pendientes hasta dentro de 7 días.</li>
+                <li data-n="2"><b>Total</b> de todo lo que está en la lista.</li>
+                <li data-n="3"><b>Cada grupo</b> (Vencidos, Hoy y después cada día) tiene su subtotal.</li>
+                <li data-n="4"><b>Cada tarjeta</b> es un compromiso, con sus botones para registrar el pago (ver <a href="#tarjeta">sección 5</a>).</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>Primero aparecen los vencidos, del más viejo al más nuevo; después, los de hoy y los de los próximos días. Lo que vence más adelante está en la pantalla Pagos: al final de la lista hay un enlace <b>Ver los demás pagos pendientes en Pagos</b>.</p>
+
+    <h3>Recontactos</h3>
+    <p>Debajo de los pagos está la parte de las consultas. Muestra a quién hay que volver a llamar, con un anillo que se va completando a medida que hacés los recontactos del día. Los botones de arriba filtran la lista: <b>Todos</b>, <b>Vencidos</b>, <b>Para hoy</b> y <b>Próximos</b>.</p>
+    <p>Cada tarjeta de recontacto tiene cuatro botones:</p>
+    <ul>
+        <li><span class="btn">Llamar</span> y <span class="btn">WhatsApp</span>: abren la llamada o el chat con ese número.</li>
+        <li><span class="btn">Posponer</span>: si el recontacto era para hoy, lo pasa una hora más tarde; si estaba atrasado, a mañana a las 9:00.</li>
+        <li><span class="btn">Nota</span>: anota algo en el historial del contacto sin cambiar la fecha.</li>
+    </ul>
+    <p>Tocando el nombre se abre la ficha, donde registrás cómo te fue (ver <a href="#recontactos">sección 13</a>).</p>
 </section>
 
+<!-- 5 -->
+<section class="capitulo" aria-labelledby="tarjeta">
+    <h2 class="capitulo__titulo" id="tarjeta"><span class="capitulo__numero">5</span>La tarjeta de un compromiso</h2>
+    <p class="entrada">Cada compromiso se muestra como una tarjeta del color de su estado. Tiene todo lo necesario para cobrar sin abrir nada más.</p>
+
+    <div class="figuras-fila">
+        <figure class="fig fig--angosta">
+            <div class="fig__marco"><img src="img/04-tarjeta.jpg" width="706" height="992" alt="Tarjeta de un compromiso vencido con datos de SAS y los botones de registro"></div>
+            <figcaption>
+                <span class="fig__titulo">Figura 8 <span>· Tarjeta de un compromiso vencido</span></span>
+            </figcaption>
+        </figure>
+        <div>
+            <ol class="leyenda">
+                <li data-n="1"><b>Cliente y concepto.</b> Tocá el nombre para abrir su ficha.</li>
+                <li data-n="2"><b>Estado:</b> vencido, para hoy, próximo, pagado…</li>
+                <li data-n="3"><b>Monto</b> prometido.</li>
+                <li data-n="4"><b>Fecha</b> del pago.</li>
+                <li data-n="5"><b>Cargó:</b> quién cargó el compromiso.</li>
+                <li data-n="6"><b>Cobrador</b> que el cliente tiene asignado en SAS.</li>
+                <li data-n="7"><b>Chip de SAS:</b> cuántas cuotas tiene vencidas en SAS y cuántos días de atraso.</li>
+                <li data-n="8"><b>Sugerencia:</b> SAS registró un pago posterior a la fecha. Si corresponde, tocá <b>¿Marcar como pagado?</b></li>
+                <li data-n="9"><b>Pagó:</b> pagó todo.</li>
+                <li data-n="10"><b>Parcial:</b> pagó una parte.</li>
+                <li data-n="11"><b>Reprogramar:</b> avisó que paga otro día.</li>
+                <li data-n="12"><b>WhatsApp:</b> manda el recordatorio con la plantilla que corresponde.</li>
+                <li data-n="13"><b>Llamar</b> al celular del cliente.</li>
+                <li data-n="14"><b>Más:</b> No pagó y Abrir detalle.</li>
+            </ol>
+        </div>
+    </div>
+
+    <figure class="fig fig--angosta">
+        <div class="fig__marco"><img src="img/05-tarjeta-aviso.jpg" width="738" height="900" alt="Tarjeta con la línea del último aviso enviado por WhatsApp"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 9 <span>· Después de mandar un WhatsApp</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Último aviso:</b> cuándo se mandó el último recordatorio y quién lo mandó, para no repetirlo.</li>
+                <li data-n="2"><b>Cobrador</b> del cliente en SAS.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>El chip de SAS y la sugerencia solo aparecen si el contacto está vinculado con su cliente de SAS Imperio (ver <a href="#sas">sección 10</a>).</p>
+</section>
+
+<!-- 6 -->
+<section class="capitulo" aria-labelledby="registrar">
+    <h2 class="capitulo__titulo" id="registrar"><span class="capitulo__numero">6</span>Registrar un pago</h2>
+    <p class="entrada">Cuando el cliente paga, o avisa que no puede, lo registrás desde la misma tarjeta. Son los mismos botones en Hoy, en Pagos y en el Calendario.</p>
+
+    <h3>¿Qué botón uso?</h3>
+    <div class="tabla-envoltorio">
+        <table>
+            <thead><tr><th>Lo que pasó</th><th>Botón</th><th>Cómo queda</th></tr></thead>
+            <tbody>
+                <tr><td>Pagó todo lo prometido</td><td><span class="btn">Pagó</span></td><td><span class="chip chip--menta">Pagado</span></td></tr>
+                <tr><td>Pagó una parte</td><td><span class="btn">Parcial</span></td><td><span class="chip chip--menta">Parcial</span> y, si querés, un compromiso nuevo por el saldo</td></tr>
+                <tr><td>Avisó que paga otro día</td><td><span class="btn">Reprogramar</span></td><td><span class="chip chip--gris">Reprogramado</span> y un compromiso nuevo para el día nuevo. No baja el cumplimiento.</td></tr>
+                <tr><td>No pagó y no avisó</td><td><span class="btn">Más</span> › <span class="btn">No pagó</span></td><td><span class="chip chip--gris">Incumplido</span>. Baja el cumplimiento.</td></tr>
+                <tr><td>Quiero dejar una nota o cargar todo a mano</td><td><span class="btn">Más</span> › <span class="btn">Abrir detalle</span></td><td>Lo que elijas en el formulario</td></tr>
+                <tr><td>Me equivoqué</td><td><span class="btn">Deshacer</span></td><td>Vuelve a pendiente</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Pagó todo</h3>
+    <p>Tocá <span class="btn">Pagó</span>. El compromiso queda pagado por el monto completo, a tu nombre, y abajo aparece un aviso durante 6 segundos.</p>
+    <figure class="fig fig--angosta">
+        <div class="fig__marco"><img src="img/06-deshacer.jpg" width="692" height="416" alt="Aviso Pago registrado con el botón Deshacer"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 10 <span>· El aviso después de registrar</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Pago registrado.</b> Confirma qué se guardó.</li>
+                <li data-n="2"><b>Deshacer.</b> Si tocaste sin querer, lo vuelve a pendiente.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>Si el aviso ya se fue, el compromiso registrado sigue teniendo su botón <span class="btn">Deshacer</span> en la ficha del contacto y en Pagos (filtro <b>Pagados</b>, <b>Incumplidos</b> o <b>Reprogramados</b>).</p>
+
+    <h3>Pagó una parte</h3>
+    <p>Tocá <span class="btn">Parcial</span>. Son dos pasos:</p>
+    <div class="figuras-fila">
+        <figure class="fig fig--media">
+            <div class="fig__marco"><img src="img/07-parcial-1.jpg" width="976" height="582" alt="Paso 1 del pago parcial: cuánto recibiste"></div>
+            <figcaption>
+                <span class="fig__titulo">Figura 11 <span>· Paso 1: cuánto recibiste</span></span>
+                <ol class="leyenda">
+                    <li data-n="1"><b>Recibido:</b> lo que te dio, sin puntos (por ejemplo 100000).</li>
+                    <li data-n="2"><b>Continuar.</b></li>
+                </ol>
+            </figcaption>
+        </figure>
+        <figure class="fig fig--media">
+            <div class="fig__marco"><img src="img/08-parcial-2.jpg" width="976" height="702" alt="Paso 2 del pago parcial: agendar el saldo"></div>
+            <figcaption>
+                <span class="fig__titulo">Figura 12 <span>· Paso 2: el saldo</span></span>
+                <ol class="leyenda">
+                    <li data-n="1">La app calcula <b>el saldo</b> que falta.</li>
+                    <li data-n="2"><b>Cuándo paga el resto:</b> Mañana, En 3 días, En 1 semana o Elegir…</li>
+                    <li data-n="3"><b>Registrar y agendar el saldo:</b> crea un compromiso nuevo por lo que falta, en esa fecha.</li>
+                    <li data-n="4"><b>Registrar sin agendar el saldo:</b> solo guarda lo recibido.</li>
+                </ol>
+            </figcaption>
+        </figure>
+    </div>
+    <p>El compromiso nuevo por el saldo queda enlazado al original: en la ficha vas a ver de dónde salió.</p>
+
+    <h3>Avisó que paga otro día</h3>
+    <p>Tocá <span class="btn">Reprogramar</span>, elegí el día nuevo y, si cambió, el monto.</p>
+    <figure class="fig fig--media">
+        <div class="fig__marco"><img src="img/09-reprogramar.jpg" width="976" height="866" alt="Hoja Reprogramar con la elección de fecha y monto"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 13 <span>· Reprogramar</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>¿Para qué día?</b> Mañana, En 3 días, En 1 semana o Elegir…</li>
+                <li data-n="2"><b>Monto:</b> viene el mismo; cambialo si el cliente va a pagar otro importe.</li>
+                <li data-n="3"><b>Reprogramar.</b></li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>El original queda como <b>reprogramado</b>, que <b>no es un incumplimiento</b>: no baja el cumplimiento. El compromiso nuevo queda a nombre de quien cargó el original.</p>
+
+    <h3>No pagó, o querés cargar los detalles</h3>
+    <figure class="fig fig--media">
+        <div class="fig__marco"><img src="img/10-mas.jpg" width="976" height="730" alt="Menú Más con las opciones No pagó y Abrir detalle"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 14 <span>· El botón Más</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>No pagó.</b> Queda como incumplido y baja el cumplimiento. Si el cliente avisó que paga otro día, usá Reprogramar.</li>
+                <li data-n="2"><b>Abrir detalle.</b> El formulario completo, con nota y opción de agendar el saldo.</li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <figure class="fig fig--alta">
+        <div class="fig__marco"><img src="img/11-registrar-pago.jpg" width="976" height="1292" alt="Formulario completo Registrar pago"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 15 <span>· Registrar pago, el formulario completo</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Resultado:</b> Pagó, Pago parcial o No pagó.</li>
+                <li data-n="2"><b>Cuánto recibiste</b> (en un pago parcial). Abajo muestra cuánto falta cobrar.</li>
+                <li data-n="3"><b>Agendar el saldo</b> (o volver a agendar, si no pagó): elegí la fecha y el monto.</li>
+                <li data-n="4"><b>Nota</b> opcional: cómo fue, qué quedó acordado.</li>
+                <li data-n="5"><b>Guardar.</b></li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <div class="caja caja--tip">
+        <span class="caja__titulo">Si dos personas registran el mismo pago</span>
+        <p>No pasa nada: la app guarda solo el primero y al segundo le avisa que ese compromiso ya estaba registrado.</p>
+    </div>
+</section>
+
+<!-- 7 -->
+<section class="capitulo" aria-labelledby="nuevo-compromiso">
+    <h2 class="capitulo__titulo" id="nuevo-compromiso"><span class="capitulo__numero">7</span>Cargar un compromiso nuevo</h2>
+    <p class="entrada">Cada vez que un cliente promete un pago, cargalo. Entrá a <b>Pagos</b> y tocá <span class="btn">Nuevo compromiso</span>, o desde la ficha del cliente, <span class="btn">Pago</span>.</p>
+
+    <figure class="fig fig--alta">
+        <div class="fig__marco"><img src="img/12-nuevo-compromiso.jpg" width="976" height="1590" alt="Hoja Nuevo compromiso buscando al cliente en la Agenda y en SAS Imperio"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 16 <span>· Paso 1: quién paga</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Buscar</b> por nombre, celular o DNI.</li>
+                <li data-n="2"><b>En la Agenda:</b> contactos que ya están cargados.</li>
+                <li data-n="3"><b>En SAS Imperio:</b> clientes de SAS que todavía no están en la Agenda. Al elegir uno, se crea el contacto con sus datos y su cobrador.</li>
+                <li data-n="4"><b>Es un contacto nuevo:</b> si no está en ningún lado, cargás nombre y celular ahí mismo.</li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <figure class="fig fig--alta">
+        <div class="fig__marco"><img src="img/13-nuevo-compromiso-datos.jpg" width="976" height="1334" alt="Hoja Nuevo compromiso con monto, concepto, número de cuota y fecha"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 17 <span>· Paso 2: el pago</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Monto</b>, sin puntos (45000).</li>
+                <li data-n="2"><b>Concepto:</b> Cuota, Saldo, Refinanciación, Entrega u Otro.</li>
+                <li data-n="3"><b>N° de cuota:</b> aparece cuando el concepto es Cuota.</li>
+                <li data-n="4"><b>Fecha del pago:</b> Mañana o Elegir… Abajo se confirma el día elegido.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>Al final podés agregar una nota y tocás <span class="btn">Guardar</span>. El compromiso queda firmado con tu nombre y aparece en Hoy, en Pagos, en el Calendario y en la ficha del cliente. El día del pago te llega un aviso.</p>
+    <ul>
+        <li><b>Un compromiso es un solo pago.</b> Si el cliente promete $20.000 el viernes y $20.000 el viernes siguiente, cargá dos.</li>
+        <li><b>Para corregir</b> el monto, la fecha o el concepto de uno pendiente, abrí la ficha del cliente y tocá <span class="btn">Editar</span> en ese compromiso. Ahí también está <b>Eliminar compromiso</b>, para uno cargado por error.</li>
+    </ul>
+</section>
+
+<!-- 8 -->
+<section class="capitulo" aria-labelledby="whatsapp">
+    <h2 class="capitulo__titulo" id="whatsapp"><span class="capitulo__numero">8</span>Recordatorios por WhatsApp</h2>
+    <p class="entrada">El botón <span class="btn">WhatsApp</span> de la tarjeta abre el chat con el cliente y el mensaje ya escrito. Solo tenés que revisarlo y mandarlo.</p>
+    <p>La app elige el mensaje según la fecha del compromiso: uno para <b>antes del vencimiento</b>, otro para cuando <b>vence hoy</b> y otro para cuando ya está <b>vencido</b>. Al tocar el botón queda anotado en la ficha («WhatsApp: recordatorio de pago…») y en la tarjeta se ve el último aviso, con quién lo mandó.</p>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/19-plantillas.jpg" width="1920" height="1350" alt="Ajustes, plantillas de WhatsApp con el texto y la vista previa"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 18 <span>· Las plantillas, en Ajustes (solo administrador)</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Plantilla:</b> Antes del vencimiento, Vence hoy o Vencido.</li>
+                <li data-n="2"><b>Texto</b> del mensaje, con las variables entre llaves.</li>
+                <li data-n="3"><b>Así se ve:</b> el mensaje con datos de ejemplo.</li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <p>El administrador edita los textos en <span class="ruta">Ajustes › Mensajes de WhatsApp</span>. Las palabras entre llaves se reemplazan solas:</p>
+    <div class="tabla-envoltorio">
+        <table>
+            <thead><tr><th>Variable</th><th>Se reemplaza por</th><th>Ejemplo</th></tr></thead>
+            <tbody>
+                <tr><td>{nombre}</td><td>El nombre del cliente</td><td>Rosa</td></tr>
+                <tr><td>{monto}</td><td>El monto del compromiso</td><td>$ 54.000</td></tr>
+                <tr><td>{fecha}</td><td>La fecha del pago</td><td>11/11</td></tr>
+                <tr><td>{concepto}</td><td>El concepto</td><td>Cuota 7</td></tr>
+                <tr><td>{dias_atraso}</td><td>Los días de atraso (en el mensaje de vencido)</td><td>1</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p>El botón <b>Restablecer</b> vuelve al texto original de esa plantilla.</p>
+</section>
+
+<!-- 9 -->
+<section class="capitulo" aria-labelledby="pagos">
+    <h2 class="capitulo__titulo" id="pagos"><span class="capitulo__numero">9</span>La pantalla Pagos</h2>
+    <p class="entrada">En Pagos están todos los compromisos, no solo los de esta semana. Sirve para buscar, filtrar, ver cómo viene cada uno y bajar los datos a Excel.</p>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/14-pagos-agenda.jpg" width="1280" height="1150" alt="Pantalla Pagos en vista Agenda con totales, filtros y la lista agrupada por día"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 19 <span>· Pagos, vista Agenda</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Totales</b> de lo que estás viendo: vencidos, para hoy, próximos 7 días y cobrado este mes.</li>
+                <li data-n="2"><b>Vistas:</b> Agenda (por día), Tabla y Tarjetas.</li>
+                <li data-n="3"><b>Exportar CSV:</b> baja la lista filtrada para abrirla en Excel.</li>
+                <li data-n="4"><b>Estado:</b> Pendientes, Vencidos, Para hoy, Próximos, Pagados, Incumplidos, Reprogramados o Todos.</li>
+                <li data-n="5"><b>Fechas:</b> Esta semana, Próximos 15 días, Este mes, Mes pasado o Elegir…</li>
+                <li data-n="6"><b>Cargó y Concepto:</b> filtran por quién cargó el compromiso y por tipo de pago.</li>
+                <li data-n="7"><b>Por usuario:</b> el cumplimiento de cada persona del equipo.</li>
+                <li data-n="8"><b>Cada día</b> con su cantidad y su total.</li>
+                <li data-n="9"><b>Cada fila</b> es un compromiso, con los mismos botones de la tarjeta.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>Arriba, el buscador <b>Nombre o concepto</b> encuentra un compromiso puntual.</p>
+
+    <figure class="fig fig--ancha">
+        <div class="fig__marco"><img src="img/15-pagos-filtros.jpg" width="1020" height="640" alt="Filtros activos con la nota de resumen y los chips para quitarlos"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 20 <span>· Filtros combinados</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Resumen</b> de lo que estás filtrando.</li>
+                <li data-n="2"><b>Chips:</b> tocá la ✕ de cada uno para sacar ese filtro.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>Los totales de arriba siempre se calculan sobre lo que estás viendo. Por ejemplo, con <b>Este mes</b> + <b>Cargó: Martín Ruiz</b> ves cuánto tiene vencido y cobrado Martín este mes.</p>
+
+    <h3>Tabla y Tarjetas</h3>
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/16-pagos-tabla.jpg" width="1280" height="900" alt="Pagos en vista Tabla con columnas ordenables y acciones fijas a la derecha"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 21 <span>· Vista Tabla</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Columna que ordena la tabla</b> (acá, Fecha). Las columnas son Fecha, Cliente, Concepto, Monto, Estado, Atraso, Cargó y Resolvió.</li>
+                <li data-n="2"><b>Ordenar:</b> tocá un título con flechitas (Fecha, Cliente, Monto, Atraso, Cargó); otra vez, para invertir el orden.</li>
+                <li data-n="3"><b>Fila con datos de SAS</b> debajo del cliente.</li>
+                <li data-n="4"><b>Acciones</b> siempre visibles a la derecha, aunque la tabla se desplace.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/17-pagos-tarjetas.jpg" width="1280" height="900" alt="Pagos en vista Tarjetas"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 22 <span>· Vista Tarjetas</span></span>
+            Las mismas tarjetas de la pantalla Hoy, en grilla. Cómoda en tablet.
+        </figcaption>
+    </figure>
+
+    <h3>Por usuario: cómo viene cada uno</h3>
+    <figure class="fig fig--ancha">
+        <div class="fig__marco"><img src="img/18-por-usuario.jpg" width="1518" height="863" alt="Panel Por usuario con lo prometido, cobrado y el cumplimiento de cada persona"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 23 <span>· Cumplimiento por usuario</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Cada persona</b> del equipo: sus compromisos pendientes, lo vencido y lo cobrado en el mes. Tocá una para ver solo lo que cargó esa persona.</li>
+                <li data-n="2"><b>Cumplimiento</b> del mes, en porcentaje.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <div class="caja caja--info">
+        <span class="caja__titulo">Cómo se calcula el cumplimiento</span>
+        <p>Se toman los compromisos con fecha de este mes que ya llegó y se compara lo cobrado contra lo prometido. Un <b>reprogramado</b> no cuenta, porque el cliente avisó. Un <b>parcial</b> con el saldo agendado cuenta por lo que pagó; el saldo se mide en su propia fecha. Un <b>incumplido</b> sí baja el porcentaje.</p>
+    </div>
+
+    <h3>Exportar a Excel</h3>
+    <p><span class="btn">Exportar CSV</span> baja exactamente lo que estás viendo, con estas columnas: Fecha, Cliente, Celular, Concepto, Monto, Pagado, Estado, Atraso (días), Cargó, Resolvió, Fecha de registro y Nota. El archivo se abre con doble clic en Excel.</p>
+</section>
+
+<!-- 10 -->
+<section class="capitulo" aria-labelledby="sas">
+    <h2 class="capitulo__titulo" id="sas"><span class="capitulo__numero">10</span>Datos de SAS Imperio</h2>
+    <p class="entrada">Si el contacto está vinculado con su cliente de SAS Imperio, la Agenda muestra lo que SAS sabe de él. Es solo para mirar: la Agenda nunca cambia nada en SAS.</p>
+    <p>Los datos de SAS aparecen en tres lugares:</p>
+    <ul>
+        <li><b>El chip de la tarjeta</b>, en rosa: «SAS: 2 cuotas vencidas · 43 días».</li>
+        <li><b>La sugerencia</b> «SAS registró un pago de $15.000 el 12/11 · ¿Marcar como pagado?», cuando SAS tiene un pago posterior a la fecha del compromiso. La Agenda nunca lo marca sola: vos decidís, y si te equivocás tenés el <span class="btn">Deshacer</span>.</li>
+        <li><b>El bloque En SAS Imperio</b> de la ficha: créditos activos y saldo, cuotas vencidas y el atraso de la más vieja, último pago confirmado y los pagos que informó el cobrador y todavía no se aprobaron.</li>
+    </ul>
+    <div class="caja caja--ojo">
+        <span class="caja__titulo">Para leer bien los números de SAS</span>
+        <ul>
+            <li>Los montos son <b>sin mora</b>.</li>
+            <li>El atraso se cuenta en <b>días hábiles</b> (lunes a sábado), igual que en SAS.</li>
+            <li>Los datos se actualizan cada 10 minutos. En la ficha, <b>Actualizar</b> los trae en el momento.</li>
+            <li>Si SAS no responde, la Agenda sigue funcionando sin esos datos.</li>
+        </ul>
+    </div>
+
+    <h3>Vincular un contacto con SAS</h3>
+    <p>Los contactos que se cargan eligiendo un cliente de SAS ya quedan vinculados. Para uno que se cargó a mano, abrí su ficha y tocá <span class="btn">Vincular con SAS</span>.</p>
+    <figure class="fig fig--angosta">
+        <div class="fig__marco"><img src="img/25-vincular-sas.jpg" width="732" height="482" alt="Búsqueda para vincular un contacto con un cliente de SAS"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 24 <span>· Vincular con SAS</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Buscá</b> por celular, DNI o apellido.</li>
+                <li data-n="2"><b>Tocá el cliente</b> correcto. Revisá el DNI antes de elegir.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>Al vincular, el contacto toma el DNI y el <b>cobrador</b> que tiene en SAS, que después se ve en las tarjetas, el Calendario, Pagos y la ficha. Si lo vinculaste con el cliente equivocado, en la ficha está <b>Desvincular de SAS</b>.</p>
+</section>
+
+<!-- 11 -->
+<section class="capitulo" aria-labelledby="consulta">
+    <h2 class="capitulo__titulo" id="consulta"><span class="capitulo__numero">11</span>Cargar una consulta</h2>
+    <p class="entrada">Cuando alguien pregunta por un producto, tocá <span class="btn">Nueva consulta</span> (en el celular, el botón azul <b>+</b>).</p>
+
+    <figure class="fig fig--alta">
+        <div class="fig__marco"><img src="img/20-nueva-consulta.jpg" width="852" height="1112" alt="Hoja Nueva consulta"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 25 <span>· Nueva consulta</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Cliente de SAS Imperio:</b> si ya es cliente, buscalo y se completan nombre, celular y localidad.</li>
+                <li data-n="2"><b>Nombre y celular.</b> El celular se escribe como lo diga la persona (381 456 7890); la app lo ordena sola.</li>
+                <li data-n="3"><b>Consulta:</b> qué está buscando.</li>
+                <li data-n="4"><b>Próximo paso:</b> Recontactar (volver a llamarlo) o Agendar pago.</li>
+                <li data-n="5"><b>Cuándo:</b> Mañana, En 3 días, En 1 semana o Elegir… Es opcional: sin fecha, queda en «Sin fecha» en Hoy.</li>
+                <li data-n="6"><b>Más datos:</b> producto de interés, localidad, origen, etiquetas.</li>
+                <li data-n="7"><b>Guardar.</b></li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <div class="figuras-fila">
+        <figure class="fig fig--alta">
+            <div class="fig__marco"><img src="img/21-nueva-consulta-sas.jpg" width="852" height="1364" alt="Búsqueda de un cliente de SAS dentro de Nueva consulta"></div>
+            <figcaption>
+                <span class="fig__titulo">Figura 26 <span>· Buscar en SAS</span></span>
+                <ol class="leyenda">
+                    <li data-n="1"><b>Búsqueda</b> por celular, DNI o apellido.</li>
+                    <li data-n="2"><b>Resultado</b> con DNI, localidad y cobrador.</li>
+                    <li data-n="3"><b>Chip</b> Moroso o Inactivo, si corresponde.</li>
+                </ol>
+            </figcaption>
+        </figure>
+        <figure class="fig fig--alta">
+            <div class="fig__marco"><img src="img/22-nueva-consulta-pago.jpg" width="852" height="1500" alt="Nueva consulta con Agendar pago elegido"></div>
+            <figcaption>
+                <span class="fig__titulo">Figura 27 <span>· Consulta con un pago</span></span>
+                <ol class="leyenda">
+                    <li data-n="1"><b>Cliente vinculado</b> con SAS.</li>
+                    <li data-n="2"><b>Agendar pago</b> en el próximo paso.</li>
+                    <li data-n="3"><b>Monto, concepto, cuota y fecha</b>, igual que en un compromiso nuevo.</li>
+                </ol>
+            </figcaption>
+        </figure>
+    </div>
+
+    <div class="caja caja--tip">
+        <span class="caja__titulo">«Este número ya está cargado»</span>
+        <p>Si el celular ya existe en la Agenda, la app avisa a quién pertenece. Con <b>Agregar consulta</b> la sumás a ese contacto, sin duplicarlo; con <b>Cancelar</b> volvés a revisar.</p>
+    </div>
+</section>
+
+<!-- 12 -->
+<section class="capitulo" aria-labelledby="contactos">
+    <h2 class="capitulo__titulo" id="contactos"><span class="capitulo__numero">12</span>Contactos y la ficha</h2>
+    <p class="entrada">En <b>Contactos</b> están todas las personas cargadas. Tocá una para abrir su ficha.</p>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/30-contactos.jpg" width="1280" height="900" alt="Pantalla Contactos con buscador, filtros de estado y tarjetas"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 28 <span>· Contactos</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Buscador</b> por nombre, celular o consulta.</li>
+                <li data-n="2"><b>Estado:</b> Todos, Nuevos, En seguimiento, Concretaron o Cerrados.</li>
+                <li data-n="3"><b>Cada tarjeta</b> abre la ficha.</li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <h3>La ficha</h3>
+    <figure class="fig fig--ancha">
+        <div class="fig__marco"><img src="img/23-ficha.jpg" width="1512" height="1350" alt="Ficha de contacto con acciones, bloque de SAS Imperio y estado"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 29 <span>· La ficha de un contacto</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Quién es:</b> nombre, estado, celular, desde cuándo es cliente, quién lo cargó y sus etiquetas.</li>
+                <li data-n="2"><b>Acciones:</b> Llamar, WhatsApp, Recontacto, Nota y Pago (compromiso nuevo).</li>
+                <li data-n="3"><b>En SAS Imperio:</b> créditos, cuotas vencidas, último pago e informados por el cobrador.</li>
+                <li data-n="4"><b>Estado:</b> Nuevo, En seguimiento, Concretó o Cerrado.</li>
+                <li data-n="5"><b>Cobrador</b> asignado en SAS, junto con la localidad y el origen.</li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <figure class="fig fig--ancha">
+        <div class="fig__marco"><img src="img/24-ficha-compromisos.jpg" width="1512" height="1350" alt="Bloque Compromisos de pago en la ficha, con uno reprogramado"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 30 <span>· Los compromisos en la ficha</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Pendiente</b>, con Registrar y Editar.</li>
+                <li data-n="2"><b>De dónde salió:</b> «Reprogramado desde el 10/11».</li>
+                <li data-n="3"><b>Uno ya registrado</b> (acá, reprogramado), con su botón Deshacer.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>Más abajo están las <b>notas</b> y el <b>historial</b>: cada llamada, WhatsApp y registro, con fecha y quién lo hizo.</p>
+    <ul>
+        <li><b>Editar</b> (arriba a la derecha) cambia los datos del contacto.</li>
+        <li><b>Eliminar un contacto</b> borra también sus compromisos, su historial y sus etiquetas, y no se puede deshacer. Si solo dejó de interesarle, mejor cerralo con su motivo.</li>
+    </ul>
+</section>
+
+<!-- 13 -->
+<section class="capitulo" aria-labelledby="recontactos">
+    <h2 class="capitulo__titulo" id="recontactos"><span class="capitulo__numero">13</span>Recontactos</h2>
+    <p class="entrada">Después de llamar o escribirle a alguien que consultó, registrá cómo te fue. Abrí su ficha y tocá <span class="btn">Recontacto</span>.</p>
+
+    <figure class="fig fig--angosta">
+        <div class="fig__marco"><img src="img/26-recontacto.jpg" width="732" height="699" alt="Hoja Registrar recontacto"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 31 <span>· Registrar recontacto</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Resultado:</b> Atendió, No atendió o Mensaje.</li>
+                <li data-n="2"><b>Nota:</b> qué te dijo.</li>
+                <li data-n="3"><b>Reagendar</b> (lo volvés a llamar) o <b>Cerrar</b> la consulta.</li>
+                <li data-n="4"><b>Cuándo</b> volver a llamarlo.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <ul>
+        <li>Si elegís <b>Cerrar</b>, indicás el motivo: <b>Concretó</b>, <b>No interesa</b> o <b>Sin respuesta</b>.</li>
+        <li>Un contacto cerrado se puede <b>reabrir</b> desde su ficha, con el mismo botón.</li>
+        <li>Si no podés atenderlo ahora, en Hoy tenés <span class="btn">Posponer</span>.</li>
+    </ul>
+</section>
+
+<!-- 14 -->
+<section class="capitulo" aria-labelledby="calendario">
+    <h2 class="capitulo__titulo" id="calendario"><span class="capitulo__numero">14</span>Calendario</h2>
+    <p class="entrada">El Calendario muestra juntos los pagos a cobrar y los recontactos, por mes, semana o día.</p>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/27-calendario-mes.jpg" width="1280" height="1000" alt="Calendario en vista Mes con importes por día y el panel del día"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 32 <span>· Vista Mes</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Vistas:</b> Mes, Semana y Día.</li>
+                <li data-n="2"><b>Flechas</b> para moverte y <b>Hoy</b> para volver.</li>
+                <li data-n="3"><b>Importe del día:</b> lo que hay para cobrar.</li>
+                <li data-n="4"><b>Leyenda</b> de colores.</li>
+                <li data-n="5"><b>Resumen</b> del día elegido.</li>
+                <li data-n="6"><b>Pagos a cobrar</b> de ese día, con los botones de siempre.</li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/28-calendario-semana.jpg" width="1280" height="900" alt="Calendario en vista Semana"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 33 <span>· Vista Semana</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Tira</b> de los siete días.</li>
+                <li data-n="2"><b>Punto:</b> ese día tiene algo cargado.</li>
+                <li data-n="3"><b>Cada ítem</b> del día elegido: tocalo para ver el detalle.</li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/29-detalle-evento.jpg" width="1280" height="900" alt="Detalle de un pago abierto desde el Calendario"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 34 <span>· Detalle de un ítem</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Detalle</b> con los datos y las acciones, sin salir del Calendario.</li>
+            </ol>
+        </figcaption>
+    </figure>
+</section>
+
+<!-- 15 -->
+<section class="capitulo" aria-labelledby="notas">
+    <h2 class="capitulo__titulo" id="notas"><span class="capitulo__numero">15</span>Notas</h2>
+    <p class="entrada">Notas es un tablero para el equipo: avisos, pendientes, datos útiles. Cada nota puede tener color, recordatorio y estar vinculada a un contacto.</p>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/31-notas.jpg" width="1280" height="900" alt="Pantalla Notas con el compositor y varias notas"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 35 <span>· Notas</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Escribí una nota</b> y guardala.</li>
+                <li data-n="2"><b>Notas</b> del equipo, con su color.</li>
+                <li data-n="3">Tocá una para abrirla y editarla.</li>
+            </ol>
+        </figcaption>
+    </figure>
+
+    <figure class="fig fig--media">
+        <div class="fig__marco"><img src="img/32-nota-editor.jpg" width="912" height="863" alt="Editor de una nota con colores y barra de acciones"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 36 <span>· Editar una nota</span></span>
+            <ol class="leyenda">
+                <li data-n="1"><b>Colores</b> para ordenarlas a simple vista.</li>
+                <li data-n="2"><b>Barra:</b> fijar la nota (queda primera en el tablero) y cerrar el editor.</li>
+            </ol>
+        </figcaption>
+    </figure>
+    <p>Más abajo en el editor están el título, el texto, el contacto vinculado, <b>Recordarme</b> y <b>Eliminar</b>. Una nota con recordatorio te avisa con una notificación a la hora elegida. En el celular, Notas está en <span class="ruta">Ajustes › Notas</span>.</p>
+</section>
+
+<!-- 16 -->
+<section class="capitulo" aria-labelledby="ajustes">
+    <h2 class="capitulo__titulo" id="ajustes"><span class="capitulo__numero">16</span>Ajustes y notificaciones</h2>
+    <p class="entrada">En Ajustes instalás la app, activás las notificaciones y cambiás tu contraseña. En la compu se entra tocando tu nombre, abajo a la izquierda.</p>
+
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/33-ajustes.jpg" width="1280" height="1000" alt="Pantalla Ajustes"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 37 <span>· Ajustes</span></span>
+            Agrupados en Aplicación, Organización, Mensajes de WhatsApp, Equipo, Seguridad y Cuenta. Mensajes de WhatsApp y Equipo solo los ve el administrador.
+        </figcaption>
+    </figure>
+
+    <h3>Activar las notificaciones</h3>
+    <figure class="fig fig--angosta">
+        <div class="fig__marco"><img src="img/35-notificaciones.jpg" width="732" height="779" alt="Opciones de notificaciones y resumen diario"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 38 <span>· Notificaciones</span></span>
+            En <span class="ruta">Ajustes › Notificaciones</span>, prendé <b>Activar en este dispositivo</b> y aceptá el permiso que pide el navegador. Hay que hacerlo en cada celular o compu. Con <b>Enviar prueba</b> comprobás que llegan.
+        </figcaption>
+    </figure>
+    <p>Con las notificaciones activas te llegan:</p>
+    <ul>
+        <li><b>Cobrar a Rosa Gómez</b> · «$54.000 · Cuota 7», el día de cada compromiso. Si son muchos juntos, llega uno solo: «Pagos a cobrar: tenés 8 pagos a cobrar por $…».</li>
+        <li><b>Recontactar a Pablo Herrera</b>, a la hora del recontacto.</li>
+        <li>Los <b>recordatorios de tus notas</b>.</li>
+        <li>El <b>resumen diario</b>, por ejemplo «Hoy: 2 para recontactar, 1 vencidos · 17 pagos a cobrar ($13.571.000,49)». Llega a la hora que figura en <b>Resumen diario</b> (8:30 si nadie la cambió). La hora es la misma para todo el equipo: si la cambiás, cambia para todos.</li>
+    </ul>
+    <p>Tocando la notificación de un pago o de un recontacto se abre la ficha del cliente.</p>
+
+    <h3>Contraseña y sesiones</h3>
+    <ul>
+        <li><span class="ruta">Ajustes › Cambiar contraseña</span>: la nueva tiene que tener al menos 10 caracteres.</li>
+        <li><span class="ruta">Cerrar sesión en todos los dispositivos</span>: si perdiste el celular o usaste una compu ajena.</li>
+        <li><span class="ruta">Etiquetas</span>: las etiquetas que se ponen a los contactos («Refinanciar», «Cliente SAS»…).</li>
+    </ul>
+</section>
+
+<!-- 17 -->
+<section class="capitulo" aria-labelledby="roles">
+    <h2 class="capitulo__titulo" id="roles"><span class="capitulo__numero">17</span>Usuarios y roles</h2>
+    <p class="entrada">Cada persona tiene su propio usuario. No compartas el tuyo: todo lo que cargás queda con tu nombre.</p>
+    <div class="tabla-envoltorio">
+        <table>
+            <thead><tr><th>Puede…</th><th>Supervisor</th><th>Administrador</th></tr></thead>
+            <tbody>
+                <tr><td>Ver y cargar contactos, consultas, compromisos y notas</td><td>Sí</td><td>Sí</td></tr>
+                <tr><td>Registrar pagos y deshacerlos</td><td>Sí</td><td>Sí</td></tr>
+                <tr><td>Ver el cumplimiento de todo el equipo</td><td>Sí</td><td>Sí</td></tr>
+                <tr><td>Editar las plantillas de WhatsApp</td><td>No</td><td>Sí</td></tr>
+                <tr><td>Crear y eliminar usuarios</td><td>No</td><td>Sí</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Dar de alta a alguien (administrador)</h3>
+    <figure class="fig">
+        <div class="fig__marco"><img src="img/34-equipo.jpg" width="1920" height="1350" alt="Ajustes, sección Equipo con la lista de usuarios"></div>
+        <figcaption>
+            <span class="fig__titulo">Figura 39 <span>· Ajustes › Equipo</span></span>
+            La lista de usuarios con su rol. Desde acá se agregan y se eliminan.
+        </figcaption>
+    </figure>
+    <ol>
+        <li>Entrá a <span class="ruta">Ajustes › Equipo</span>.</li>
+        <li>Completá <b>Nombre completo</b>, <b>Usuario</b> (por ejemplo nombre.apellido) y el <b>Rol</b>.</li>
+        <li>Escribí la contraseña inicial dos veces. Tiene que ser de <b>solo números, al menos 10</b>: así se escribe rápido en el teclado del celular. Después cada uno la puede cambiar.</li>
+        <li>Tocá <span class="btn">Agregar usuario</span> y pasale el usuario y la contraseña a la persona.</li>
+    </ol>
+    <p>Si eliminás un usuario, lo que cargó sigue firmado con su nombre.</p>
+</section>
+
+<!-- 18 -->
+<section class="capitulo" aria-labelledby="colores">
+    <h2 class="capitulo__titulo" id="colores"><span class="capitulo__numero">18</span>Estados y colores</h2>
+    <p class="entrada">Los colores significan siempre lo mismo, en todas las pantallas.</p>
+
+    <h3>Compromisos de pago</h3>
+    <div class="tabla-envoltorio">
+        <table>
+            <thead><tr><th>Estado</th><th>Color</th><th>Qué significa</th></tr></thead>
+            <tbody>
+                <tr><td>Vencido</td><td><span class="chip chip--rosa">Vencido</span></td><td>Pendiente y la fecha ya pasó.</td></tr>
+                <tr><td>Para hoy</td><td><span class="chip chip--durazno">Para hoy</span></td><td>Pendiente, vence hoy.</td></tr>
+                <tr><td>Próximo</td><td><span class="chip chip--lavanda">Próximo</span></td><td>Pendiente, vence más adelante.</td></tr>
+                <tr><td>Pagado</td><td><span class="chip chip--menta">Pagado</span></td><td>Pagó todo.</td></tr>
+                <tr><td>Parcial</td><td><span class="chip chip--menta">Parcial</span></td><td>Pagó una parte. El saldo puede estar agendado como otro compromiso.</td></tr>
+                <tr><td>Reprogramado</td><td><span class="chip chip--gris">Reprogramado</span></td><td>Avisó que paga otro día; hay un compromiso nuevo. No baja el cumplimiento.</td></tr>
+                <tr><td>Incumplido</td><td><span class="chip chip--gris">Incumplido</span></td><td>No pagó. Baja el cumplimiento.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Contactos</h3>
+    <div class="tabla-envoltorio">
+        <table>
+            <thead><tr><th>Estado</th><th>Color</th><th>Qué significa</th></tr></thead>
+            <tbody>
+                <tr><td>Nuevo</td><td><span class="chip chip--celeste">Nuevo</span></td><td>Recién cargado, todavía sin recontactos.</td></tr>
+                <tr><td>En seguimiento</td><td><span class="chip chip--durazno">En seguimiento</span></td><td>Ya hubo contacto y tiene un próximo llamado.</td></tr>
+                <tr><td>Concretó</td><td><span class="chip chip--menta">Concretó</span></td><td>Compró o ya es cliente.</td></tr>
+                <tr><td>Cerrado</td><td><span class="chip chip--gris">Cerrado</span></td><td>No le interesa o no respondió.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- 19 -->
+<section class="capitulo" aria-labelledby="ejemplos">
+    <h2 class="capitulo__titulo" id="ejemplos"><span class="capitulo__numero">19</span>Ejemplos paso a paso</h2>
+    <p class="entrada">Las situaciones de todos los días, resueltas de punta a punta.</p>
+
+    <div class="ejemplo">
+        <h3>Pagó todo</h3>
+        <p class="ejemplo__caso">Rosa Gómez tenía que pagar hoy $54.000 de la cuota 7 y vino a pagar.</p>
+        <ol>
+            <li>En <b>Hoy › Pagos a cobrar</b>, buscá su tarjeta en el grupo <b>Hoy</b>.</li>
+            <li>Tocá <span class="btn">Pagó</span>.</li>
+            <li>Listo: la tarjeta pasa a pagado y sube el cobrado del mes.</li>
+        </ol>
+    </div>
+
+    <div class="ejemplo">
+        <h3>Pagó una parte y el resto el viernes</h3>
+        <p class="ejemplo__caso">Lucía Ferreyra debía $260.000, trajo $100.000 y dice que el resto lo paga el viernes.</p>
+        <ol>
+            <li>En su tarjeta, tocá <span class="btn">Parcial</span>.</li>
+            <li>En <b>Recibido</b> escribí 100000 y tocá <span class="btn">Continuar</span>.</li>
+            <li>La app pregunta «¿Agendás el saldo de $160.000?». Tocá <b>Elegir…</b> y marcá el viernes.</li>
+            <li>Tocá <span class="btn">Registrar y agendar el saldo</span>.</li>
+            <li>Queda un parcial por $100.000 y un compromiso nuevo por $160.000 para el viernes.</li>
+        </ol>
+    </div>
+
+    <div class="ejemplo">
+        <h3>Avisa que paga el lunes</h3>
+        <p class="ejemplo__caso">Silvia Juárez escribe: «Esta semana no llego, te pago el lunes».</p>
+        <ol>
+            <li>Tocá <span class="btn">Reprogramar</span> en su tarjeta.</li>
+            <li>Elegí el lunes. Si va a pagar otro monto, cambialo.</li>
+            <li>Tocá <span class="btn">Reprogramar</span>. El original queda reprogramado (no cuenta como incumplido) y el lunes aparece el nuevo.</li>
+        </ol>
+    </div>
+
+    <div class="ejemplo">
+        <h3>No pagó ni avisó</h3>
+        <p class="ejemplo__caso">El compromiso de Héctor Ibarra venció hace tres días y no responde.</p>
+        <ol>
+            <li>Mandale el recordatorio con <span class="btn">WhatsApp</span>: sale el mensaje de «vencido».</li>
+            <li>Si no hay respuesta y no se va a cobrar, tocá <span class="btn">Más</span> › <span class="btn">No pagó</span>.</li>
+            <li>Si después promete pagar, cargá un compromiso nuevo con la fecha que te dé.</li>
+        </ol>
+    </div>
+
+    <div class="ejemplo">
+        <h3>Mandar el recordatorio antes de que venza</h3>
+        <p class="ejemplo__caso">Mañana vence la cuota de Esteban Molina y querés recordárselo hoy.</p>
+        <ol>
+            <li>En <b>Hoy</b>, buscá su tarjeta en el grupo de mañana (o en <b>Pagos</b> con el filtro <b>Próximos</b>).</li>
+            <li>Tocá <span class="btn">WhatsApp</span>: se abre el chat con el mensaje «antes del vencimiento».</li>
+            <li>Revisalo y mandalo. En la tarjeta queda el último aviso con tu nombre.</li>
+        </ol>
+    </div>
+
+    <div class="ejemplo">
+        <h3>Un cliente nuevo promete pagar</h3>
+        <p class="ejemplo__caso">Llama alguien que todavía no está en la Agenda y promete una entrega de $80.000 para el día 20.</p>
+        <ol>
+            <li>Entrá a <b>Pagos</b> y tocá <span class="btn">Nuevo compromiso</span>.</li>
+            <li>Buscalo por apellido o DNI. Si aparece en <b>En SAS Imperio</b>, elegilo: se crea con sus datos y su cobrador.</li>
+            <li>Si no aparece en ningún lado, tocá <b>Es un contacto nuevo</b> y cargá nombre y celular.</li>
+            <li>Monto 80000, concepto <b>Entrega</b>, fecha <b>Elegir…</b> › día 20. <span class="btn">Guardar</span>.</li>
+        </ol>
+    </div>
+
+    <div class="ejemplo">
+        <h3>SAS dice que ya pagó</h3>
+        <p class="ejemplo__caso">En la tarjeta de Marcelo Cabrera aparece «SAS registró un pago de $15.000 el 12/11 · ¿Marcar como pagado?».</p>
+        <ol>
+            <li>Fijate si el pago de SAS corresponde a este compromiso (el monto y la fecha).</li>
+            <li>Si pagó todo, tocá <b>¿Marcar como pagado?</b>. Si pagó menos de lo prometido, usá <span class="btn">Parcial</span>.</li>
+            <li>Si no corresponde, ignorá la sugerencia: la Agenda no marca nada sola.</li>
+        </ol>
+    </div>
+
+    <div class="ejemplo">
+        <h3>Me equivoqué de botón</h3>
+        <p class="ejemplo__caso">Tocaste Pagó en el cliente equivocado.</p>
+        <ol>
+            <li>Tocá <span class="btn">Deshacer</span> en el aviso de abajo (dura 6 segundos).</li>
+            <li>Si ya se fue, abrí la ficha del cliente y tocá <span class="btn">Deshacer</span> en ese compromiso. Vuelve a pendiente.</li>
+            <li>Si lo que reprogramaste fue un error, al deshacerlo también se borra el compromiso nuevo (si todavía está pendiente).</li>
+        </ol>
+    </div>
+
+    <div class="ejemplo">
+        <h3>¿Cómo vengo este mes?</h3>
+        <p class="ejemplo__caso">Querés saber cuánto cobraste de lo que cargaste vos.</p>
+        <ol>
+            <li>En <b>Hoy</b>, elegí <b>Míos</b>: los totales y el cumplimiento pasan a ser solo de tus compromisos.</li>
+            <li>Para compararte con el resto, en <b>Pagos</b> abrí <b>Por usuario</b>.</li>
+        </ol>
+    </div>
+
+    <div class="ejemplo">
+        <h3>¿Qué hay para cobrar la semana que viene?</h3>
+        <p class="ejemplo__caso">Querés organizar la ruta de cobro de la semana próxima.</p>
+        <ol>
+            <li>Mirá la segunda fila de la tira <b>Próximos 14 días</b> en Hoy: tenés el total de cada día.</li>
+            <li>Para la lista completa, en <b>Pagos</b> elegí <b>Pendientes</b> y <b>Próximos 15 días</b>, o <b>Elegir…</b> con las fechas exactas.</li>
+            <li>Si la necesitás en papel o en Excel, tocá <span class="btn">Exportar CSV</span>.</li>
+        </ol>
+    </div>
+</section>
+
+<!-- 20 -->
+<section class="capitulo" aria-labelledby="preguntas">
+    <h2 class="capitulo__titulo" id="preguntas"><span class="capitulo__numero">20</span>Preguntas frecuentes</h2>
+
+    <details class="pregunta" open>
+        <summary>No me llegan las notificaciones al celular.</summary>
+        <ul>
+            <li>Revisá que estén activas en <span class="ruta">Ajustes › Notificaciones</span> en ese dispositivo.</li>
+            <li>En iPhone, la app tiene que estar agregada a Inicio y abierta desde ese ícono.</li>
+            <li>Revisá que el celular no tenga silenciadas las notificaciones del navegador o de la app.</li>
+        </ul>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>¿Cuál es la diferencia entre «Reprogramar» y «No pagó»?</summary>
+        <p>Reprogramar es cuando el cliente <b>avisó</b> que paga otro día: no cuenta como incumplimiento y se crea el compromiso nuevo. No pagó es cuando no cumplió: queda incumplido y baja el cumplimiento.</p>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>Un pago de hoy, ¿cuándo pasa a vencido?</summary>
+        <p>A la medianoche. Durante todo el día sigue «para hoy», aunque la hora ya haya pasado.</p>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>Cargué un cliente que ya existía, ¿se duplicó?</summary>
+        <p>No. Si el celular ya está cargado, la app avisa «Este número ya está cargado» y te ofrece sumar la consulta al contacto existente. Lo mismo al cargar un compromiso con un contacto nuevo: si el celular ya existe, usa ese contacto.</p>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>¿Por qué no veo el chip de SAS en un cliente?</summary>
+        <p>Porque el contacto no está vinculado con SAS. Abrí la ficha y tocá <span class="btn">Vincular con SAS</span>. Si está vinculado y igual no aparece, puede ser que SAS no esté respondiendo en ese momento; probá más tarde con <b>Actualizar</b>.</p>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>¿Puedo cambiar algo de SAS desde la Agenda?</summary>
+        <p>No. La Agenda solo lee los datos de SAS. Los pagos se siguen cargando en SAS como siempre; la Agenda es para seguir las promesas de pago.</p>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>¿Qué ve «Míos»?</summary>
+        <p>Los compromisos que cargaste vos, aunque los haya cobrado otra persona.</p>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>¿Qué pasa si elimino un contacto?</summary>
+        <p>Se borran también sus compromisos de pago, sus consultas, su historial y sus etiquetas, y no se puede deshacer. Si solo dejó de interesarle, cerralo con su motivo en lugar de eliminarlo.</p>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>Olvidé mi contraseña.</summary>
+        <p>Pedile al administrador que te dé un acceso nuevo. Cuando vuelvas a entrar, cambiá la contraseña desde <span class="ruta">Ajustes › Cambiar contraseña</span>.</p>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>¿Funciona sin internet?</summary>
+        <p>Podés abrir la app y ver lo último que se cargó en pantalla, pero para registrar pagos, cargar compromisos o ver datos nuevos necesitás conexión.</p>
+    </details>
+
+    <details class="pregunta" open>
+        <summary>¿Por qué la contraseña inicial es de números?</summary>
+        <p>Para que se escriba rápido con el teclado numérico del celular. Al tener al menos 10 dígitos sigue siendo segura. Después podés cambiarla por la que quieras (de 10 caracteres o más).</p>
+    </details>
+</section>
+
+<footer class="pie">
+    Agenda IC · Imperio Comercial · Instructivo actualizado en noviembre de 2026. Las capturas usan datos de prueba; los nombres, montos y cobradores son inventados.
+</footer>
+
+</main>
+</div>
 </body>
 </html>
