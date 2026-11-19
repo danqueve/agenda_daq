@@ -17,6 +17,7 @@ const CON_VERSION = [
     './assets/css/pantallas/ajustes.css',
     './assets/css/pantallas/pagos.css',
     './assets/css/pantallas/login.css',
+    './assets/css/tema-astryx.css',
     './assets/js/app.js',
     './assets/js/helpers.js',
     './assets/js/contactos.js',

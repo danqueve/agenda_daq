@@ -59,9 +59,16 @@ Producción: base `c2881399_credit`, usuario `c2881399_agendasas` (clave solo en
   cron); se muestra en las tarjetas de compromiso, el Calendario, Pagos › Agenda, «Registrar pago» y la ficha.
 
 ## Diseño
-La interfaz sigue el diseño pastel de `docs/diseno-pastel/` (referencias HTML exactas +
-`assets/css/components.css` y `assets/css/pantallas/*.css`). `docs/DESIGN.md` queda para voz,
-íconos y reglas generales.
+Tema **Astryx neutral, opción 1b «Cola y detalle»** (noviembre 2026): fondo gris claro, superficies blancas con
+borde suave, acción principal negra, estados en chips pastel, tipografía Figtree (local en `assets/vendor/fonts/`).
+Desde 1024 px la navegación es una barra superior; en el celular sigue la barra inferior.
+- Colores y radios: `assets/css/tokens.css`. Las reglas del tema van en `assets/css/tema-astryx.css`, que se carga
+  último y pisa a `components.css` y `pantallas/*.css` (que conservan la estructura del diseño pastel anterior de
+  `docs/diseno-pastel/`). Un cambio de estilo general va en el tema, no repartido en cada pantalla.
+- Hoy es «Cola y detalle» (`app/vistas/parciales/hoy_cola.php`, lógica en `assets/js/cobranza.js`): la cola de cobro
+  a la izquierda y el compromiso elegido (o el siguiente a cobrar) a la derecha; en el celular, «Cobrado hoy», el
+  siguiente a cobrar con «Pagó» grande y la cola debajo. Los recontactos quedan plegados abajo.
+`docs/DESIGN.md` queda para voz, íconos y reglas generales (su paleta es la anterior; la fuente de verdad es tokens.css).
 
 ## Restricción de hosting (importante)
 En el VPS de producción todos los dominios sirven el mismo public_html y no se puede
@@ -89,7 +96,7 @@ agenda_daq/
 │       ├── pantallas/   #     hoy, contactos, calendario, notas, pagos, ajustes
 │       ├── sheets/      #     una hoja por archivo: contacto, ficha, compromiso, pago_rapido, seguimiento…
 │       └── parciales/   #     piezas que se repiten: pago_acciones, tarjeta_pago, pago_sas, pagos_tabla…
-├── assets/css/          # tokens.css, base.css, components.css (genéricos) y pantallas/*.css
+├── assets/css/          # tokens.css, base.css, components.css (genéricos), pantallas/*.css y tema-astryx.css (último)
 │   └── pantallas/       #   uno por pantalla u hoja grande: hoy, contactos, calendario, ficha, contacto
 │                        #   (Nueva consulta), notas, ajustes, pagos (carga en ese orden, después de
 │                        #   components.css) y login
@@ -143,8 +150,8 @@ Hacer más visibles los compromisos de pago (Hoy como tablero de cobranza, Pagos
 registro más rápido, datos de SAS, orden del código). Plan por fases, una por vez:
 `docs/plans/2026-11-11-compromisos-visualizacion.md`. Leelo antes de tocar Hoy, Pagos o el Calendario.
 Hechas las Fases 1 a 5; sigue la Fase 6 (control visual, accesibilidad, tests, manual y deploy).
-Hoy es un tablero de cobranza (filtro Todos | Míos, totales, tira de 14 días y pagos agrupados por día) y los
-recontactos quedan como segundo plano. Para revisar la app con volumen, `sql/seed_demo.sql` (solo local).
+Hoy es «Cola y detalle» (filtro Todos | Míos, cumplimiento del mes, cola agrupada por día y detalle del compromiso)
+y los recontactos quedan plegados como segundo plano. Para revisar la app con volumen, `sql/seed_demo.sql` (solo local).
 
 ## Nota de desarrollo local
 Este repo se desarrolla en la carpeta `C:\wamp64\www\agenda` (no `agenda_daq`), reutilizando una

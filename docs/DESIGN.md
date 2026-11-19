@@ -1,5 +1,10 @@
 # Agenda IC — Sistema de diseño
 
+> **Noviembre 2026:** la app pasó al tema Astryx neutral (opción 1b «Cola y detalle»). Colores, radios y tipografía
+> (Figtree) están en `assets/css/tokens.css` y las reglas en `assets/css/tema-astryx.css`; ver «Diseño» en CLAUDE.md.
+> La paleta azul y Public Sans que se describen abajo quedan como historia; la voz, los textos y las reglas de
+> calidad siguen vigentes.
+
 ## Idea
 Se tiene que sentir como una app nativa de iOS (tipo Recordatorios / Contactos / Salud de Apple):
 fondos agrupados, listas "inset grouped", títulos grandes que se achican al hacer scroll,

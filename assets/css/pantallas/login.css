@@ -16,7 +16,7 @@
 .login__deco--4 { bottom: 9%; right: 9%; width: 190px; height: 120px; background: var(--pastel-red); border-color: var(--pastel-red-borde); transform: rotate(-6deg); }
 @media (max-width: 599px) { .login__deco { opacity: .6; transform: scale(.6); } }
 .login__marca { position: relative; display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
-.login__marca-icono { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--pastel-tint); border: 1px solid var(--pastel-tint-borde); color: var(--tint); }
+.login__marca-icono { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--tint); border: 1px solid var(--tint); color: var(--tint-contraste); }
 .login__card {
     position: relative; width: 100%; max-width: 380px; box-sizing: border-box;
     padding: 28px;

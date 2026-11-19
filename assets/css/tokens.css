@@ -1,67 +1,71 @@
 :root {
     color-scheme: light;
 
-    /* Color — modo claro (paleta tomada del tema de referencia Hando).
-       tint, red, orange, gray y avatares 1/6/8 están oscurecidos para cumplir
-       contraste AA con texto blanco (>=4.5:1; íconos >=3:1). En modo oscuro
-       se restauran los tonos originales, que ya contrastan sobre fondo oscuro. */
-    --bg-grouped: #F6F8FB;
+    /* Color — tema Astryx neutral (diseño 1b «Cola y detalle»). Fondo gris
+       claro, superficies blancas con borde suave, acción principal negra y
+       estados en chips pastel con texto oscuro. Los textos de estado
+       (*-texto) y los semánticos cumplen AA (>=4.5:1) sobre su fondo. */
+    --bg-grouped: #F1F1F1;
     --bg-card: #FFFFFF;
-    --bg-card-2: #F0F4F7;
-    --label: #2F384F;
-    --label-2: #4A5A6B;
-    --label-3: #8C98A4;
-    --separator: #DEE2E6;
-    --tint: #0A6CCC;
-    --tint-hover: #0960B5;
+    --bg-card-2: #EDEDED;
+    --label: #000000;
+    --label-2: #474747;
+    --label-3: #919191;
+    --separator: #E3E3E3;
+    --tint: #1B1B1B;
+    --tint-hover: #333333;
     --tint-contraste: #FFFFFF;
 
-    --red: #D12A5E;
-    --red-hover: #BA2453;
-    --orange: #C85F25;
-    --orange-hover: #B25421;
-    --green: #287F71;
-    --green-hover: #247266;
-    --gray: #6B7785;
-    --indigo: #522C8F;
-    --indigo-hover: #45256F;
+    --red: #B5232E;
+    --red-hover: #9E1E28;
+    --orange: #A54E00;
+    --orange-hover: #8E4300;
+    --green: #1B6F0A;
+    --green-hover: #155A07;
+    --gray: #6A6A6A;
+    --indigo: #0060BD;
+    --indigo-hover: #0053A3;
 
-    /* Pastel (tarjetas de estado en la pantalla Hoy). A propósito NO se
-       redefinen en los bloques de tema oscuro: son colores claros fijos
-       (quedan como chips pastel sobre fondo oscuro), no adaptados al tema. */
-    --pastel-tint: #E4F1FF;
-    --pastel-tint-borde: #C9E3FF;
-    --tint-texto: #0B63B8;
-    --pastel-red: #FDE8EF;
-    --pastel-red-borde: #F8CFDC;
-    --red-texto: #B3204F;
-    --pastel-orange: #FDEEE4;
-    --pastel-orange-borde: #F8D9C4;
-    --orange-texto: #A4501F;
-    --pastel-indigo: #EEE9F7;
-    --pastel-indigo-borde: #DCD2EE;
-    --indigo-texto: #522C8F;
-    --pastel-green: #E2F1EE;
-    --pastel-green-borde: #C4E2DC;
-    --green-texto: #1F6B5F;
-    --pastel-gray: #EEF1F4;
-    --pastel-gray-borde: #DDE2E8;
-    --pastel-label: #2F384F;
-    --pastel-label-2: #4A5A6B;
-    --halo-foco: rgba(16, 141, 255, .18);
+    /* Puntos de estado (solo decoración junto a una palabra, nunca texto). */
+    --punto-vencido: #C9303A;
+    --punto-hoy: #E97E1D;
+    --punto-proximo: #0074E2;
+    --punto-cobrado: #198100;
 
-    /* Paleta de avatares (8 tonos, tomados de la paleta de acento de Hando) */
-    --avatar-1: #0A6CCC;
-    --avatar-2: #522C8F;
-    --avatar-3: #963B68;
-    --avatar-4: #DB398A;
-    --avatar-5: #E7366B;
-    --avatar-6: #C85F25;
-    --avatar-7: #287F71;
-    --avatar-8: #12806A;
+    /* Pastel: fondos de chips y avisos de estado, con su texto oscuro. */
+    --pastel-tint: #EDEDED;
+    --pastel-tint-borde: #DCDCDC;
+    --tint-texto: #000000;
+    --pastel-red: #FFC4BE;
+    --pastel-red-borde: #FFADA5;
+    --red-texto: #76000C;
+    --pastel-orange: #FFC7A1;
+    --pastel-orange-borde: #FFB27F;
+    --orange-texto: #622700;
+    --pastel-indigo: #B9D7FF;
+    --pastel-indigo-borde: #9DC6FF;
+    --indigo-texto: #003978;
+    --pastel-green: #BCE0BB;
+    --pastel-green-borde: #A3D4A1;
+    --green-texto: #00490B;
+    --pastel-gray: #E2E2E2;
+    --pastel-gray-borde: #D4D4D4;
+    --pastel-label: #000000;
+    --pastel-label-2: #474747;
+    --halo-foco: rgba(27, 27, 27, .14);
 
-    /* Tipografía */
-    --font-sistema: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    /* Avatares pastel con iniciales oscuras (color de texto en .avatar). */
+    --avatar-1: #B9D7FF;
+    --avatar-2: #F7D5FF;
+    --avatar-3: #BCE0BB;
+    --avatar-4: #FFC7A1;
+    --avatar-5: #A9E2D6;
+    --avatar-6: #FAE19E;
+    --avatar-7: #FFC0D7;
+    --avatar-8: #E2E2E2;
+
+/* Tipografía */
+    --font-sistema: "Figtree", "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
     --fs-large-title: 28px;
     --lh-large-title: 34px;
@@ -93,20 +97,20 @@
 
     /* Layout */
     --margen-lateral: 24px;
-    --radio-grupo: 8px;
-    --radio-sheet: 8px;
-    --radio-chico: 4px;
+    --radio-grupo: 12px;
+    --radio-sheet: 12px;
+    --radio-chico: 10px;
     --celda-alto-min: 44px;
-    --sidebar-width: 260px;
+    --sidebar-width: 0px;
     /* La barra superior fija se sacó (ver nota en components.css); queda
        en 0 para que los calc() que todavía la restan sigan siendo válidos
        sin tener que tocar cada uno. */
-    --topbar-height: 0px;
+    --topbar-height: 0px; /* 56px desde 1024px: ver tema-astryx.css */
 
     /* Sombras (valores reales del tema de referencia) */
-    --sombra-sm: 0 2px 8px rgba(9, 30, 66, .06);
-    --sombra-md: 0 8px 16px rgba(9, 30, 66, .14);
-    --sombra-lg: 0 16px 48px rgba(9, 30, 66, .20);
+    --sombra-sm: 0 1px 2px rgba(0, 0, 0, .04);
+    --sombra-md: 0 2px 4px rgba(0, 0, 0, .05), 0 4px 8px rgba(0, 0, 0, .10);
+    --sombra-lg: 0 4px 6px rgba(0, 0, 0, .10), 0 12px 24px rgba(0, 0, 0, .15);
 
     /* Movimiento */
     --curva-ios: cubic-bezier(.32, .72, 0, 1);

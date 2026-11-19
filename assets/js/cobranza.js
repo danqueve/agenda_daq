@@ -5,6 +5,10 @@ function cobranzaModule() {
 
     return {
         hoyMios: false,
+        // Compromiso abierto en el detalle de Hoy (diseño «Cola y detalle»). null = el siguiente a cobrar.
+        pagoFocoId: null,
+        // Lugar en la cola del que se eligió: al cobrarlo sale de la cola y el detalle pasa al que quedó en ese lugar.
+        pagoFocoIndice: null,
 
         iniciarCobranza() {
             try {
@@ -17,6 +21,8 @@ function cobranzaModule() {
         elegirAlcanceHoy(mios) {
             if (this.hoyMios === mios) return;
             this.hoyMios = mios;
+            this.pagoFocoId = null;
+            this.pagoFocoIndice = null;
             try {
                 localStorage.setItem('agenda.hoy.mios', mios ? '1' : '0');
             } catch (error) {
@@ -83,6 +89,57 @@ function cobranzaModule() {
         verProximosEnPagos() {
             this.activo = 'pagos';
             this.filtrarPagos('proximos');
+        },
+
+        // ===== Cola y detalle (Hoy) =====
+        pagosEnCola() {
+            return this.gruposCobranza().flatMap((grupo) => grupo.items);
+        },
+
+        // El compromiso del detalle: el que se eligió en la cola mientras siga pendiente; si ya se registró, el que
+        // quedó en su lugar; si no se eligió ninguno, el siguiente a cobrar (el primer vencido o de hoy) o el primero.
+        pagoFoco() {
+            const pagos = this.pagosEnCola();
+            if (!pagos.length) return null;
+            const elegido = pagos.find((pago) => pago.id === this.pagoFocoId);
+            if (elegido) return elegido;
+            if (this.pagoFocoIndice !== null) return pagos[Math.min(this.pagoFocoIndice, pagos.length - 1)];
+            return pagos.find((pago) => pago.situacion === 'vencido' || pago.situacion === 'hoy') || pagos[0];
+        },
+
+        // «Siguiente» si el detalle lo eligió la app; «Elegido» si lo tocó quien mira.
+        pagoFocoElegido() {
+            return this.pagoFocoId !== null && this.pagoFoco()?.id === this.pagoFocoId;
+        },
+
+        esPagoFoco(pago) {
+            return this.pagoFoco()?.id === pago.id;
+        },
+
+        elegirPagoFoco(pago) {
+            this.pagoFocoId = pago.id;
+            this.pagoFocoIndice = this.pagosEnCola().findIndex((item) => item.id === pago.id);
+            this.refrescarIconos();
+            // En el celular el detalle está arriba de la cola: se sube para verlo.
+            if (window.matchMedia('(max-width: 1023px)').matches) {
+                this.$nextTick(() => document.querySelector('.cola-detalle')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+            }
+        },
+
+        // Cobrado de lo que vencía hoy, sobre lo que vencía hoy (cobrado + lo que falta), para la barra de Hoy.
+        progresoCobroHoy() {
+            const hoy = this.fechaIso(new Date());
+            const dia = (this.panel.cobranza?.dias || []).find((d) => d.iso === hoy);
+            const cobrado = Number(dia?.cobrado || 0);
+            const total = cobrado + Number(dia?.monto || 0);
+            return {
+                texto: `${this.formatoMonto(cobrado)} de ${this.formatoMonto(total)}`,
+                porcentaje: total > 0 ? Math.round((cobrado * 100) / total) : 0,
+            };
+        },
+
+        pagosEnColaTexto() {
+            return this.cantidadPagosTexto((this.panel.compromisos || []).length);
         },
     };
 }

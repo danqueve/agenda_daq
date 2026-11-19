@@ -40,6 +40,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
     <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/notas.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/ajustes.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset('assets/css/pantallas/pagos.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('assets/css/tema-astryx.css')) ?>">
 </head>
 <body>
     <div class="app-shell" x-data="appShell()" x-init="init()" :class="{'modo-contactos': activo === 'contactos'}">
@@ -84,8 +85,7 @@ $usuarioRol = usuario_actual_rol() ?? ROL_SUPERVISOR;
                 aria-label="Ir a Ajustes"
             >
                 <span
-                    class="avatar"
-                    style="background:var(--tint)"
+                    class="avatar avatar--oscuro"
                     x-text='iniciales(<?= json_encode($usuarioNombre, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS) ?>)'
                 ></span>
                 <span class="tabbar__perfil-nombre"><?= e($usuarioNombre) ?></span>

@@ -1,0 +1,271 @@
+/* =====================================================================
+   Tema Astryx · diseño 1b «Cola y detalle»
+   Se carga al final (después de pantallas/*.css): fondo gris claro,
+   superficies blancas con borde suave, acción principal negra, estados en
+   chips pastel y, desde 1024 px, barra de navegación arriba en vez de la
+   barra lateral. Los colores salen de tokens.css.
+   ===================================================================== */
+
+body { letter-spacing: 0; }
+
+/* ===== Barra superior (≥1024 px) · en el celular sigue la barra de abajo ===== */
+@media (min-width: 1024px) {
+    :root { --topbar-height: 56px; }
+
+    .tabbar {
+        position: fixed; top: 0; right: 0; bottom: auto; left: 0; z-index: 60;
+        flex-direction: row; align-items: center; gap: 24px;
+        width: auto; height: var(--topbar-height); min-height: 0;
+        padding: 0 20px;
+        background: var(--bg-card); border: 0; border-bottom: 1px solid var(--separator); box-shadow: none;
+    }
+    .tabbar__brand { display: flex; gap: 8px; padding: 0; font-size: var(--fs-body); font-weight: 700; letter-spacing: 0; }
+    .tabbar__brand-mark { width: 28px; height: 28px; border-radius: 6px; background: var(--tint); color: var(--tint-contraste); }
+    .tabbar__brand-mark svg { width: 16px; height: 16px; }
+    .tabbar__items { display: flex; flex-direction: row; gap: 2px; flex: 1; }
+    .tabbar__item {
+        flex: none; flex-direction: row; gap: 6px;
+        min-height: 36px; padding: 0 12px;
+        border-radius: var(--radio-chico);
+        color: var(--label); font-weight: 500;
+    }
+    .tabbar__item:hover { background: rgba(0, 0, 0, .05); }
+    .tabbar__item[aria-current="page"] { background: rgba(0, 0, 0, .06); color: var(--label); font-weight: 600; }
+    .tabbar__icon { display: none; }
+    .tabbar__label { font-size: var(--fs-body); }
+    .tabbar__badge { position: static; margin: 0; background: var(--pastel-red); color: var(--red-texto); font-size: 12px; line-height: 18px; height: 18px; min-width: 18px; border-radius: 9px; }
+    .tabbar__perfil { margin: 0; padding: 4px 10px 4px 4px; gap: 8px; border-radius: 9999px; background: transparent; }
+    .tabbar__perfil:hover { background: rgba(0, 0, 0, .05); }
+    .tabbar__perfil[aria-current="page"] { background: rgba(0, 0, 0, .06); box-shadow: none; }
+    .tabbar__perfil .avatar { width: 32px; height: 32px; }
+    .tabbar__perfil-nombre { font-size: var(--fs-body); font-weight: 500; }
+
+    .app-shell__content { margin-left: 0; padding-top: var(--topbar-height); min-height: 100dvh; }
+    .sheet-backdrop { padding-left: 0; padding-top: var(--topbar-height); }
+}
+
+/* Celular y tablet: barra inferior blanca, la pestaña activa en negro. */
+@media (max-width: 1023px) {
+    .tabbar { background: var(--bg-card); box-shadow: none; }
+    .tabbar__item { color: #6A6A6A; }
+    .tabbar__item[aria-current="page"] { color: var(--label); }
+    .tabbar__badge { background: var(--red); color: #fff; }
+}
+
+/* ===== Avatares pastel con iniciales oscuras ===== */
+.avatar { color: var(--label); font-weight: 600; }
+.avatar--oscuro { background: var(--tint); color: var(--tint-contraste); }
+
+/* ===== Cabecera de pantalla ===== */
+.navbar__large-title { font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: 0; }
+.navbar .subhead { font-size: var(--fs-footnote); }
+@media (max-width: 1023px) {
+    .navbar__large-title { font-size: 29px; line-height: 36px; }
+    .navbar .subhead { font-size: var(--fs-body); }
+}
+
+/* ===== Botones ===== */
+.workspace-create, .btn-principal, .empty-state__boton {
+    border-radius: var(--radio-chico); background: var(--tint); color: var(--tint-contraste);
+    font-size: var(--fs-body); font-weight: 500; box-shadow: none;
+}
+.workspace-create:hover, .btn-principal:hover, .empty-state__boton:hover { background: var(--tint-hover); }
+.btn-principal--danger { background: var(--red); }
+.btn-principal--danger:hover { background: var(--red-hover); }
+.workspace-search, .search-field--header, .search-field { border-radius: var(--radio-chico); border: 1px solid var(--separator); background: var(--bg-card); color: var(--label-2); }
+.search-field:focus-within { border-color: var(--tint); box-shadow: 0 0 0 3px var(--halo-foco); }
+.btn-texto { color: var(--label); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.btn-texto--peligro { color: var(--red); }
+.semana-card__ver, .disclosure { color: var(--label); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ===== Segmentado (Todos | Míos, vistas) ===== */
+.segmented { padding: 4px; gap: 2px; border: 0; border-radius: var(--radio-chico); background: rgba(0, 0, 0, .06); }
+.segmented__option { border-radius: 6px; color: var(--label); font-weight: 500; }
+.segmented__option[aria-selected="true"] { background: var(--bg-card); color: var(--label); font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+
+/* ===== Pills, filtros y etiquetas ===== */
+.pill, .filtro-pill, .tag { border-radius: var(--radio-chico); border-color: var(--separator); background: var(--bg-card); color: var(--label); }
+.pill[aria-selected="true"], .filtro-pill[aria-selected="true"], .filtro-pill[aria-pressed="true"] {
+    border-color: var(--tint); background: var(--tint); color: var(--tint-contraste); font-weight: 600;
+}
+.tag--selected { border-color: var(--tint); background: rgba(0, 0, 0, .06); color: var(--label); }
+
+/* ===== Grupos y tarjetas: superficies blancas, el estado va en el chip ===== */
+.group, .semana-card, .anillo-dia, .pagos-tabla-envoltorio { border: 1px solid var(--separator); border-radius: var(--radio-grupo); box-shadow: none; }
+.group__header { text-transform: none; letter-spacing: 0; font-size: var(--fs-footnote); font-weight: 600; color: var(--label-2); }
+
+.card-pastel,
+.card-pastel--vencido, .card-pastel--hoy, .card-pastel--proximo,
+.card-pastel--nuevo, .card-pastel--seguimiento, .card-pastel--concreto, .card-pastel--cerrado {
+    background: var(--bg-card); border-color: var(--separator); box-shadow: none; color: var(--label);
+}
+.card-pastel--seleccionada { border-color: var(--tint); box-shadow: 0 0 0 1px var(--tint); }
+.card-pastel__detalle, .card-pastel__fecha, .card-pastel__autor, .card-pastel__pie, .card-pastel__aviso { color: var(--label-2); }
+
+.chip-estado {
+    padding: 0 8px; border-radius: 6px;
+    font-size: var(--fs-footnote); line-height: 20px; font-weight: 500; letter-spacing: 0; text-transform: none;
+    background: var(--pastel-gray); color: var(--label);
+}
+.card-pastel--vencido .chip-estado, .card-pastel--vencido .chip-estado--estado,
+.pago-fila--vencido .chip-estado, .chip-estado--vencido { background: var(--pastel-red); color: var(--red-texto); }
+.card-pastel--hoy .chip-estado, .card-pastel--seguimiento .chip-estado--estado,
+.pago-fila--hoy .chip-estado, .chip-estado--hoy { background: var(--pastel-orange); color: var(--orange-texto); }
+.card-pastel--proximo .chip-estado, .card-pastel--nuevo .chip-estado--estado,
+.pago-fila--proximo .chip-estado, .chip-estado--proximo { background: var(--pastel-indigo); color: var(--indigo-texto); }
+.card-pastel--concreto .chip-estado--estado,
+.pago-fila--pagado .chip-estado, .pago-fila--parcial .chip-estado,
+.chip-estado--pagado, .chip-estado--parcial { background: var(--pastel-green); color: var(--green-texto); }
+.card-pastel--cerrado .chip-estado--estado,
+.pago-fila--incumplido .chip-estado, .pago-fila--reprogramado .chip-estado,
+.chip-estado--incumplido, .chip-estado--reprogramado { background: var(--pastel-gray); color: var(--label); }
+.card-pastel__tags .chip-estado:not(.chip-estado--estado) { background: var(--pastel-gray); color: var(--label); }
+
+/* Fila de Pagos › Agenda: blanca, con el chip de estado de color. */
+.pago-fila,
+.pago-fila--vencido, .pago-fila--hoy, .pago-fila--proximo, .pago-fila--pagado,
+.pago-fila--parcial, .pago-fila--incumplido, .pago-fila--reprogramado {
+    background: var(--bg-card); border-color: var(--separator); color: var(--label);
+}
+.pago-fila__detalle, .pago-fila__aviso { color: var(--label-2); }
+
+/* Tarjetas de totales: blancas con un punto de color junto al rótulo. */
+.stat-card,
+.stat-card--vencido, .stat-card--hoy, .stat-card--proximo, .stat-card--concreto {
+    gap: 2px; padding: 12px 14px;
+    background: var(--bg-card); border-color: var(--separator); color: var(--label);
+}
+.stat-card__cabecera { justify-content: flex-start; gap: 6px; }
+.stat-card__cabecera::before { content: ''; order: -1; width: 8px; height: 8px; border-radius: 50%; background: var(--gray); }
+.stat-card--vencido .stat-card__cabecera::before { background: var(--punto-vencido); }
+.stat-card--hoy .stat-card__cabecera::before { background: var(--punto-hoy); }
+.stat-card--proximo .stat-card__cabecera::before { background: var(--punto-proximo); }
+.stat-card--concreto .stat-card__cabecera::before { background: var(--punto-cobrado); }
+.stat-card__etiqueta,
+.stat-card--vencido .stat-card__etiqueta, .stat-card--hoy .stat-card__etiqueta,
+.stat-card--proximo .stat-card__etiqueta, .stat-card--concreto .stat-card__etiqueta {
+    color: var(--label-2); font-weight: 500; letter-spacing: 0; text-transform: none; font-size: var(--fs-footnote); line-height: 20px;
+}
+.stat-card__icono { display: none; }
+.stat-card__numero { font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: 0; }
+.stat-card__ayuda { color: var(--label-2); font-size: var(--fs-footnote); line-height: 20px; }
+.stat-card__cumplimiento .stat-card__ayuda strong { color: var(--label); }
+
+/* Barras finas de progreso (cumplimiento): pista gris, avance verde. */
+.pagos-barra-fina { background: #D4D4D4; }
+.pagos-barra-fina > span { background: var(--punto-cobrado); }
+
+/* ===== Botonera de un compromiso ===== */
+.pago-accion { border-radius: var(--radio-chico); background: rgba(0, 0, 0, .06); color: var(--label); font-weight: 500; }
+.pago-accion:hover { background: rgba(0, 0, 0, .1); }
+.pago-accion--pago { background: var(--tint); color: var(--tint-contraste); }
+.pago-accion--pago:hover { background: var(--tint-hover); }
+.pago-accion--pago svg { color: var(--tint-contraste); }
+.pago-accion--llamar svg { color: var(--label); }
+.pago-accion--whatsapp svg { color: #2F7D33; }
+.quick-action-card { border-radius: var(--radio-chico); background: rgba(0, 0, 0, .06); color: var(--label); font-weight: 500; }
+.quick-action-card--llamar svg { color: var(--label); }
+.quick-action-card--whatsapp svg { color: #2F7D33; }
+
+/* ===== SAS ===== */
+.chip-sas { border-radius: 6px; background: #E2E2E2; color: #1B1B1B; font-weight: 500; }
+.chip-sas--vencido { background: var(--pastel-red); color: var(--red-texto); }
+.chip-sas--aldia { background: var(--pastel-green); color: var(--green-texto); }
+.sas-sugerencia { border: 0; border-radius: var(--radio-grupo); background: var(--pastel-indigo); color: var(--indigo-texto); }
+.sas-sugerencia svg { color: var(--indigo-texto); }
+.sas-sugerencia__boton { border-radius: var(--radio-chico); background: var(--bg-card); color: var(--indigo-texto); }
+
+/* ===== Hojas (sheets) ===== */
+.sheet-backdrop { background: rgba(0, 0, 0, .35); }
+.sheet { border: 0; box-shadow: var(--sombra-lg); }
+.sheet__header { background: var(--bg-card); border-bottom: 1px solid var(--separator); color: var(--label); }
+.sheet__header .btn-texto { color: var(--label); text-decoration: none; }
+.form-cell:focus-within { box-shadow: inset 0 0 0 2px var(--tint); }
+.textarea-celeste:focus-within { border-color: var(--tint); box-shadow: 0 0 0 4px var(--halo-foco); }
+.error-inline { border-radius: var(--radio-grupo); background: var(--pastel-red); color: var(--red-texto); }
+
+/* ===== Interruptor, foco, HUD y aviso con acción ===== */
+.toggle[aria-checked="true"] { background: var(--tint); }
+:focus-visible { outline-color: var(--tint); }
+.hud svg { color: var(--punto-cobrado); }
+.toast-accion { border-radius: var(--radio-chico); background: var(--tint); }
+.toast-accion svg { color: var(--pastel-green); }
+
+.semana-dia--es-hoy { border-color: var(--tint); box-shadow: 0 0 0 1px var(--tint); }
+.semana-dia--es-hoy .semana-dia__num { color: var(--label); }
+
+/* Celular: si la cabecera no tiene un campo de texto (solo botones, como en
+   Hoy), los botones quedan redondos al lado del título, como en el diseño. */
+@media (max-width: 599px) {
+    .navbar__large-row:not(:has(input)) { flex-wrap: nowrap; align-items: flex-end; }
+    .navbar__large-row:not(:has(input)) .navbar__acciones { flex: none; gap: 8px; }
+    .navbar__large-row:not(:has(input)) :is(.workspace-search, .workspace-create) {
+        flex: none; width: var(--celda-alto-min); min-width: 0; height: var(--celda-alto-min); padding: 0;
+        border-radius: 9999px; border: 0;
+    }
+    .navbar__large-row:not(:has(input)) .workspace-search { background: rgba(0, 0, 0, .06); color: var(--label); }
+}
+@media (min-width: 1024px) {
+    .workspace-search, .search-field--header { width: 240px; min-height: 40px; }
+    .workspace-search--accion { width: auto; }
+    .workspace-create { min-height: 40px; }
+}
+
+/* Encabezados de grupo en tipo oración ("Aplicación", no "aplicación"). */
+.group__header::first-letter { text-transform: uppercase; }
+
+/* Compromisos en la ficha y en el panel del día: tarjeta blanca con una
+   franja de color a la izquierda y el chip de estado. */
+.compromiso-item,
+.compromiso-item--vencido, .compromiso-item--hoy, .compromiso-item--proximo, .compromiso-item--pagado,
+.compromiso-item--parcial, .compromiso-item--incumplido, .compromiso-item--reprogramado {
+    background: var(--bg-card); border-color: var(--separator); color: var(--label);
+    box-shadow: inset 3px 0 0 var(--gray);
+}
+.compromiso-item--vencido { box-shadow: inset 3px 0 0 var(--punto-vencido); }
+.compromiso-item--hoy { box-shadow: inset 3px 0 0 var(--punto-hoy); }
+.compromiso-item--proximo { box-shadow: inset 3px 0 0 var(--punto-proximo); }
+.compromiso-item--pagado, .compromiso-item--parcial { box-shadow: inset 3px 0 0 var(--punto-cobrado); }
+.compromiso-item--vencido .chip-estado { background: var(--pastel-red); color: var(--red-texto); }
+.compromiso-item--hoy .chip-estado { background: var(--pastel-orange); color: var(--orange-texto); }
+.compromiso-item--proximo .chip-estado { background: var(--pastel-indigo); color: var(--indigo-texto); }
+.compromiso-item--pagado .chip-estado, .compromiso-item--parcial .chip-estado { background: var(--pastel-green); color: var(--green-texto); }
+.compromiso-item .pago-accion { background: rgba(0, 0, 0, .06); }
+.compromiso-item .pago-accion--pago { background: var(--tint); }
+
+/* Calendario: el mapa de calor de lo que hay para cobrar va en azul (con
+   negro quedaba como días deshabilitados). */
+.calendario-dia--cobro-1, .calendario-leyenda__nivel--1 { background: color-mix(in srgb, var(--punto-proximo) 8%, var(--bg-card)); }
+.calendario-dia--cobro-2, .calendario-leyenda__nivel--2 { background: color-mix(in srgb, var(--punto-proximo) 14%, var(--bg-card)); }
+.calendario-dia--cobro-3, .calendario-leyenda__nivel--3 { background: color-mix(in srgb, var(--punto-proximo) 20%, var(--bg-card)); }
+.calendario-dia--cobro-4, .calendario-leyenda__nivel--4 { background: color-mix(in srgb, var(--punto-proximo) 27%, var(--bg-card)); }
+.calendario-dia--cobro-1::after, .calendario-dia--cobro-2::after, .calendario-dia--cobro-3::after, .calendario-dia--cobro-4::after,
+.calendario-leyenda__nivel::after { background: var(--punto-proximo); }
+.calendario-panel__resumen { background: var(--bg-card); border-color: var(--separator); }
+.calendario-panel__dia { color: var(--label-2); }
+
+/* Ajustes: tarjeta de perfil blanca. */
+.perfil-card { background: var(--bg-card); border-color: var(--separator); }
+
+/* Encabezados de grupo dentro de hojas y pantallas: texto sobre el fondo, sin franja blanca. */
+.sheet .group__header, .screen__body .group__header { background: transparent; padding-left: 4px; padding-right: 4px; }
+
+/* Ficha del contacto: identidad en blanco; el estado lo dice el chip. */
+.contact-detail__identidad,
+.contact-detail__identidad--nuevo, .contact-detail__identidad--seguimiento,
+.contact-detail__identidad--concreto, .contact-detail__identidad--cerrado {
+    background: var(--bg-card); border-color: var(--separator);
+}
+.contact-detail__identidad .chip-estado { background: var(--pastel-gray); color: var(--label); }
+.contact-detail__identidad--nuevo .chip-estado { background: var(--pastel-indigo); color: var(--indigo-texto); }
+.contact-detail__identidad--seguimiento .chip-estado { background: var(--pastel-orange); color: var(--orange-texto); }
+.contact-detail__identidad--concreto .chip-estado { background: var(--pastel-green); color: var(--green-texto); }
+.contact-detail__identidad .action-buttons > * { background: rgba(0, 0, 0, .06); }
+
+/* En el celular el detalle de Hoy queda debajo de la cabecera fija al subir a verlo. */
+@media (max-width: 1023px) { .cola-detalle { scroll-margin-top: 112px; } }
+.contact-detail__badge { padding: 0 8px; border-radius: 6px; font-weight: 500; line-height: 20px; letter-spacing: 0; text-transform: none; background: var(--pastel-gray); color: var(--label); }
+.contact-detail__identidad--nuevo .contact-detail__badge { background: var(--pastel-indigo); color: var(--indigo-texto); }
+.contact-detail__identidad--seguimiento .contact-detail__badge { background: var(--pastel-orange); color: var(--orange-texto); }
+.contact-detail__identidad--concreto .contact-detail__badge { background: var(--pastel-green); color: var(--green-texto); }
+.contact-detail__identidad--cerrado .contact-detail__badge { background: var(--pastel-gray); color: var(--label); }
